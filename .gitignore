@@ -11,3 +11,5 @@ ready.txt
 record.bin
 
 *.exe
+
+/.idea
