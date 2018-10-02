@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8719a17ebc2a3ba652f140ae7006bf14b8cb7cd27a0ed1c8bae7020b6543bf81"
+            "sha256": "2a3e6868c2c0c99c8859db3fdf5617f2a1222850571a718bf83d77a8614cbb1a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -101,6 +101,14 @@
             ],
             "index": "pypi",
             "version": "==1.9.4"
+        },
+        "pyserial": {
+            "hashes": [
+                "sha256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
+                "sha256:e0770fadba80c31013896c7e6ef703f72e7834965954a78e71a3049488d4d7d8"
+            ],
+            "index": "pypi",
+            "version": "==3.4"
         },
         "python-chess": {
             "hashes": [
