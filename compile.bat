@@ -1,3 +1,6 @@
+rmdir /s dist
+rmdir /s build
+
 pyinstaller -y run.py
 pyinstaller -y usbtool.py
 pyinstaller -y move.py
