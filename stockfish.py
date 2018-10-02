@@ -1,6 +1,5 @@
 import cPickle as pickle
 import os  # , Queue
-import subprocess
 import time
 
 from pystockfish import *
