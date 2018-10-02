@@ -1,5 +1,5 @@
-rmdir /s dist
-rmdir /s build
+rmdir /s /q dist
+rmdir /s /q build
 
 pyinstaller -y run.py
 pyinstaller -y usbtool.py
