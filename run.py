@@ -1,6 +1,8 @@
+import sys
+
 DEBUG = False
 
-TO_EXE = not __file__.endswith('.py')
+TO_EXE = getattr(sys, 'frozen', False)
 
 XRESOLUTION = 1920
 
@@ -15,7 +17,7 @@ import pickle
 import pygame
 import stockfish
 import subprocess
-import sys
+
 
 import codes
 from Chessnut import Game
