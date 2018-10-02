@@ -1,0 +1,69 @@
+To compile PC chess software from sources:
+
+
+
+1. Install all needed software and prepare folders:
+
+Install Inno Setup Compiler 5.5.9 (for final setup package)
+
+Install python 2.7 from official site, then install pygame,
+ Then install setup-tools package, in order to use commands
+easy_install and pip packages, full instruction here:
+
+http://blog.troygrosfield.com/2010/12/18/installing-easy_install-and-pip-for-python/
+
+
+
+Then install pygame, pyinstaller, py2exe by commands:
+
+pip install pygame
+pip install pystockfish
+pip install pyinstaller
+pip install py2exe
+
+( more info about pyinstaller here: http://pyinstaller.readthedocs.io/en/stable/installation.html )
+
+
+
+
+Next, extract chess.zip to c:\chess folder and chess_distr.zip to c:\chess_distr.
+
+
+Open c:\chess\run.py and check value:
+TO_EXE = True
+It means that main software will launch move.exe and usb.exe files, not Python scripts
+It have to be TO_EXE = False for debugging if you run Python scripts directly.
+
+
+
+2. Compilation.
+
+
+cd c:\chess
+pyinstaller --icon=c:\chess\certabo.ico run.py
+
+Then copy c:\chess\dist\run\run.exe to c:\chess_distr
+
+
+if you made changes in usb.py file, also do:
+
+python 1.py py2exe
+
+Then copy c:\chess\dist\usb.exe to c:\chess_distr
+
+
+if you made changes in move.py file, also do:
+
+pyinstaller move.py
+
+Then copy c:\chess\dist\move\move.exe to c:\chess_distr
+
+
+3. Executing:
+
+cd c:\chess_distr
+run.exe
+
+4. To make setup package, launch Inno Setup Compiler and open file c:\chess\for_inno_setup\inno_script.iss
+then select Build>Compile in Menu or press Ctrl+F9. The resulting file will appear in folder c:\tmp 
+

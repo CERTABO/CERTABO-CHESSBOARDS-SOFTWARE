@@ -1,0 +1,29 @@
+License Agreement
+
+You should read the following terms and conditions carefully before using this software. Your use of this software indicates your full acceptance of this license agreement and warranty.
+
+1. Using of Trial Version
+
+You are granted a non-exclusive license to use this software program (hereinafter referred to as the "SOFTWARE") solely for evaluation purposes for maximum of 30 calendar days, after which you must either register this "SOFTWARE" or remove it from your computer. You may freely redistribute the trial version of the "SOFTWARE" with the following exceptions:
+
+The original package supplied by ToyCatSoft is not modified. You may not alter, delete or add any files in the distribution archive.
+
+The limited evaluation nature of the Trial Version software is not misrepresented.
+
+No money is charged to the person receiving the software without written permission from the copyright holder. 
+
+2. Using of Registered Version
+
+Each licensed copy of the "SOFTWARE" may be used by a single person on a single workstation. The registered "SOFTWARE" may not be rented, leased or lend to any other person, nor transferred or sub-licensed. The "SOFTWARE" is licensed, not sold, to you! In case Site License purchased you may use the "SOFTWARE" on unlimited amount of workstations and by unlimited amount of developers inside your company.
+
+3. Copyright and Ownership
+
+The "SOFTWARE" is copyrighted and owned by ToyCatSoft. You acknowledge that the title, ownership rights, and intellectual property rights in and to the "SOFTWARE" shall remain in exclusive property of ToyCatSoft.
+
+4. Software Protection
+
+You shall not decompile, reverse engineer, disassemble or otherwise reduce any part of this "SOFTWARE" to human readable form nor permit any third party to do so. You shall not, nor permit any third party to copy, make error corrections to or otherwise modify, adapt or translate the "SOFTWARE" nor create derivative works of the "SOFTWARE".
+
+5. Disclaimer
+
+The "SOFTWARE" and the accompanying files are provided "AS IS" without warranty of any kind. ToyCatSoft is not responsible for any damage whatsoever, including loss of information, interruption of business, personal injury and/or any damage or consequential damage without limitation, incurred before, during or after the use of the "SOFTWARE".
