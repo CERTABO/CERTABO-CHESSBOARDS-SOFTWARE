@@ -11,6 +11,8 @@ ready.txt
 record.bin
 
 *.exe
+*.spec
 
 /.idea
+/build
 /dist

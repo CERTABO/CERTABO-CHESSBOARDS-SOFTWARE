@@ -75,9 +75,9 @@ lightgrey = 190, 190, 190
 lightestgrey = 230, 230, 230
 
 if TO_EXE:
-    usb_proc = subprocess.Popen("usb.exe", shell=True)
+    usb_proc = subprocess.Popen("usbtool.exe", shell=True)
 else:
-    usb_proc = subprocess.Popen("python usb.py", shell=True)
+    usb_proc = subprocess.Popen("python usbtool.py", shell=True)
 
 tt.sleep(1)  # time to make stable COMx connection
 

@@ -9,7 +9,7 @@ import time
 from select import *
 from socket import *
 
-print("--- usb.py started ---")
+print("--- usbtool started ---")
 
 import serial.tools.list_ports
 
@@ -54,7 +54,7 @@ if not uart_ok:
 # erase RS buf
 if uart_ok: uart.flushInput()
 
-print("Started usb.py. waiting for new messages")
+print("Started usbtool. waiting for new messages")
 
 timeout_RS = datetime.datetime.now()
 counter=0

@@ -1,14 +1,11 @@
 pyinstaller -y run.py
-copy usb.py usb2.py
-pyinstaller -y usb2.py
-del usb2.py
+pyinstaller -y usbtool.py
 pyinstaller -y move.py
 
 mkdir dist\result
 
 xcopy /s /e /h /y dist\run dist\result
-xcopy /s /e /h /y dist\usb2 dist\result\
-move dist\result\usb2.exe dist\result\usb.exe
+xcopy /s /e /h /y dist\usbtool dist\result\
 xcopy /s /e /h /y dist\move dist\result\
 
 copy stockfish.exe dist\result\
