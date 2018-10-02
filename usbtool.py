@@ -128,11 +128,13 @@ while 1:
                 if got_byte and c=="\n":
                     uart.flushInput()
                     k+=1
-                    if DEBUG: print k,
+                    if DEBUG:
+                        print(k,)
                     #print counter
                     message = message[1:len(message)-2]
                     #print [message]
-                    if DEBUG: print len(message.split(" ")),"numbers"
+                    if DEBUG:
+                        print(len(message.split(" ")), "numbers")
                     if len(message.split(" "))==320: # 64*5
                         try:
     #                        KUDA_POSYLAT = ('127.0.0.1', 3003) # send to
