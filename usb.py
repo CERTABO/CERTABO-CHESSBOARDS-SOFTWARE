@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 DEBUG = False
 
 # for exe compile run python 1.py py2exe
@@ -7,17 +9,17 @@ import time
 from select import *
 from socket import *
 
-print "--- usb.py started ---"
+print("--- usb.py started ---")
 
 import serial.tools.list_ports
 
 
 ports = list(serial.tools.list_ports.comports())
 for p in ports:
-    print p
+    print(p)
     
 s = str(ports[0]).split(' ')[0]
-ports = s,''
+ports = s, ''
 #ports = ['COM%s' % (i + 1) for i in range(256)]
 
 #result = []
@@ -29,7 +31,7 @@ ports = s,''
 #    except:
 #        pass
 #ports = result
-print ports
+print(ports)
 
 
 uart_ok=False
@@ -37,14 +39,14 @@ try:
     uart = serial.Serial(ports[0], 38400, timeout=2.5) # 0-COM1, 1-COM2 / speed / 
     uart_ok=True
 except:
-    print "can't open Serial port"
+    print("can't open Serial port")
 
 if not uart_ok:
     try:
         uart = serial.Serial(ports[0], 38400, timeout=2.5) # 0-COM1, 1-COM2 / speed / 
         uart_ok=True
     except:
-        print "can't open Serial"
+        print("can't open Serial")
 
 #time.sleep(3) # without it, .write not work
 
@@ -52,7 +54,7 @@ if not uart_ok:
 # erase RS buf
 if uart_ok: uart.flushInput()
 
-print "Started usb.py. waiting for new messages"
+print("Started usb.py. waiting for new messages")
 
 timeout_RS = datetime.datetime.now()
 counter=0
@@ -77,17 +79,18 @@ while 1:
     if recv_ready:
         try:
             data, addr = sock.recvfrom( 2048 )
-            if DEBUG: print "sending to usb data with length =",len(data)
+            if DEBUG:
+                print("sending to usb data with length =", len(data))
             uart.write( data )
         except:
-            print "chess main part not running"
+            print("chess main part not running")
 
     if not uart_ok:
         try:
             uart = serial.Serial(ports[0], 38400, timeout=2.5) # 0-COM1, 1-COM2 / speed / 
             uart_ok=True
         except:
-            print "can't open Serial at ", ports[0]
+            print("can't open Serial at ", ports[0])
 
     time.sleep(0.001)
     t = datetime.datetime.now()
@@ -106,7 +109,7 @@ while 1:
         try:
             to_read = uart.inWaiting()
         except:
-            print "uart.inWaiting failed"
+            print("uart.inWaiting failed")
             
         if to_read>0:
             #print counter       	
@@ -118,7 +121,7 @@ while 1:
                     counter+=1
                     got_byte = True
                 except:
-                    print "Cannot do uart.read()"
+                    print("Cannot do uart.read()")
                     uart_ok =  False
                     got_byte = False
 
@@ -140,7 +143,7 @@ while 1:
                             sock.sendto( message, KUDA_POSYLAT )
     #                        sock.close()
                         except:
-                            print "can't send UDP"
+                            print("can't send UDP")
                     counter = 0
                     message = ""
                 else:
