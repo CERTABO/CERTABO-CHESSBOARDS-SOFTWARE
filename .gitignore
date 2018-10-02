@@ -1,0 +1,13 @@
+*.sav
+
+/sprites*/
+/stockfish_all/
+
+
+calibration.bin
+bestmove.p
+move_history_tmp.p
+ready.txt
+record.bin
+
+*.exe
