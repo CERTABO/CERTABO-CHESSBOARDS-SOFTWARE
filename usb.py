@@ -2,10 +2,10 @@ DEBUG = False
 
 # for exe compile run python 1.py py2exe
 
-import time, datetime, os, serial, sys, UserList, UserString, commands
-from string import *
+import datetime
+import time
+from select import *
 from socket import *
-from select import * 
 
 print "--- usb.py started ---"
 
