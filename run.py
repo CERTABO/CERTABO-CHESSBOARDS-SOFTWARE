@@ -1,5 +1,7 @@
 DEBUG = False
-TO_EXE = True
+
+TO_EXE = not __file__.endswith('.py')
+
 XRESOLUTION = 1920
 
 import struct, pygame, sys,  os, stockfish, pickle, subprocess
