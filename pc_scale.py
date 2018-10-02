@@ -1,3 +1,4 @@
+from __future__ import print_function
 import PIL  # pip install pillow
 from PIL import Image
 
@@ -14,7 +15,7 @@ def resize(filename):
     w2 = int(float(img.size[0]) * kx2)
     h2 = int(float(img.size[1]) * ky2)
 
-    print filename, img.size[0], w1, w2
+    print(filename, img.size[0], w1, w2)
     img.close()
 
     img = Image.open('big_pngs//' + filename)  # pics for 480x320
@@ -36,7 +37,7 @@ names = ("black_bishop", "black_king", "black_knight", "black_pawn", "black_quee
          "please-wait", "check-mate-banner")
 
 sprite = {}
-print len(names)
+print(len(names))
 for name in names:
     filename = name + '.png'
     img = Image.open('big_pngs//' + filename)

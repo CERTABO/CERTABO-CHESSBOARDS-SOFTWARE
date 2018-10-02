@@ -1,3 +1,4 @@
+from __future__ import print_function
 import pickle
 
 # data conversion
@@ -18,7 +19,7 @@ def compare_cells(x, y):
 
 def load_calibration():
     global p, r, n, b, k, q, P, R, N, B, K, Q
-    print "codes.py - loading calibration"
+    print("codes.py - loading calibration")
     p, r, n, b, k, q, P, R, N, B, K, Q = pickle.load( open( "calibration.bin", "rb" ) )
 
 
@@ -29,10 +30,10 @@ def statistic_processing_for_calibration( samples, show_print ):
     for n_cell in range(64):
         cells = []
 #        if show_print: print "\n    cell n =",n_cell,letter[n_cell%8]+str(8-n_cell/8), "   samples:"
-        if show_print: print "\n    ",letter[n_cell%8]+str(8-n_cell/8), "   samples:"
+        if show_print: print("\n    ",letter[n_cell%8]+str(8-n_cell/8), "   samples:")
         for usb_data in samples:
             cells.append( cell_codes( n_cell, usb_data ) )
-            if show_print: print cell_codes( n_cell, usb_data )
+            if show_print: print(cell_codes( n_cell, usb_data ))
         histograms = []
         for cell in cells:
             histogram = 0
@@ -45,11 +46,11 @@ def statistic_processing_for_calibration( samples, show_print ):
         max_index = histograms.index( max_value )
 
         # append cells[max_index] to result
-        if show_print: print "---final code:",
+        if show_print: print("---final code:", end=' ')
         for i in cells[max_index]:
-            if show_print: print i,
+            if show_print: print(i, end=' ')
             result.append( i )
-        if show_print: print
+        if show_print: print()
 
     return result
 
@@ -105,10 +106,10 @@ def statistic_processing( samples, show_print ):
     for n_cell in range(64):
         cells = []
 #        if show_print: print "\n    cell n =",n_cell,letter[n_cell%8]+str(8-n_cell/8), "   samples:"
-        if show_print: print "\n    ",letter[n_cell%8]+str(8-n_cell/8), "   samples:"
+        if show_print: print("\n    ",letter[n_cell%8]+str(8-n_cell/8), "   samples:")
         for usb_data in samples:
             cells.append( cell_codes( n_cell, usb_data ) )
-            if show_print: print cell_codes( n_cell, usb_data )
+            if show_print: print(cell_codes( n_cell, usb_data ))
         histograms = []
 
         known_cells = []
@@ -119,9 +120,9 @@ def statistic_processing( samples, show_print ):
                 known_cells.append( cell )
 
         if len(known_cells)==0:
-            print "Found only unknown cell codes in cell ",letter[n_cell%8]+str(8-n_cell/8),":"
+            print("Found only unknown cell codes in cell ",letter[n_cell%8]+str(8-n_cell/8),":")
             for cell in cells: # stack of history of cell codes for one cell
-                print cell
+                print(cell)
 
             found_unknown_cell=True
             break
@@ -138,11 +139,11 @@ def statistic_processing( samples, show_print ):
         max_index = histograms.index( max_value )
 
         # append cells[max_index] to result
-        if show_print: print "---final code:",
+        if show_print: print("---final code:", end=' ')
         for i in known_cells[max_index]:
-            if show_print: print i,
+            if show_print: print(i, end=' ')
             result.append( i )
-        if show_print: print
+        if show_print: print()
 
     if found_unknown_cell:
         return []
@@ -214,13 +215,13 @@ def calibration( usb_data, new_setup ):
                     previous_not_in_current = False
                     break
             if previous_not_in_current:
-                print "previous not in current"
+                print("previous not in current")
                 pnew.append( previous )
             else:
-                print "previous in current"
+                print("previous in current")
         return pnew
 
-    print "Q before =",Qn
+    print("Q before =",Qn)
                 
     pn = add_new( pn, p, pp)
     rn = add_new( rn, r, rp)
@@ -234,16 +235,16 @@ def calibration( usb_data, new_setup ):
     Bn = add_new( Bn, B, Bp)
     Kn = add_new( Kn, K, Kp)
     Qn = add_new( Qn, Q, Qp)
-    print "Q after =",Qn
+    print("Q after =",Qn)
 
     #compare_cells( cell, cell_p )
     if not new_setup:
-        print "------- not new setup ----"
+        print("------- not new setup ----")
         results = pn, rn, nn, bn, kn, qn, Pn, Rn, Nn, Bn, Kn, Qn
         p, r, n, b, k, q, P, R, N, B, K, Q = pn, rn, nn, bn, kn, qn, Pn, Rn, Nn, Bn, Kn, Qn
     pickle.dump( results, open( "calibration.bin", "wb" ) )
 
-    print "----------------"
+    print("----------------")
     #print r
 #    print compare_cells(p[0], p[1]) 
 
@@ -253,45 +254,45 @@ def calibration( usb_data, new_setup ):
             #print cell
             #print empty_cell
             if cell_empty( cell ):
-                print "-",
+                print("-", end=' ')
             else: # not empty
                 for cell_p in p:
                     if compare_cells( cell, cell_p ):
-                        print "p",
+                        print("p", end=' ')
                 for cell_p in P:
                     if compare_cells( cell, cell_p ):
-                        print "P",
+                        print("P", end=' ')
                 for cell_p in r:
                     if compare_cells( cell, cell_p ):
-                        print "r",
+                        print("r", end=' ')
                 for cell_p in R:
                     if compare_cells( cell, cell_p ):
-                        print "R",
+                        print("R", end=' ')
                 for cell_p in n:
                     if compare_cells( cell, cell_p ):
-                        print "n",
+                        print("n", end=' ')
                 for cell_p in N:
                     if compare_cells( cell, cell_p ):
-                        print "N",
+                        print("N", end=' ')
                 for cell_p in b:
                     if compare_cells( cell, cell_p ):
-                        print "b",
+                        print("b", end=' ')
                 for cell_p in B:
                     if compare_cells( cell, cell_p ):
-                        print "B",
+                        print("B", end=' ')
                 for cell_p in q:
                     if compare_cells( cell, cell_p ):
-                        print "q",
+                        print("q", end=' ')
                 for cell_p in Q:
                     if compare_cells( cell, cell_p ):
-                        print "Q",
+                        print("Q", end=' ')
                 for cell_p in k:
                     if compare_cells( cell, cell_p ):
-                        print "k",
+                        print("k", end=' ')
                 for cell_p in K:
                     if compare_cells( cell, cell_p ):
-                        print "K",
-        print
+                        print("K", end=' ')
+        print()
         
 letter = "a","b","c","d","e","f","g","h"
 
@@ -366,7 +367,7 @@ def usb_data_to_FEN( usb_data ):
                     s+=c
                 if c == "unknown":
 #                    print "Unknown piece at cell n =",j*8+i, ", ",letter[i]+str(8-j)
-                    print "Unknown piece at ",letter[i]+str(8-j)
+                    print("Unknown piece at ",letter[i]+str(8-j))
                     was_unknown_piece = True
         if empty_cells_counter>0 and c=="-":
             s += str(empty_cells_counter)
@@ -423,8 +424,8 @@ def FEN2board( FEN_string, play_white ):
 
 
 def FENs2move( FEN_prev, FEN, play_white ):
-    print "---------------------- FENs2move() --------------------"
-    print "FEN_prev=",FEN_prev,"FEN=",FEN
+    print("---------------------- FENs2move() --------------------")
+    print("FEN_prev=",FEN_prev,"FEN=",FEN)
 
     board_prev = FEN2board( FEN_prev, play_white )
     board = FEN2board( FEN, play_white )
@@ -469,9 +470,9 @@ def FENs2move( FEN_prev, FEN, play_white ):
         row = '2'
 
     if pawn in p_from:
-        print "Movement",pawn
+        print("Movement",pawn)
         if row in p_from[pawn]:
-            print "Found conversion !"
+            print("Found conversion !")
             for key in p_to:
                 if key!=pawn:
                     move = p_from[pawn] + p_to[key] + key
@@ -490,7 +491,7 @@ def FENs2move( FEN_prev, FEN, play_white ):
             if key in p_to:
                 move = p_from[key]+p_to[key]
 
-    print "------------ move found:",move,"---------------"
+    print("------------ move found:",move,"---------------")
     return move    
 
 

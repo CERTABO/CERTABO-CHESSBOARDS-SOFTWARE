@@ -1,3 +1,4 @@
+from __future__ import print_function
 import cPickle as pickle
 import os  # , Queue
 import time
@@ -91,7 +92,7 @@ def start_thinking_about_bestmove(move_history, difficulty):
     else:
         command = "python move.py"
     proc = subprocess.Popen(command, shell=True)
-    print "proc.pid = ", proc.pid
+    print("proc.pid = ", proc.pid)
     return proc
 
 
