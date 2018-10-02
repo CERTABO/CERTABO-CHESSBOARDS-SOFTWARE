@@ -565,6 +565,17 @@ while 1:
                     f.close()
                     if move_history:
                         game = chess.pgn.Game()
+                        game.headers['Date'] = datetime.now().strftime('%Y.%m.%d')
+                        if play_white:
+                            game.headers['White'] = 'Human'
+                            game.headers['Black'] = 'Computer'
+                        else:
+                            game.headers['White'] = 'Computer'
+                            game.headers['Black'] = 'Human'
+                        if mate_we_lost:
+                            game.headers['Result'] = '0-1' if play_white else '1-0'
+                        if mate_we_won:
+                            game.headers['Result'] = '1-0' if play_white else '0-1'
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
