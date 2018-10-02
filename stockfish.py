@@ -1,9 +1,13 @@
-from pystockfish import *
-import threading, subprocess, time, os #, Queue
 import cPickle as pickle
-TO_EXE = True    
+import os  # , Queue
+import subprocess
+import time
 
-#import multiprocessing
+from pystockfish import *
+
+TO_EXE = True
+
+# import multiprocessing
 
 # Contempt Integer, Default: 0, Min: -100, Max: 100
 # Roughly equivalent to "optimism." Positive values of contempt favor more "risky" play, 
@@ -21,9 +25,9 @@ TO_EXE = True
 # Ponder Boolean, Default: True
 # Whether or not the engine should analyze when it is the opponent's turn.
 
-#MultiPV Integer, Default: 1, Min: 1, Max: 500
-#The number of alternate lines of analysis to display. Specify 1 to just get the best line. 
-#Asking for more lines slows down the search.
+# MultiPV Integer, Default: 1, Min: 1, Max: 500
+# The number of alternate lines of analysis to display. Specify 1 to just get the best line.
+# Asking for more lines slows down the search.
 
 # ?? Move Overhead Integer, Default: 30, Min: 0, Max:5000
 
@@ -33,71 +37,72 @@ TO_EXE = True
 # ?? Slow Mover Integer, Default: 70, Min: 10, Max: 1000
 
 params = {
-        "Contempt Factor": 0,
-        "Min Split Depth": 0,
-        "Threads": 2,
-        "Hash": 128,
-        "MultiPV": 1,
-        "Skill Level": 20,
-        "Move Overhead": 30,
-        "Minimum Thinking Time": 20, 
-        "Slow Mover": 80
-}  
+    "Contempt Factor": 0,
+    "Min Split Depth": 0,
+    "Threads": 2,
+    "Hash": 128,
+    "MultiPV": 1,
+    "Skill Level": 20,
+    "Move Overhead": 30,
+    "Minimum Thinking Time": 20,
+    "Slow Mover": 80
+}
 game = ""
 small_game = ""
 
-def ini( difficulty ):
+
+def ini(difficulty):
     global small_game
-#    game = Engine(depth=difficulty, param=params)
-#    small_game = Engine(depth=0, param=params)
+    #    game = Engine(depth=difficulty, param=params)
+    #    small_game = Engine(depth=0, param=params)
     small_game = Engine(depth=0)
-    #game = Engine(depth=0)
+    # game = Engine(depth=0)
     return game
+
 
 #    game_engine.setposition( move_history )
 #    ai_move = game_engine.bestmove()['move'
 
 proc = None
 q = 0
-best_move =""
+best_move = ""
 
 
-
-def get_move( q, move_history, difficulty ):
+def get_move(q, move_history, difficulty):
     global game, best_move
-#    game = Engine(depth=difficulty, param=params)
+    #    game = Engine(depth=difficulty, param=params)
     game = Engine(depth=difficulty)
-    game.setposition( move_history )
+    game.setposition(move_history)
     best_move = game.bestmove()
-    #q.put( game.bestmove() ) 
+    # q.put( game.bestmove() )
 
 
-    
-def start_thinking_about_bestmove( move_history, difficulty ):
+def start_thinking_about_bestmove(move_history, difficulty):
     global proc
-    f = open( "move_history_tmp.p", "wb" )
-    pickle.dump( (move_history, difficulty), f )
+    f = open("move_history_tmp.p", "wb")
+    pickle.dump((move_history, difficulty), f)
     f.flush()
     os.fsync(f)
-    
+
     f.close()
     time.sleep(0.1)
-    
-    if TO_EXE: command = "move.exe"
-    else: command = "python move.py"
-    proc = subprocess.Popen(command, shell=True) 
-    print "proc.pid = ",proc.pid
+
+    if TO_EXE:
+        command = "move.exe"
+    else:
+        command = "python move.py"
+    proc = subprocess.Popen(command, shell=True)
+    print "proc.pid = ", proc.pid
     return proc
 
-    
-    
-    
+
 def get_result_of_thinking():
-    #time.sleep(0.1)
-    f = open( "bestmove.p", "rb" )
-    best_move = pickle.load( f )
+    # time.sleep(0.1)
+    f = open("bestmove.p", "rb")
+    best_move = pickle.load(f)
     f.close()
     return best_move['move']
+
 
 # get move value if Force move pressed
 def get_fast_result(move_history):
@@ -105,41 +110,7 @@ def get_fast_result(move_history):
 
     # kill long process
     subprocess.call(['taskkill', '/F', '/T', '/PID', str(proc.pid)])
-#time.sleep(0.1)
-    
-    small_game.setposition( move_history )
+    # time.sleep(0.1)
+
+    small_game.setposition(move_history)
     return small_game.bestmove()['move']
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
