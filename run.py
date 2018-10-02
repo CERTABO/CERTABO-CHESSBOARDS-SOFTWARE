@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 
 DEBUG = False
@@ -47,12 +48,12 @@ def do_poweroff(proc):
 f = open('screen.ini', 'rb')
 try:
     XRESOLUTION = int(f.readline().split(" #")[0])
-    print XRESOLUTION
+    print(XRESOLUTION)
     if XRESOLUTION == 1380: XRESOLUTION = 1366
 except:
-    print "Cannot read resolution from screen.ini"
+    print("Cannot read resolution from screen.ini")
 if XRESOLUTION != 480 and XRESOLUTION != 1366 and XRESOLUTION != 1920:
-    print "Wrong value xscreensize.ini =", XRESOLUTION, ", setting 1366"
+    print("Wrong value xscreensize.ini =", XRESOLUTION, ", setting 1366")
     XRESOLUTION = 1366
 try:
     s = f.readline().split(" #")[0]
@@ -62,7 +63,7 @@ try:
         fullscreen = False
 except:
     fullscreen = False
-    print "Cannot read 'fullscreen' or 'window' as second line from screen.ini"
+    print("Cannot read 'fullscreen' or 'window' as second line from screen.ini")
 f.close()
 
 # define set of colors
@@ -89,8 +90,8 @@ pygame.init()
 # auto reduce a screen's resolution
 infoObject = pygame.display.Info()
 xmax, ymax = infoObject.current_w, infoObject.current_h
-print "Xmax=", xmax
-print "XRESOLUTION =", XRESOLUTION
+print("Xmax=", xmax)
+print("XRESOLUTION =", XRESOLUTION)
 if xmax < XRESOLUTION: XRESOLUTION = 1366
 if xmax < XRESOLUTION: XRESOLUTION = 480
 
@@ -207,7 +208,7 @@ def show_board_and_animated_move(FEN_string, move, x0, y0):
             # pygame.display.flip() # copy to screen
     if piece == "":
         return
-    print piece
+    print(piece)
     for i in range(20):
         x, y = 0, 0
         show("chessboard_xy", x0, y0)
@@ -338,7 +339,7 @@ while 1:
             usb_data_exist = True
 
         except:
-            print "No new data from usb.exe, perhaps chess board not connected"
+            print("No new data from usb.exe, perhaps chess board not connected")
 
     scr.fill(white)  # clear screen
 
@@ -369,7 +370,7 @@ while 1:
                 usb_data_history_filled = True
                 usb_data_history_i = 0
 
-            if DEBUG: print "usb_data_history_i = ", usb_data_history_i
+            if DEBUG: print("usb_data_history_i = ", usb_data_history_i)
             usb_data_history[usb_data_history_i] = usb_data[:]
             usb_data_history_i += 1
             if usb_data_history_filled:
@@ -379,14 +380,14 @@ while 1:
                     if test_state != "":
                         board_state = test_state
                 else:
-                    print "Statistic processing failed, found unknown piece"
+                    print("Statistic processing failed, found unknown piece")
 
             if calibration:
                 calibration_samples.append(usb_data)
-                print "    adding new calibration sample"
+                print("    adding new calibration sample")
                 calibration_samples_counter += 1
                 if calibration_samples_counter >= 15:
-                    print "------- we have collected enough samples for averaging ----"
+                    print("------- we have collected enough samples for averaging ----")
                     usb_data = codes.statistic_processing_for_calibration(calibration_samples, False)
                     # print usb_data
                     codes.calibration(usb_data, new_setup)
@@ -409,7 +410,7 @@ while 1:
         if left_click:
 
             if 6 < x < 102 and 232 < y < 265:
-                print "calibration"
+                print("calibration")
                 if usb_data_exist:
                     calibration = True
                     new_setup = False
@@ -417,7 +418,7 @@ while 1:
                     calibration_samples = []
                     calibration_samples.append(usb_data)
             if 6 < x < 102 and y >= 265:
-                print "New setup calibration"
+                print("New setup calibration")
                 if usb_data_exist:
                     calibration = True
                     new_setup = True
@@ -477,7 +478,7 @@ while 1:
                 if (77 + 40 - 5) < y < (77 + 40 + 30):
                     dialog = ""
                     if x > (200 + 105):  # confirm button
-                        print "do delete"
+                        print("do delete")
                         os.system("del " + saved_files[resume_file_selected + resume_file_start])
                         # update saved files list to load
 
@@ -623,7 +624,7 @@ while 1:
 
         if new_usb_data:
             new_usb_data = False
-            if DEBUG: print "Virtual board: ", board_state
+            if DEBUG: print("Virtual board: ", board_state)
 
             banners_counter += 1
 
@@ -652,10 +653,10 @@ while 1:
                                     banner_do_move = False
                                     do_user_move = True
                             else:
-                                if DEBUG: print "Place pieces on their places"
+                                if DEBUG: print("Place pieces on their places")
                                 banner_right_places = True
                         else:
-                            if DEBUG: print "All pieces on right places"
+                            if DEBUG: print("All pieces on right places")
                             sock.sendto(chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0),
                                         KUDA_POSYLAT)
                             banner_right_places = False
@@ -669,7 +670,7 @@ while 1:
                                 banner_place_pieces = False
                                 banner_do_move = True
                 else:
-                    print "Statistic processing failed, found unknown piece"
+                    print("Statistic processing failed, found unknown piece")
 
         show("terminal", 179, 3)
 
@@ -759,7 +760,7 @@ while 1:
                     # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
                     # pygame.display.flip() # copy to screen
                     if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
-                        print "------------------------------------"
+                        print("------------------------------------")
                         ai_move = stockfish.get_fast_result(move_history)
                         got_fast_result = True
                         break
@@ -769,7 +770,7 @@ while 1:
                 if not got_fast_result:
                     ai_move = stockfish.get_result_of_thinking()
 
-                print "AI move: ", ai_move
+                print("AI move: ", ai_move)
 
                 # highlight right LED
                 i, value, i_source, value_source = codes.move2led(ai_move)  # error here if checkmate before
@@ -799,14 +800,14 @@ while 1:
                     chessgame.apply_move(ai_move)  # validate move
                     move_history.append(ai_move)
                     board_state = str(chessgame)
-                    print "   stockfish move: ", ai_move
-                    print "after stockfish move: ", board_state
+                    print("   stockfish move: ", ai_move)
+                    print("after stockfish move: ", board_state)
                     board_history.append(board_state)
                 except:
-                    print "   ----invalid chess_engine move! ---- ", ai_move
+                    print("   ----invalid chess_engine move! ---- ", ai_move)
                     terminal_text = ai_move + " - invalid move !"
 
-                print "\n\n", board_state
+                print("\n\n", board_state)
 
                 # check for mate
                 mate_we_lost = False
@@ -822,7 +823,7 @@ while 1:
 
                 # if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
-                    print "mate!"
+                    print("mate!")
                     mate_we_lost = True
 
                     # user move
@@ -843,7 +844,7 @@ while 1:
                     #                   terminal_text_line2 = terminal_text
                     #                   terminal_text = "white move: "+ai_move
 
-                    print "   user move: ", move
+                    print("   user move: ", move)
                     do_ai_move = True
                     hint_text = ""
                     if play_white:
@@ -853,7 +854,7 @@ while 1:
                         terminal_text += ", black move: " + move
 
                 except:
-                    print "   ----invalid user move! ---- ", move
+                    print("   ----invalid user move! ---- ", move)
                     terminal_text_line2 = terminal_text
 
                     terminal_text = move + " - invalid move !"
@@ -874,7 +875,7 @@ while 1:
 
                 #            if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
-                    print "mate! we won!"
+                    print("mate! we won!")
                     mate_we_won = True
 
             show_board(board_state, 178, 40)
@@ -924,7 +925,7 @@ while 1:
                         icon = icon_codes[i]
                         if len(move) == 4:
                             move += icon
-                            print "move for conversion: ", move
+                            print("move for conversion: ", move)
                             conversion_dialog = False
                             do_user_move = True
                 else:
@@ -934,9 +935,9 @@ while 1:
 
                     if 6 < x < 127 and (143 + 22) < y < (174 + 22):  # Take back button
                         if len(board_history) > 2:
-                            print "--------- before take back: "
-                            print board_history
-                            print move_history
+                            print("--------- before take back: ")
+                            print(board_history)
+                            print(move_history)
 
                             board_history.pop()  # remove last element
                             board_history.pop()  # remove last element
@@ -944,10 +945,10 @@ while 1:
                             move_history.pop()  # it's for stockfish engine
                             move_history.pop()  # it's for stockfish engine
 
-                            print "--------- after take back: "
-                            print board_history
-                            print move_history
-                            print "----------------------------------"
+                            print("--------- after take back: ")
+                            print(board_history)
+                            print(move_history)
+                            print("----------------------------------")
 
                             previous_board_click = ""
                             board_click = ""
@@ -960,7 +961,7 @@ while 1:
 
                             hint_text = ""
                         else:
-                            print "cannot do takeback, len(board_history) = ", len(board_history)
+                            print("cannot do takeback, len(board_history) = ", len(board_history))
 
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         #                        game_engine.setposition( move_history )
