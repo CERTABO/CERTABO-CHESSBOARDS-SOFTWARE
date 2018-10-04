@@ -124,16 +124,18 @@ pygame.display.flip()  # copy to screen
 #    pygame.mouse.set_cursor(*cursor_sizer)
 
 # ----------- load sprites
-names = "black_bishop", "black_king", "black_knight", "black_pawn", "black_queen", "black_rook", \
-        "white_bishop", "white_king", "white_knight", "white_pawn", "white_queen", "white_rook", "terminal", \
-        "logo", "chessboard_xy", "new_game", "resume_game", "save", "exit", "hint", "setup", \
-        "take_back", "resume_back", \
-        "analysing", "back", "black", "confirm", "delete-game", "depth1", "depth2", "depth3", "depth4", \
-        "depth5", "depth6", "depth7", "depth8", "depth9", "depth10", "depth11", "depth12", "depth13", \
-        "depth14", "depth15", "depth16", "depth17", "depth18", "depth19", "depth20", "done", \
-        "force-move", "select-depth", "start", "welcome", "white", "hide_back", "start-up-logo", \
-        "do-your-move", "move-certabo", "place-pieces", "place-pieces-on-chessboard", "new-setup", \
-        "please-wait", "check-mate-banner"
+names = (
+    "black_bishop", "black_king", "black_knight", "black_pawn", "black_queen", "black_rook",
+    "white_bishop", "white_king", "white_knight", "white_pawn", "white_queen", "white_rook", "terminal",
+    "logo", "chessboard_xy", "new_game", "resume_game", "save", "exit", "hint", "setup",
+    "take_back", "resume_back",
+    "analysing", "back", "black", "confirm", "delete-game", "depth1", "depth2", "depth3", "depth4",
+    "depth5", "depth6", "depth7", "depth8", "depth9", "depth10", "depth11", "depth12", "depth13",
+    "depth14", "depth15", "depth16", "depth17", "depth18", "depth19", "depth20", "done",
+    "force-move", "select-depth", "start", "welcome", "white", "hide_back", "start-up-logo",
+    "do-your-move", "move-certabo", "place-pieces", "place-pieces-on-chessboard", "new-setup",
+    "please-wait", "check-mate-banner"
+)
 
 sprite = {}
 for name in names:
@@ -153,9 +155,30 @@ def show(name, x, y):
 
 # Show chessboard using FEN string like
 # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-FEN = {"b": "black_bishop", "k": "black_king", "n": "black_knight", "p": "black_pawn", \
-       "q": "black_queen", "r": "black_rook", "B": "white_bishop", "K": "white_king", \
+FEN = {"b": "black_bishop", "k": "black_king", "n": "black_knight", "p": "black_pawn",
+       "q": "black_queen", "r": "black_rook", "B": "white_bishop", "K": "white_king",
        "N": "white_knight", "P": "white_pawn", "Q": "white_queen", "R": "white_rook"}
+
+
+def draw_rect(x, y, w, h, color):
+    pygame.draw.rect(
+        scr, color,
+        (x * x_multiplier, y * y_multiplier, w * x_multiplier, h * y_multiplier)
+    )
+
+
+def draw_button(x, y, text, color, text_color=white, font=font_large, padding=(5, 5, 5, 5)):
+    ptop, pbottom, pleft, pright = padding
+    text_width, text_height = font.size(text)
+    text_width //= x_multiplier
+    text_height //= y_multiplier
+    button_width = pleft + text_width + pright
+    button_height = ptop + text_height + pbottom
+    draw_rect(x, y, button_width, button_height, color)
+    img = font.render(text, 22, text_color)  # string, blend, color, background color
+    pos = (x + pleft) * x_multiplier, (y + ptop) * y_multiplier
+    scr.blit(img, pos)
+    return pygame.Rect(x, y, button_width, button_height)
 
 
 def show_board(FEN_string, x0, y0):
@@ -265,8 +288,8 @@ board_click = ""  # example: "e2"
 do_ai_move = True
 do_user_move = False
 conversion_dialog = False
-mate_we_lost = False
-mate_we_won = False
+white_lost = False
+black_lost = False
 
 renew = True
 left_click = False
@@ -296,11 +319,11 @@ usb_data_history_filled = False
 usb_data_history_i = 0
 
 banner_right_places = False
-banners_counter = 0
 game_process_just_startted = True
 banner_do_move = False
 
 new_setup = False
+computer_game = True
 
 # sock.sendto( chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0), KUDA_POSYLAT )
 message = chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF)
@@ -344,8 +367,8 @@ while 1:
     scr.fill(white)  # clear screen
 
     x, y = pygame.mouse.get_pos()  # mouse position
-    x = x / x_multiplier;
-    y = y / y_multiplier;
+    x = x / x_multiplier
+    y = y / y_multiplier
 
     mbutton = pygame.mouse.get_pressed()
     if DEBUG: txt(str((x, y)), 80, 300, lightgrey)
@@ -439,8 +462,8 @@ while 1:
                 saved_files_time = []
                 terminal_text = ""
                 terminal_text_line2 = ""
-                mate_we_won = False
-                mate_we_lost = False
+                white_lost = False
+                black_lost = False
 
                 for name in saved_files:
                     saved_files_time.append(tt.gmtime(os.stat(name).st_mtime))
@@ -453,8 +476,8 @@ while 1:
         show("back", 3, 146)
         show("delete-game", 103, 283)
 
-        pygame.draw.rect(scr, lightestgrey, \
-                         (113 * x_multiplier, 41 * y_multiplier + resume_file_selected * 29 * y_multiplier, \
+        pygame.draw.rect(scr, lightestgrey,
+                         (113 * x_multiplier, 41 * y_multiplier + resume_file_selected * 29 * y_multiplier,
                           330 * x_multiplier, 30 * y_multiplier))  # selection
 
         for i in range(len(saved_files)):
@@ -462,7 +485,7 @@ while 1:
             txt_large(saved_files[i + resume_file_start].replace('.sav', ''), 117, 41 + i * 29, grey)
             v = saved_files_time[i]
 
-            txt_large("%d-%d-%d  %d:%d" % (v.tm_year, v.tm_mon, v.tm_mday, v.tm_hour, v.tm_min), \
+            txt_large("%d-%d-%d  %d:%d" % (v.tm_year, v.tm_mon, v.tm_mday, v.tm_hour, v.tm_min),
                       300, 41 + i * 29, lightgrey)
 
         if dialog == "delete":
@@ -506,8 +529,8 @@ while 1:
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
                 f = open(saved_files[resume_file_selected + resume_file_start], 'rb')
-                move_history, board_state, terminal_text, terminal_text_line2, board_history, timer, \
-                play_white, difficulty = pickle.load(f)
+                (move_history, board_state, terminal_text, terminal_text_line2,
+                 board_history, timer, play_white, difficulty) = pickle.load(f)
                 f.close()
                 game_engine = stockfish.ini(difficulty)
                 previous_board_click = ""
@@ -536,10 +559,10 @@ while 1:
         txt_large(name_to_save, 273 - len(name_to_save) * (51 / 10.0), 86, terminal_text_color)
 
         # show keyboard        
-        keyboard_buttons = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-'), \
-                           ('q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'), \
-                           ('a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'), \
-                           ('z', 'x', 'c', 'v', 'b', 'n', 'm')
+        keyboard_buttons = (('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-'),
+                           ('q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'),
+                           ('a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'),
+                           ('z', 'x', 'c', 'v', 'b', 'n', 'm'))
 
         lenx = 42  # size of buttons
         leny = 38  # size of buttons
@@ -582,22 +605,26 @@ while 1:
             if hover_key != "":
                 if hover_key == "save":
                     f = open(name_to_save + ".sav", 'wb')
-                    pickle.dump([move_history, board_state, terminal_text, terminal_text_line2, board_history, \
+                    pickle.dump([move_history, board_state, terminal_text, terminal_text_line2, board_history,
                                  timer, play_white, difficulty], f)
                     f.close()
                     if move_history:
                         game = chess.pgn.Game()
                         game.headers['Date'] = datetime.now().strftime('%Y.%m.%d')
-                        if play_white:
-                            game.headers['White'] = 'Human'
-                            game.headers['Black'] = 'Computer'
+                        if computer_game:
+                            if play_white:
+                                game.headers['White'] = 'Human'
+                                game.headers['Black'] = 'Computer'
+                            else:
+                                game.headers['White'] = 'Computer'
+                                game.headers['Black'] = 'Human'
                         else:
-                            game.headers['White'] = 'Computer'
+                            game.headers['White'] = 'Human'
                             game.headers['Black'] = 'Human'
-                        if mate_we_lost:
-                            game.headers['Result'] = '0-1' if play_white else '1-0'
-                        if mate_we_won:
-                            game.headers['Result'] = '1-0' if play_white else '0-1'
+                        if white_lost:
+                            game.headers['Result'] = '0-1'
+                        if black_lost:
+                            game.headers['Result'] = '1-0'
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
@@ -624,9 +651,9 @@ while 1:
 
         if new_usb_data:
             new_usb_data = False
-            if DEBUG: print("Virtual board: ", board_state)
+            if DEBUG:
+                print("Virtual board: ", board_state)
 
-            banners_counter += 1
 
             if usb_data_history_i >= usb_data_history_depth:
                 usb_data_history_filled = True
@@ -715,7 +742,7 @@ while 1:
 
 
         else:  # usual game process
-            if do_ai_move and (not mate_we_won and not mate_we_lost):
+            if computer_game and do_ai_move and (not white_lost and not black_lost):
                 do_ai_move = False
 
                 # stockfish chess engine interrogation
@@ -752,8 +779,8 @@ while 1:
                             sys.exit()
 
                     x, y = pygame.mouse.get_pos()  # mouse position
-                    x = x / x_multiplier;
-                    y = y / y_multiplier;
+                    x = x / x_multiplier
+                    y = y / y_multiplier
 
                     mbutton = pygame.mouse.get_pressed()
 
@@ -810,7 +837,8 @@ while 1:
                 print("\n\n", board_state)
 
                 # check for mate
-                mate_we_lost = False
+                black_lost = False
+                white_lost = False
                 chessgame = Game(fen=board_state)
                 possible_moves = chessgame.get_moves()
 
@@ -824,10 +852,12 @@ while 1:
                 # if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
                     print("mate!")
-                    mate_we_lost = True
-
+                    if play_white:
+                        white_lost = True
+                    else:
+                        black_lost = True
                     # user move
-            if do_user_move and (not mate_we_won and not mate_we_lost):
+            if do_user_move and (not white_lost and not black_lost):
                 do_user_move = False
                 try:
                     chessgame = Game(fen=board_state)
@@ -863,7 +893,8 @@ while 1:
                     banner_do_move = True
 
                 # check for mate
-                mate_we_won = False
+                white_lost = False
+                black_lost = False
                 chessgame = Game(fen=board_state)
                 possible_moves = chessgame.get_moves()
                 # print "state = ",chessgame.status
@@ -876,12 +907,14 @@ while 1:
                 #            if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
                     print("mate! we won!")
-                    mate_we_won = True
+                    if play_white:
+                        black_lost = True
+                    else:
+                        white_lost = True
 
             show_board(board_state, 178, 40)
 
             # -------------------- show banners -------------------------
-            #            if banners_counter%2 ==0:
             x0, y0 = 5, 127
             if banner_right_places:
                 if move_history == [] or banner_place_pieces:
@@ -895,7 +928,7 @@ while 1:
                 # pygame.draw.rect(scr, black, (x0+2, y0+2, 167, 28) )
                 # txt("Please move your piece",x0+14,y0+4,white)
 
-            if mate_we_lost or mate_we_won:
+            if white_lost or black_lost:
                 show("check-mate-banner", 227, 97)
                 # pygame.draw.rect(scr, lightgrey, (227+2, 77+2,200,78) )
                 # pygame.draw.rect(scr, white, (227, 77,200,78) )
@@ -952,8 +985,8 @@ while 1:
 
                             previous_board_click = ""
                             board_click = ""
-                            mate_we_won = False
-                            mate_we_lost = False
+                            black_lost = False
+                            white_lost = False
 
                             banner_do_move = False
                             do_user_move = False
@@ -970,9 +1003,9 @@ while 1:
                         # print "continues..."
 
                         show_board(board_state, 178, 40)
-                        pygame.draw.rect(scr, lightgrey, (229 * x_multiplier, 79 * y_multiplier, \
+                        pygame.draw.rect(scr, lightgrey, (229 * x_multiplier, 79 * y_multiplier,
                                                           200 * x_multiplier, 78 * y_multiplier))
-                        pygame.draw.rect(scr, white, (227 * x_multiplier, 77 * y_multiplier, \
+                        pygame.draw.rect(scr, white, (227 * x_multiplier, 77 * y_multiplier,
                                                       200 * x_multiplier, 78 * y_multiplier))
                         txt_large("Analysing...", 227 + 55, 77 + 8, grey)
                         show("force-move", 247, 77 + 39)
@@ -988,8 +1021,8 @@ while 1:
                                     sys.exit()
 
                             x, y = pygame.mouse.get_pos()  # mouse position
-                            x = x / x_multiplier;
-                            y = y / y_multiplier;
+                            x //= x_multiplier
+                            y //= y_multiplier
 
                             mbutton = pygame.mouse.get_pressed()
                             # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
@@ -1013,47 +1046,54 @@ while 1:
     # ---------------- new game dialog ----------------
     elif window == "new game":
 
-        txt_large("Depth:", 203, 115, green)
-        show("depth" + str(difficulty + 1), 214, 151)
-        txt_large("<", 189, 156, grey)
-        txt_large(">", 265, 156, grey)
-        x0 = 213
-        if difficulty == 0:
-            txt("Easiest", x0, 191, grey)
-        elif difficulty < 4:
-            txt("Easy", x0 + 6, 191, grey)
-        elif difficulty > 18:
-            txt("Very hard", x0 - 10, 191, grey)
-        elif difficulty > 10:
-            txt("Hard", x0 + 6, 191, grey)
+        button_h_vs_ai = draw_button(150, 25, "Human VS AI", green if computer_game else grey)
+        button_h_vs_h = draw_button(button_h_vs_ai.right + 10, 25, "Human VS Human", grey if computer_game else green)
+
+        if computer_game:
+            txt_large("Depth:", 203, 115, green)
+            show("depth" + str(difficulty + 1), 214, 151)
+            txt_large("<", 189, 156, grey)
+            txt_large(">", 265, 156, grey)
+            x0 = 213
+            if difficulty == 0:
+                txt("Easiest", x0, 191, grey)
+            elif difficulty < 4:
+                txt("Easy", x0 + 6, 191, grey)
+            elif difficulty > 18:
+                txt("Very hard", x0 - 10, 191, grey)
+            elif difficulty > 10:
+                txt("Hard", x0 + 6, 191, grey)
+            else:
+                txt("Normal", x0, 191, grey)
+            txt_large("Color to play:", 175, 232, green)
+            if play_white:
+                show("white", 184, 269)
+            else:
+                show("black", 184, 269)
         else:
-            txt("Normal", x0, 191, grey)
+            pass
 
         show("back", 14, 269)
         show("start", 363, 269)
-        txt_large("Color to play:", 175, 232, green)
-        if play_white:
-            show("white", 184, 269)
-        else:
-            show("black", 184, 269)
+
 
         if left_click:
-
-            if 149 < y < 188:
-                if x > 233:
-                    if difficulty < 19:
-                        difficulty += 1
+            if button_h_vs_ai.collidepoint(x, y):
+                computer_game = True
+            if button_h_vs_h.collidepoint(x, y):
+                computer_game = False
+            if computer_game:
+                if 149 < y < 188:
+                    if x > 233:
+                        if difficulty < 19:
+                            difficulty += 1
+                        else:
+                            difficulty = 0
                     else:
-                        difficulty = 0
-                else:
-                    if difficulty > 0:
-                        difficulty -= 1
-                    else:
-                        difficulty = 19
-
-            if 268 < y < (275 + 31):
-                if 14 < x < 109:  # <- back
-                    window = "home"
+                        if difficulty > 0:
+                            difficulty -= 1
+                        else:
+                            difficulty = 19
 
                 if 174 < x < 292:  # blacl/white toggle
                     if play_white:
@@ -1061,14 +1101,22 @@ while 1:
                     else:
                         play_white = True
 
+            if 268 < y < (275 + 31):
+                if 14 < x < 109:  # <- back
+                    window = "home"
+
                 if 365 < x < 467:  # start game ->
                     window = "game"
-                    game_engine = stockfish.ini(difficulty)
+                    if computer_game:
+                        terminal_text_line2 = "New game, depth=" + str(difficulty + 1)
+                        game_engine = stockfish.ini(difficulty)
+                    else:
+                        terminal_text_line2 = "New game"
                     board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
                     move_history = []
                     board_history = [board_state]
-                    terminal_text_line2 = "New game, depth=" + str(difficulty + 1)
+
                     previous_board_click = ""
                     board_click = ""
                     do_user_move = False
@@ -1079,8 +1127,8 @@ while 1:
                     # else:
                     #    do_ai_move = True
                     conversion_dialog = False
-                    mate_we_lost = False
-                    mate_we_won = False
+                    white_lost = False
+                    black_lost = False
                     banner_do_move = False
                     game_process_just_started = True
                     banner_place_pieces = True
