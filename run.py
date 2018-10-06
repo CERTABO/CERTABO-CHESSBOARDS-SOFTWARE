@@ -628,7 +628,7 @@ while 1:
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
-                        with open('{}.pgn', 'w') as f:
+                        with open('{}.pgn'.format(name_to_save), 'w') as f:
                             exporter = chess.pgn.FileExporter(f)
                             game.accept(exporter)
                     window = "game"
