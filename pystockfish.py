@@ -154,6 +154,7 @@ class Engine(subprocess.Popen):
             "Hash": 16,
             "MultiPV": 1,
             "Skill Level": 20,
+            "Strength": 50,
             "Move Overhead": 30,
             "Minimum Thinking Time": 20,
             "Slow Mover": 80,
