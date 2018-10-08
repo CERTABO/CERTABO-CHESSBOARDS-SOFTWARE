@@ -509,7 +509,6 @@ while 1:
                 move_history, board_state, terminal_text, terminal_text_line2, board_history, timer, \
                 play_white, difficulty = pickle.load(f)
                 f.close()
-                game_engine = stockfish.ini(difficulty)
                 previous_board_click = ""
                 board_click = ""
                 do_ai_move = False
@@ -728,7 +727,7 @@ while 1:
 
                 #                ai_move = game_engine.bestmove()['move']
 
-                proc = stockfish.start_thinking_about_bestmove(move_history, difficulty)
+                proc = stockfish.EngineThread(move_history, difficulty)
                 # print "continues..."
 
                 show_board(board_state, 178, 40)
@@ -742,7 +741,7 @@ while 1:
 
                 got_fast_result = False
                 # while stockfish.th.is_alive(): # thinking
-                while proc.poll() == None:
+                while proc.is_alive():
 
                     # event from system & keyboard
                     for event in pygame.event.get():  # all values in event list
@@ -752,8 +751,8 @@ while 1:
                             sys.exit()
 
                     x, y = pygame.mouse.get_pos()  # mouse position
-                    x = x / x_multiplier;
-                    y = y / y_multiplier;
+                    x = x / x_multiplier
+                    y = y / y_multiplier
 
                     mbutton = pygame.mouse.get_pressed()
 
@@ -761,14 +760,16 @@ while 1:
                     # pygame.display.flip() # copy to screen
                     if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
                         print("------------------------------------")
-                        ai_move = stockfish.get_fast_result(move_history)
+                        proc.stop()
+                        proc.join()
+                        ai_move = proc.best_move
                         got_fast_result = True
                         break
 
                     tt.sleep(0.05)
 
                 if not got_fast_result:
-                    ai_move = stockfish.get_result_of_thinking()
+                    ai_move = proc.best_move
 
                 print("AI move: ", ai_move)
 
@@ -966,7 +967,8 @@ while 1:
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
-                        proc = stockfish.start_thinking_about_bestmove(move_history, difficulty)
+                        proc = stockfish.EngineThread(move_history, difficulty)
+                        proc.start()
                         # print "continues..."
 
                         show_board(board_state, 178, 40)
@@ -979,7 +981,7 @@ while 1:
                         pygame.display.flip()  # copy to screen
 
                         got_fast_result = False
-                        while proc.poll() == None:  # thinking
+                        while proc.is_alive():  # thinking
                             # event from system & keyboard
                             for event in pygame.event.get():  # all values in event list
                                 if event.type == pygame.QUIT:
@@ -988,21 +990,22 @@ while 1:
                                     sys.exit()
 
                             x, y = pygame.mouse.get_pos()  # mouse position
-                            x = x / x_multiplier;
-                            y = y / y_multiplier;
+                            x = x / x_multiplier
+                            y = y / y_multiplier
 
                             mbutton = pygame.mouse.get_pressed()
                             # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
                             # pygame.display.flip() # copy to screen
                             if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
-                                hint_text = stockfish.get_fast_result(move_history)
+                                proc.stop()
+                                proc.join()
+                                hint_text = proc.best_move
                                 got_fast_result = True
                                 mbutton = (0, 0, 0)
-
                                 break
 
                         if not got_fast_result:
-                            hint_text = stockfish.get_result_of_thinking()
+                            hint_text = proc.best_move
 
                     if 6 < x < 78 and 244 < y < 272:  # Save button
                         window = "save"
@@ -1063,7 +1066,6 @@ while 1:
 
                 if 365 < x < 467:  # start game ->
                     window = "game"
-                    game_engine = stockfish.ini(difficulty)
                     board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
                     move_history = []
