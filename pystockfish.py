@@ -131,6 +131,10 @@ class Match:
         return self.winner
 
 
+class MaxDepthReached(Exception):
+    pass
+
+
 class Engine(subprocess.Popen):
     """
     This initiates the Stockfish chess engine with Ponder set to False.
@@ -174,7 +178,7 @@ class Engine(subprocess.Popen):
         self.output_queue = Queue.Queue()
         self.output_reader = AsyncLineReader(self.stdout, self.output_queue)
         self.output_reader.start()
-        self.depth = str(depth)
+        self.depth = depth
         self.ponder = ponder
         self.put('uci')
         if not ponder:
@@ -259,6 +263,13 @@ class Engine(subprocess.Popen):
         text = text.strip()
         split_text = text.split(' ')
         if split_text[0] == "info":
+            if split_text[1] == "depth":
+                try:
+                    depth = int(split_text[2])
+                except (ValueError, TypeError):
+                    return
+                if depth > self.depth:
+                    raise MaxDepthReached()
             last_info = Engine._bestmove_get_info(text)
             if 'pv' not in last_info:
                 return

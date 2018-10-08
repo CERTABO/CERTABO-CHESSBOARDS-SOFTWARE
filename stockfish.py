@@ -69,13 +69,17 @@ class EngineThread(threading.Thread):
         self.engine.setposition(self.move_history)
         self.engine.go()
         while True:
-            best_move = self.engine.trybestmove()
-            if best_move:
-                self.best_move = best_move['move']
-                break
             if self.stop_engine and not self.stop_sent:
                 self.engine.put('stop')
                 self.stop_sent = True
+            try:
+                best_move = self.engine.trybestmove()
+            except MaxDepthReached:
+                self.stop()
+            else:
+                if best_move:
+                    self.best_move = best_move['move']
+                    break
         self.engine.kill()
 
     def stop(self):
@@ -84,10 +88,8 @@ class EngineThread(threading.Thread):
 
 def main():
     logging.basicConfig(level='DEBUG')
-    et = EngineThread(difficulty=25, move_history=[])
+    et = EngineThread(move_history=[], difficulty=5)
     et.start()
-    time.sleep(3)
-    et.stop()
     et.join()
     print(et.best_move)
 
