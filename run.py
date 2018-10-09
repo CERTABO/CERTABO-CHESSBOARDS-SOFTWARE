@@ -25,7 +25,7 @@ logging.basicConfig(level='INFO')
 
 import codes
 from Chessnut import Game
-from constants import DEFAULT_ENGINE
+
 
 stockfish.TO_EXE = TO_EXE
 
