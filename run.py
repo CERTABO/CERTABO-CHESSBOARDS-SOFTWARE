@@ -728,6 +728,7 @@ while 1:
                 #                ai_move = game_engine.bestmove()['move']
 
                 proc = stockfish.EngineThread(move_history, difficulty)
+                proc.start()
                 # print "continues..."
 
                 show_board(board_state, 178, 40)
