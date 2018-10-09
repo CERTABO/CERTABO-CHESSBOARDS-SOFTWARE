@@ -14,3 +14,6 @@ record.bin
 /.idea
 /build
 /dist
+/engines
+
+local_constants.py
