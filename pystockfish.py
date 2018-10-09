@@ -207,7 +207,6 @@ class Engine(subprocess.Popen):
             base_param['Contempt'] = randint(rand_min, rand_max),
             base_param['Contempt Factor'] = randint(rand_min, rand_max),
 
-        base_param.update(param)
         self.param = base_param
         for name, value in list(base_param.items()):
             self.setoption(name, value)
