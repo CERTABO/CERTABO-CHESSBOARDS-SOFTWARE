@@ -72,6 +72,7 @@ f.close()
 
 # define set of colors
 green = 0, 200, 0
+darkergreen = 0, 180, 0
 red = 200, 0, 0
 black = 0, 0, 0
 blue = 0, 0, 200
@@ -274,6 +275,8 @@ mate_we_won = False
 
 renew = True
 left_click = False
+
+engine = 'stockfish'
 
 saved_files = []
 resume_file_selected = 0
@@ -731,7 +734,7 @@ while 1:
 
                 #                ai_move = game_engine.bestmove()['move']
 
-                proc = stockfish.EngineThread(move_history, difficulty, engine=DEFAULT_ENGINE)
+                proc = stockfish.EngineThread(move_history, difficulty, engine=engine)
                 proc.start()
                 # print "continues..."
 
@@ -972,7 +975,7 @@ while 1:
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
-                        proc = stockfish.EngineThread(move_history, difficulty, engine=DEFAULT_ENGINE)
+                        proc = stockfish.EngineThread(move_history, difficulty, engine=engine)
                         proc.start()
                         # print "continues..."
 
@@ -1025,6 +1028,16 @@ while 1:
         show("depth" + str(difficulty + 1), 214, 151)
         txt_large("<", 189, 156, grey)
         txt_large(">", 265, 156, grey)
+        txt_large('Engine:', 250, 20, grey)
+        pygame.draw.rect(scr, darkergreen if engine == 'lc0' else grey, (170 * x_multiplier, 55 * y_multiplier,
+                                     60 * x_multiplier, 40 * y_multiplier))
+        txt_large('LC0', 180, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' else grey, (240 * x_multiplier, 55 * y_multiplier,
+                                     100 * x_multiplier, 40 * y_multiplier))
+        txt_large('Stockfish', 250, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' else grey, (360 * x_multiplier, 55 * y_multiplier,
+                                     90 * x_multiplier, 40 * y_multiplier))
+        txt_large('Houdini', 370, 60, white)
         x0 = 213
         if difficulty == 0:
             txt("Easiest", x0, 191, grey)
@@ -1046,7 +1059,13 @@ while 1:
             show("black", 184, 269)
 
         if left_click:
-
+            if 55 < y < 95:
+                if 170 < x < 230:
+                    engine = 'lc0'
+                elif 240 < x < 340:
+                    engine = 'stockfish'
+                elif 360 < x < 450:
+                    engine = 'houdini6'
             if 149 < y < 188:
                 if x > 233:
                     if difficulty < 19:
