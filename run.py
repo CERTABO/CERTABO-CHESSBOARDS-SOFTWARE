@@ -25,6 +25,7 @@ logging.basicConfig(level='INFO')
 
 import codes
 from Chessnut import Game
+from constants import DEFAULT_ENGINE
 
 stockfish.TO_EXE = TO_EXE
 
@@ -730,7 +731,7 @@ while 1:
 
                 #                ai_move = game_engine.bestmove()['move']
 
-                proc = stockfish.EngineThread(move_history, difficulty)
+                proc = stockfish.EngineThread(move_history, difficulty, engine=DEFAULT_ENGINE)
                 proc.start()
                 # print "continues..."
 
@@ -971,7 +972,7 @@ while 1:
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
-                        proc = stockfish.EngineThread(move_history, difficulty)
+                        proc = stockfish.EngineThread(move_history, difficulty, engine=DEFAULT_ENGINE)
                         proc.start()
                         # print "continues..."
 
