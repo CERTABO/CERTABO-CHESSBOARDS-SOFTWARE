@@ -165,7 +165,7 @@ class Engine(subprocess.Popen):
     engines.
     """
 
-    def __init__(self, depth=2, ponder=False, param={}, rand=False, rand_min=-10, rand_max=10, binary=None):
+    def __init__(self, depth=2, ponder=False, param=None, rand=False, rand_min=-10, rand_max=10, binary=None):
         if binary:
             binary_path = binary
         else:
@@ -184,21 +184,24 @@ class Engine(subprocess.Popen):
         if not ponder:
             self.setoption('Ponder', False)
 
-        base_param = {
-            "Write Debug Log": "false",
-            "Contempt Factor": 0,  # There are some stockfish versions with Contempt Factor
-            "Contempt": 0,  # and others with Contempt. Just try both.
-            "Min Split Depth": 0,
-            "Threads": 1,
-            "Hash": 16,
-            "MultiPV": 1,
-            "Skill Level": 20,
-            "Strength": 50,
-            "Move Overhead": 30,
-            "Minimum Thinking Time": 20,
-            "Slow Mover": 80,
-            "UCI_Chess960": "false",
-        }
+        if param:
+            base_param = param
+        else:
+            base_param = {
+                "Write Debug Log": "false",
+                "Contempt Factor": 0,  # There are some stockfish versions with Contempt Factor
+                "Contempt": 0,  # and others with Contempt. Just try both.
+                "Min Split Depth": 0,
+                "Threads": 1,
+                "Hash": 16,
+                "MultiPV": 1,
+                "Skill Level": 20,
+                "Strength": 50,
+                "Move Overhead": 30,
+                "Minimum Thinking Time": 20,
+                "Slow Mover": 80,
+                "UCI_Chess960": "false",
+            }
 
         if rand:
             base_param['Contempt'] = randint(rand_min, rand_max),

@@ -3,6 +3,8 @@ import cPickle as pickle
 import os  # , Queue
 import time
 import threading
+import json
+from constants import ENGINE_PATH
 
 from pystockfish import *
 
@@ -51,7 +53,8 @@ params = {
 
 
 class EngineThread(threading.Thread):
-    def __init__(self, move_history, difficulty, *args, **kwargs):
+    def __init__(self, move_history, difficulty, engine='stockfish', *args, **kwargs):
+        self.engine = engine
         self.move_history = move_history
         self.please_stop = False
         self.stop_engine = False
@@ -62,9 +65,20 @@ class EngineThread(threading.Thread):
         self.stop_sent = False
         super(EngineThread, self).__init__(*args, **kwargs)
 
+    def get_engine_path(self):
+        return os.path.join(ENGINE_PATH, '{}.exe'.format(self.engine))
+
+    def get_engine_params(self):
+        try:
+            with open(os.path.join(ENGINE_PATH, '{}.params.json'.format(self.engine))) as f:
+                return json.load(f)
+        except:
+            logging.warning('Could not load params for engine %s. Defaults will be used')
+            return None
+
     def run(self):
         logging.info('Starting engine...')
-        self.engine = Engine(depth=self.difficulty)
+        self.engine = Engine(depth=self.difficulty, binary=self.get_engine_path(), param=self.get_engine_params())
         logging.info('Setting position to %s', self.move_history)
         self.engine.setposition(self.move_history)
         self.engine.go()
