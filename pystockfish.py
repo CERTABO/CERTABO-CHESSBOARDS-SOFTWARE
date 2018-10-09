@@ -35,7 +35,7 @@ class AsyncLineReader(threading.Thread):
 
     def run(self):
         for line in iter(self.fd.readline, ''):
-            logging.debug('Got line from engine: %s', line)
+            logging.info('Engine: %s', line)
             self.outputQueue.put(line)
 
     def eof(self):
@@ -217,6 +217,7 @@ class Engine(subprocess.Popen):
         self.isready()
 
     def put(self, command):
+        logging.info('Command: %s', command)
         self.stdin.write(command + '\n')
         self.stdin.flush()
 

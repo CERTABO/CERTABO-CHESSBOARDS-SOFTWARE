@@ -18,6 +18,9 @@ import pickle
 import pygame
 import stockfish
 import subprocess
+import logging
+
+logging.basicConfig(level='INFO')
 
 
 import codes
