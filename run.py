@@ -1029,15 +1029,18 @@ while 1:
         txt_large("<", 189, 156, grey)
         txt_large(">", 265, 156, grey)
         txt_large('Engine:', 250, 20, grey)
-        pygame.draw.rect(scr, darkergreen if engine == 'lc0' else grey, (170 * x_multiplier, 55 * y_multiplier,
-                                     60 * x_multiplier, 40 * y_multiplier))
-        txt_large('LC0', 180, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' else grey, (240 * x_multiplier, 55 * y_multiplier,
-                                     100 * x_multiplier, 40 * y_multiplier))
-        txt_large('Stockfish', 250, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' else grey, (360 * x_multiplier, 55 * y_multiplier,
+        pygame.draw.rect(scr, darkergreen if engine == 'lc0' else grey, (120 * x_multiplier, 55 * y_multiplier,
+                                     45 * x_multiplier, 40 * y_multiplier))
+        txt_large('LC0', 125, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' else grey, (170 * x_multiplier, 55 * y_multiplier,
                                      90 * x_multiplier, 40 * y_multiplier))
-        txt_large('Houdini', 370, 60, white)
+        txt_large('Stockfish', 175, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' else grey, (265 * x_multiplier, 55 * y_multiplier,
+                                     80 * x_multiplier, 40 * y_multiplier))
+        txt_large('Houdini', 270, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'fire' else grey, (350 * x_multiplier, 55 * y_multiplier,
+                                                                             45 * x_multiplier, 40 * y_multiplier))
+        txt_large('Fire', 355, 60, white)
         x0 = 213
         if difficulty == 0:
             txt("Easiest", x0, 191, grey)
@@ -1060,12 +1063,14 @@ while 1:
 
         if left_click:
             if 55 < y < 95:
-                if 170 < x < 230:
+                if 120 < x < 165:
                     engine = 'lc0'
-                elif 240 < x < 340:
+                elif 170 < x < 260:
                     engine = 'stockfish'
-                elif 360 < x < 450:
+                elif 265 < x < 345:
                     engine = 'houdini6'
+                elif 350 < x < 395:
+                    engine = 'fire'
             if 149 < y < 188:
                 if x > 233:
                     if difficulty < 19:
