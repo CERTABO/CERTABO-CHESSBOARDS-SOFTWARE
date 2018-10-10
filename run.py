@@ -604,6 +604,8 @@ while 1:
                             game.headers['Result'] = '0-1' if play_white else '1-0'
                         if mate_we_won:
                             game.headers['Result'] = '1-0' if play_white else '0-1'
+                        if not mate_we_won and not mate_we_lost:
+                            game.headers['Result'] = '*'
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
