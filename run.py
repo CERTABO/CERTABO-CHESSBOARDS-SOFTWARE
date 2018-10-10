@@ -25,9 +25,15 @@ logging.basicConfig(level='INFO')
 
 import codes
 from Chessnut import Game
-
+from constants import CERTABO_SAVE_PATH
 
 stockfish.TO_EXE = TO_EXE
+
+
+try:
+    os.makedirs(CERTABO_SAVE_PATH)
+except OSError:
+    pass
 
 
 def txt(s, x, y, color):
@@ -441,7 +447,7 @@ while 1:
             if 6 < x < 163 and 191 < y < 222:  # resume pressed
                 window = "resume"
                 # update saved files list to load
-                files = os.listdir(".")
+                files = os.listdir(CERTABO_SAVE_PATH)
                 saved_files = [v for v in files if '.sav' in v]
                 saved_files_time = []
                 terminal_text = ""
@@ -587,7 +593,9 @@ while 1:
 
             if hover_key != "":
                 if hover_key == "save":
-                    f = open(name_to_save + ".sav", 'wb')
+                    OUTPUT_SAV = os.path.join(CERTABO_SAVE_PATH, '{}.sav'.format(name_to_save))
+                    OUTPUT_PGN = os.path.join(CERTABO_SAVE_PATH, '{}.pgn'.format(name_to_save))
+                    f = open(OUTPUT_SAV, 'wb')
                     pickle.dump([move_history, board_state, terminal_text, terminal_text_line2, board_history, \
                                  timer, play_white, difficulty], f)
                     f.close()
@@ -609,7 +617,7 @@ while 1:
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
-                        with open('{}.pgn'.format(name_to_save), 'w') as f:
+                        with open(OUTPUT_PGN, 'w') as f:
                             exporter = chess.pgn.FileExporter(f)
                             game.accept(exporter)
                     window = "game"
