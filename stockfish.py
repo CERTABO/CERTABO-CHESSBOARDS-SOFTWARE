@@ -2,6 +2,9 @@ from __future__ import print_function
 import cPickle as pickle
 import os  # , Queue
 import time
+import threading
+import json
+from constants import ENGINE_PATH
 
 from pystockfish import *
 
@@ -47,70 +50,60 @@ params = {
     "Minimum Thinking Time": 20,
     "Slow Mover": 80
 }
-game = ""
-small_game = ""
 
 
-def ini(difficulty):
-    global small_game
-    #    game = Engine(depth=difficulty, param=params)
-    #    small_game = Engine(depth=0, param=params)
-    small_game = Engine(depth=0)
-    # game = Engine(depth=0)
-    return game
+class EngineThread(threading.Thread):
+    def __init__(self, move_history, difficulty, engine='stockfish', *args, **kwargs):
+        self.engine = engine
+        self.engine_path = os.path.join(ENGINE_PATH, '{}.exe'.format(self.engine))
+        self.engine_parameters = None
+        try:
+            with open(os.path.join(ENGINE_PATH, '{}.parameters.json'.format(self.engine))) as f:
+                self.engine_parameters = json.load(f)
+        except:
+            logging.warning('Could not load params for engine %s. Defaults will be used')
+            pass
+        self.move_history = move_history
+        self.please_stop = False
+        self.stop_engine = False
+        self.engine_running = False
+        self.engine = None
+        self.best_move = None
+        self.difficulty = difficulty
+        self.stop_sent = False
+        super(EngineThread, self).__init__(*args, **kwargs)
+
+    def run(self):
+        logging.info('Starting engine...')
+        self.engine = Engine(depth=self.difficulty, binary=self.engine_path, param=self.engine_parameters)
+        logging.info('Setting position to %s', self.move_history)
+        self.engine.setposition(self.move_history)
+        self.engine.go()
+        while True:
+            if self.stop_engine and not self.stop_sent:
+                self.engine.put('stop')
+                self.stop_sent = True
+            try:
+                best_move = self.engine.trybestmove()
+            except MaxDepthReached:
+                self.stop()
+            else:
+                if best_move:
+                    self.best_move = best_move['move']
+                    break
+        self.engine.kill()
+
+    def stop(self):
+        self.stop_engine = True
 
 
-#    game_engine.setposition( move_history )
-#    ai_move = game_engine.bestmove()['move'
-
-proc = None
-q = 0
-best_move = ""
-
-
-def get_move(q, move_history, difficulty):
-    global game, best_move
-    #    game = Engine(depth=difficulty, param=params)
-    game = Engine(depth=difficulty)
-    game.setposition(move_history)
-    best_move = game.bestmove()
-    # q.put( game.bestmove() )
+def main():
+    logging.basicConfig(level='DEBUG')
+    et = EngineThread(move_history=[], difficulty=5)
+    et.start()
+    et.join()
+    print(et.best_move)
 
 
-def start_thinking_about_bestmove(move_history, difficulty):
-    global proc
-    f = open("move_history_tmp.p", "wb")
-    pickle.dump((move_history, difficulty), f)
-    f.flush()
-    os.fsync(f)
-
-    f.close()
-    time.sleep(0.1)
-
-    if TO_EXE:
-        command = "move.exe"
-    else:
-        command = "python move.py"
-    proc = subprocess.Popen(command, shell=True)
-    print("proc.pid = ", proc.pid)
-    return proc
-
-
-def get_result_of_thinking():
-    # time.sleep(0.1)
-    f = open("bestmove.p", "rb")
-    best_move = pickle.load(f)
-    f.close()
-    return best_move['move']
-
-
-# get move value if Force move pressed
-def get_fast_result(move_history):
-    global proc
-
-    # kill long process
-    subprocess.call(['taskkill', '/F', '/T', '/PID', str(proc.pid)])
-    # time.sleep(0.1)
-
-    small_game.setposition(move_history)
-    return small_game.bestmove()['move']
+if __name__ == '__main__':
+    main()

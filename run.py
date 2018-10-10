@@ -18,12 +18,22 @@ import pickle
 import pygame
 import stockfish
 import subprocess
+import logging
+
+logging.basicConfig(level='INFO')
 
 
 import codes
 from Chessnut import Game
+from constants import CERTABO_SAVE_PATH
 
 stockfish.TO_EXE = TO_EXE
+
+
+try:
+    os.makedirs(CERTABO_SAVE_PATH)
+except OSError:
+    pass
 
 
 def txt(s, x, y, color):
@@ -68,6 +78,7 @@ f.close()
 
 # define set of colors
 green = 0, 200, 0
+darkergreen = 0, 180, 0
 red = 200, 0, 0
 black = 0, 0, 0
 blue = 0, 0, 200
@@ -271,6 +282,8 @@ mate_we_won = False
 renew = True
 left_click = False
 
+engine = 'stockfish'
+
 saved_files = []
 resume_file_selected = 0
 resume_file_start = 0  # starting filename to show
@@ -434,7 +447,7 @@ while 1:
             if 6 < x < 163 and 191 < y < 222:  # resume pressed
                 window = "resume"
                 # update saved files list to load
-                files = os.listdir(".")
+                files = os.listdir(CERTABO_SAVE_PATH)
                 saved_files = [v for v in files if '.sav' in v]
                 saved_files_time = []
                 terminal_text = ""
@@ -509,7 +522,6 @@ while 1:
                 move_history, board_state, terminal_text, terminal_text_line2, board_history, timer, \
                 play_white, difficulty = pickle.load(f)
                 f.close()
-                game_engine = stockfish.ini(difficulty)
                 previous_board_click = ""
                 board_click = ""
                 do_ai_move = False
@@ -581,7 +593,9 @@ while 1:
 
             if hover_key != "":
                 if hover_key == "save":
-                    f = open(name_to_save + ".sav", 'wb')
+                    OUTPUT_SAV = os.path.join(CERTABO_SAVE_PATH, '{}.sav'.format(name_to_save))
+                    OUTPUT_PGN = os.path.join(CERTABO_SAVE_PATH, '{}.pgn'.format(name_to_save))
+                    f = open(OUTPUT_SAV, 'wb')
                     pickle.dump([move_history, board_state, terminal_text, terminal_text_line2, board_history, \
                                  timer, play_white, difficulty], f)
                     f.close()
@@ -598,10 +612,12 @@ while 1:
                             game.headers['Result'] = '0-1' if play_white else '1-0'
                         if mate_we_won:
                             game.headers['Result'] = '1-0' if play_white else '0-1'
+                        if not mate_we_won and not mate_we_lost:
+                            game.headers['Result'] = '*'
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
-                        with open('{}.pgn'.format(name_to_save), 'w') as f:
+                        with open(OUTPUT_PGN, 'w') as f:
                             exporter = chess.pgn.FileExporter(f)
                             game.accept(exporter)
                     window = "game"
@@ -728,7 +744,8 @@ while 1:
 
                 #                ai_move = game_engine.bestmove()['move']
 
-                proc = stockfish.start_thinking_about_bestmove(move_history, difficulty)
+                proc = stockfish.EngineThread(move_history, difficulty, engine=engine)
+                proc.start()
                 # print "continues..."
 
                 show_board(board_state, 178, 40)
@@ -742,7 +759,7 @@ while 1:
 
                 got_fast_result = False
                 # while stockfish.th.is_alive(): # thinking
-                while proc.poll() == None:
+                while proc.is_alive():
 
                     # event from system & keyboard
                     for event in pygame.event.get():  # all values in event list
@@ -752,8 +769,8 @@ while 1:
                             sys.exit()
 
                     x, y = pygame.mouse.get_pos()  # mouse position
-                    x = x / x_multiplier;
-                    y = y / y_multiplier;
+                    x = x / x_multiplier
+                    y = y / y_multiplier
 
                     mbutton = pygame.mouse.get_pressed()
 
@@ -761,14 +778,16 @@ while 1:
                     # pygame.display.flip() # copy to screen
                     if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
                         print("------------------------------------")
-                        ai_move = stockfish.get_fast_result(move_history)
+                        proc.stop()
+                        proc.join()
+                        ai_move = proc.best_move
                         got_fast_result = True
                         break
 
                     tt.sleep(0.05)
 
                 if not got_fast_result:
-                    ai_move = stockfish.get_result_of_thinking()
+                    ai_move = proc.best_move
 
                 print("AI move: ", ai_move)
 
@@ -966,7 +985,8 @@ while 1:
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
-                        proc = stockfish.start_thinking_about_bestmove(move_history, difficulty)
+                        proc = stockfish.EngineThread(move_history, difficulty, engine=engine)
+                        proc.start()
                         # print "continues..."
 
                         show_board(board_state, 178, 40)
@@ -979,7 +999,7 @@ while 1:
                         pygame.display.flip()  # copy to screen
 
                         got_fast_result = False
-                        while proc.poll() == None:  # thinking
+                        while proc.is_alive():  # thinking
                             # event from system & keyboard
                             for event in pygame.event.get():  # all values in event list
                                 if event.type == pygame.QUIT:
@@ -988,21 +1008,22 @@ while 1:
                                     sys.exit()
 
                             x, y = pygame.mouse.get_pos()  # mouse position
-                            x = x / x_multiplier;
-                            y = y / y_multiplier;
+                            x = x / x_multiplier
+                            y = y / y_multiplier
 
                             mbutton = pygame.mouse.get_pressed()
                             # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
                             # pygame.display.flip() # copy to screen
                             if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
-                                hint_text = stockfish.get_fast_result(move_history)
+                                proc.stop()
+                                proc.join()
+                                hint_text = proc.best_move
                                 got_fast_result = True
                                 mbutton = (0, 0, 0)
-
                                 break
 
                         if not got_fast_result:
-                            hint_text = stockfish.get_result_of_thinking()
+                            hint_text = proc.best_move
 
                     if 6 < x < 78 and 244 < y < 272:  # Save button
                         window = "save"
@@ -1017,6 +1038,19 @@ while 1:
         show("depth" + str(difficulty + 1), 214, 151)
         txt_large("<", 189, 156, grey)
         txt_large(">", 265, 156, grey)
+        txt_large('Engine:', 250, 20, grey)
+        pygame.draw.rect(scr, darkergreen if engine == 'lc0' else grey, (120 * x_multiplier, 55 * y_multiplier,
+                                     45 * x_multiplier, 40 * y_multiplier))
+        txt_large('LC0', 125, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' else grey, (170 * x_multiplier, 55 * y_multiplier,
+                                     90 * x_multiplier, 40 * y_multiplier))
+        txt_large('Stockfish', 175, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' else grey, (265 * x_multiplier, 55 * y_multiplier,
+                                     80 * x_multiplier, 40 * y_multiplier))
+        txt_large('Houdini', 270, 60, white)
+        pygame.draw.rect(scr, darkergreen if engine == 'fire' else grey, (350 * x_multiplier, 55 * y_multiplier,
+                                                                             45 * x_multiplier, 40 * y_multiplier))
+        txt_large('Fire', 355, 60, white)
         x0 = 213
         if difficulty == 0:
             txt("Easiest", x0, 191, grey)
@@ -1038,7 +1072,15 @@ while 1:
             show("black", 184, 269)
 
         if left_click:
-
+            if 55 < y < 95:
+                if 120 < x < 165:
+                    engine = 'lc0'
+                elif 170 < x < 260:
+                    engine = 'stockfish'
+                elif 265 < x < 345:
+                    engine = 'houdini6'
+                elif 350 < x < 395:
+                    engine = 'fire'
             if 149 < y < 188:
                 if x > 233:
                     if difficulty < 19:
@@ -1063,7 +1105,6 @@ while 1:
 
                 if 365 < x < 467:  # start game ->
                     window = "game"
-                    game_engine = stockfish.ini(difficulty)
                     board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
                     move_history = []

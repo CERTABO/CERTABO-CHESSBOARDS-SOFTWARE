@@ -11,13 +11,45 @@
     :license: GNU General Public License, see LICENSE for more details.
 """
 
+import Queue
+import logging
 import re
 import subprocess
+import threading
 from random import randint
-import logging
+
 MAX_MOVES = 200
 UCI_MOVE_REGEX = "[a-h]\d[a-h]\d[qrnb]?"
 PV_REGEX = " pv (?P<move_list>{0}( {0})*)".format(UCI_MOVE_REGEX)
+
+
+class AsyncLineReader(threading.Thread):
+    def __init__(self, fd, outputQueue):
+        threading.Thread.__init__(self)
+
+        assert isinstance(outputQueue, Queue.Queue)
+        assert callable(fd.readline)
+
+        self.fd = fd
+        self.outputQueue = outputQueue
+
+    def run(self):
+        for line in iter(self.fd.readline, ''):
+            logging.info('Engine: %s', line)
+            self.outputQueue.put(line)
+
+    def eof(self):
+        return not self.is_alive() and self.outputQueue.empty()
+
+    @classmethod
+    def getForFd(cls, fd, start=True):
+        queue = Queue.Queue()
+        reader = cls(fd, queue)
+
+        if start:
+            reader.start()
+
+        return reader, queue
 
 
 class Match:
@@ -99,6 +131,10 @@ class Match:
         return self.winner
 
 
+class MaxDepthReached(Exception):
+    pass
+
+
 class Engine(subprocess.Popen):
     """
     This initiates the Stockfish chess engine with Ponder set to False.
@@ -129,7 +165,7 @@ class Engine(subprocess.Popen):
     engines.
     """
 
-    def __init__(self, depth=2, ponder=False, param={}, rand=False, rand_min=-10, rand_max=10, binary=None):
+    def __init__(self, depth=2, ponder=False, param=None, rand=False, rand_min=-10, rand_max=10, binary=None):
         if binary:
             binary_path = binary
         else:
@@ -139,33 +175,38 @@ class Engine(subprocess.Popen):
                                   universal_newlines=True,
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE, )
-        self.depth = str(depth)
+        self.output_queue = Queue.Queue()
+        self.output_reader = AsyncLineReader(self.stdout, self.output_queue)
+        self.output_reader.start()
+        self.depth = depth
         self.ponder = ponder
         self.put('uci')
         if not ponder:
             self.setoption('Ponder', False)
 
-        base_param = {
-            "Write Debug Log": "false",
-            "Contempt Factor": 0,  # There are some stockfish versions with Contempt Factor
-            "Contempt": 0,  # and others with Contempt. Just try both.
-            "Min Split Depth": 0,
-            "Threads": 1,
-            "Hash": 16,
-            "MultiPV": 1,
-            "Skill Level": 20,
-            "Strength": 50,
-            "Move Overhead": 30,
-            "Minimum Thinking Time": 20,
-            "Slow Mover": 80,
-            "UCI_Chess960": "false",
-        }
+        if param:
+            base_param = param
+        else:
+            base_param = {
+                "Write Debug Log": "false",
+                "Contempt Factor": 0,  # There are some stockfish versions with Contempt Factor
+                "Contempt": 0,  # and others with Contempt. Just try both.
+                "Min Split Depth": 0,
+                "Threads": 1,
+                "Hash": 16,
+                "MultiPV": 1,
+                "Skill Level": 20,
+                "Strength": 50,
+                "Move Overhead": 30,
+                "Minimum Thinking Time": 20,
+                "Slow Mover": 80,
+                "UCI_Chess960": "false",
+            }
 
         if rand:
             base_param['Contempt'] = randint(rand_min, rand_max),
             base_param['Contempt Factor'] = randint(rand_min, rand_max),
 
-        base_param.update(param)
         self.param = base_param
         for name, value in list(base_param.items()):
             self.setoption(name, value)
@@ -178,6 +219,7 @@ class Engine(subprocess.Popen):
         self.isready()
 
     def put(self, command):
+        logging.info('Command: %s', command)
         self.stdin.write(command + '\n')
         self.stdin.flush()
 
@@ -216,6 +258,29 @@ class Engine(subprocess.Popen):
         """
         return ' '.join(moves)
 
+    def trybestmove(self):
+        try:
+            text = self.output_queue.get_nowait()
+        except Queue.Empty:
+            return
+        text = text.strip()
+        split_text = text.split(' ')
+        if split_text[0] == "info":
+            if split_text[1] == "depth":
+                try:
+                    depth = int(split_text[2])
+                except (ValueError, TypeError):
+                    return
+                if depth > self.depth:
+                    raise MaxDepthReached()
+            last_info = Engine._bestmove_get_info(text)
+            if 'pv' not in last_info:
+                return
+        if split_text[0] == "bestmove":
+            ponder = None if len(split_text) < 3 else split_text[2]
+            return {'move': split_text[1],
+                    'ponder': ponder}
+
     def bestmove(self):
         """
         Get proposed best move for current position.
@@ -226,14 +291,14 @@ class Engine(subprocess.Popen):
         self.go()
         last_info = ""
         while True:
-            text = self.stdout.readline().strip()
+            text = self.output_queue.get().strip()
             split_text = text.split(' ')
             logging.info('Got engine line: %s', text)
             print(text)
             if split_text[0] == "info":
                 last_info = Engine._bestmove_get_info(text)
                 if 'pv' not in last_info:
-                	continue
+                    continue
             if split_text[0] == "bestmove":
                 ponder = None if len(split_text) < 3 else split_text[2]
                 return {'move': split_text[1],
@@ -271,9 +336,9 @@ class Engine(subprocess.Popen):
         """
         search = re.search(pattern=field + " (?P<value>\d+)", string=info)
         if search:
-        	return {field: int(search.group("value"))}
+            return {field: int(search.group("value"))}
         else:
-        	return {}
+            return {}
 
     @staticmethod
     def _get_info_score(info):
@@ -287,9 +352,9 @@ class Engine(subprocess.Popen):
         """
         search = re.search(pattern="score (?P<eval>\w+) (?P<value>-?\d+)", string=info)
         if search:
-        	return {"score": {"eval": search.group("eval"), "value": int(search.group("value"))}}
+            return {"score": {"eval": search.group("eval"), "value": int(search.group("value"))}}
         else:
-        	return {}
+            return {}
 
     @staticmethod
     def _get_info_pv(info):
@@ -300,9 +365,9 @@ class Engine(subprocess.Popen):
         """
         search = re.search(pattern=PV_REGEX, string=info)
         if search:
-        	return {"pv": search.group("move_list")}
+            return {"pv": search.group("move_list")}
         else:
-        	return {}
+            return {}
 
     def isready(self):
         """
@@ -310,6 +375,6 @@ class Engine(subprocess.Popen):
         """
         self.put('isready')
         while True:
-            text = self.stdout.readline().strip()
+            text = self.output_queue.get().strip()
             if text == 'readyok':
                 return text
