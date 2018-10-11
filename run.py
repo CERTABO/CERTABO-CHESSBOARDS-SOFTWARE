@@ -492,7 +492,7 @@ while 1:
                     dialog = ""
                     if x > (200 + 105):  # confirm button
                         print("do delete")
-                        os.system("del " + saved_files[resume_file_selected + resume_file_start])
+                        os.system("del " + os.path.join(CERTABO_SAVE_PATH, saved_files[resume_file_selected + resume_file_start]))
                         # update saved files list to load
 
                         files = os.listdir(r"")
@@ -518,7 +518,7 @@ while 1:
                     resume_file_selected = i
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
-                f = open(saved_files[resume_file_selected + resume_file_start], 'rb')
+                f = open(os.path.join(CERTABO_SAVE_PATH, saved_files[resume_file_selected + resume_file_start], 'rb'))
                 move_history, board_state, terminal_text, terminal_text_line2, board_history, timer, \
                 play_white, difficulty = pickle.load(f)
                 f.close()
