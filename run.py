@@ -471,7 +471,8 @@ while 1:
                           330 * x_multiplier, 30 * y_multiplier))  # selection
 
         for i in range(len(saved_files)):
-            if i > 7: break
+            if i > 7:
+                break
             txt_large(saved_files[i + resume_file_start].replace('.sav', ''), 117, 41 + i * 29, grey)
             v = saved_files_time[i]
 
@@ -669,18 +670,25 @@ while 1:
                                     banner_do_move = False
                                     do_user_move = True
                             else:
-                                if DEBUG: print("Place pieces on their places")
+                                if DEBUG:
+                                    print("Place pieces on their places")
                                 banner_right_places = True
                         else:
-                            if DEBUG: print("All pieces on right places")
+                            if DEBUG:
+                                print("All pieces on right places")
                             sock.sendto(chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0),
                                         KUDA_POSYLAT)
                             banner_right_places = False
-
+                            banner_place_pieces = False
                             # start with black, do move just right after right initial board placement
-                            if banner_place_pieces and not play_white:
+                            white_to_move = len(move_history) % 2 == 0
+
+                            if white_to_move != play_white:
                                 do_ai_move = True
-                                banner_place_pieces = False
+                                do_user_move = False
+                            else:
+                                do_user_move = True
+                                do_ai_move = False
 
                             if not game_process_just_started and not do_user_move and not do_ai_move:
                                 banner_place_pieces = False
