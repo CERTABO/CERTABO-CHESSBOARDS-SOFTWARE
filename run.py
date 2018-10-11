@@ -683,11 +683,9 @@ while 1:
                             # start with black, do move just right after right initial board placement
                             white_to_move = len(move_history) % 2 == 0
 
-                            if white_to_move == play_white:
+                            if white_to_move != play_white:
                                 do_ai_move = True
-                                do_user_move = False
                             else:
-                                do_user_move = True
                                 do_ai_move = False
 
                             if not game_process_just_started and not do_user_move and not do_ai_move:
