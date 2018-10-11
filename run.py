@@ -456,7 +456,7 @@ while 1:
                 mate_we_lost = False
 
                 for name in saved_files:
-                    saved_files_time.append(tt.gmtime(os.stat(name).st_mtime))
+                    saved_files_time.append(tt.gmtime(os.stat(os.path.join(CERTABO_SAVE_PATH, name)).st_mtime))
 
     # ---------------- Resume game dialog ----------------
     elif window == "resume":
