@@ -262,8 +262,19 @@ timer = 0
 play_white = True
 difficulty = 0
 board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-terminal_text_second = "Game started"
-terminal_text_first = "Terminal text here"
+terminal_lines = [
+    "Game started",
+    "Terminal text here"
+]
+
+def terminal_print(s, newline=True):
+    global terminal_lines
+    if newline:
+        terminal_lines = [terminal_lines[1], s]
+    else:
+        terminal_lines[1] = '{}{}'.format(terminal_lines[1], s)
+
+
 pressed_key = ""
 hint_text = ""
 move_history = []
@@ -451,8 +462,7 @@ while 1:
                 files = os.listdir(CERTABO_SAVE_PATH)
                 saved_files = [v for v in files if '.sav' in v]
                 saved_files_time = []
-                terminal_text_second = ""
-                terminal_text_first = ""
+                terminal_lines = ["", ""]
                 mate_we_won = False
                 mate_we_lost = False
 
@@ -521,7 +531,7 @@ while 1:
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
                 f = open(os.path.join(CERTABO_SAVE_PATH, saved_files[resume_file_selected + resume_file_start]), 'rb')
-                move_history, board_state, terminal_text_second, terminal_text_first, board_history, timer, \
+                move_history, board_state, terminal_lines[1], terminal_lines[0], board_history, timer, \
                 play_white, difficulty = pickle.load(f)
                 f.close()
                 previous_board_click = ""
@@ -598,7 +608,7 @@ while 1:
                     OUTPUT_SAV = os.path.join(CERTABO_SAVE_PATH, '{}.sav'.format(name_to_save))
                     OUTPUT_PGN = os.path.join(CERTABO_SAVE_PATH, '{}.pgn'.format(name_to_save))
                     f = open(OUTPUT_SAV, 'wb')
-                    pickle.dump([move_history, board_state, terminal_text_second, terminal_text_first, board_history, \
+                    pickle.dump([move_history, board_state, terminal_lines[1], terminal_lines[0], board_history,
                                  timer, play_white, difficulty], f)
                     f.close()
                     if move_history:
@@ -701,8 +711,8 @@ while 1:
 
         show("terminal", 179, 3)
 
-        txt(terminal_text_first, 183, 3, terminal_text_color)
-        txt(terminal_text_second, 183, 18, terminal_text_color)
+        txt(terminal_lines[0], 183, 3, terminal_text_color)
+        txt(terminal_lines[1], 183, 18, terminal_text_color)
         txt_large(hint_text, 96, 185 + 22, grey)
 
         # buttons
@@ -727,8 +737,7 @@ while 1:
                         dialog = ""
                         window = "home"
                         board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-                        terminal_text_second = ""
-                        terminal_text_first = ""
+                        terminal_lines = ["", ""]
                         pressed_key = ""
                         hint_text = ""
                         move_history = []
@@ -828,9 +837,11 @@ while 1:
                     print("   stockfish move: ", ai_move)
                     print("after stockfish move: ", board_state)
                     board_history.append(board_state)
+                    side = ('white', 'black')[len(move_history) % 2]
+                    terminal_print('{} move: {}'.format(side, ai_move))
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
-                    terminal_text_second = ai_move + " - invalid move !"
+                    terminal_print(ai_move + " - invalid move !")
 
                 print("\n\n", board_state)
 
@@ -844,7 +855,7 @@ while 1:
 
                 if chessgame.status == chessgame.CHECK:
                     # print " *************** check ! ******************"
-                    terminal_text_second += " check!"
+                    terminal_print(" check!", False)
 
                 # if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
@@ -870,14 +881,14 @@ while 1:
                     #                   terminal_text = "white move: "+ai_move
 
                     print("   user move: ", move)
+                    side = ('white', 'black')[len(move_history) % 2]
+                    terminal_print('{} move: {}'.format(side, move))
                     if not human_game:
                         do_ai_move = True
                         hint_text = ""
                 except:
                     print("   ----invalid user move! ---- ", move)
-                    terminal_text_first = terminal_text_second
-
-                    terminal_text_second = move + " - invalid move !"
+                    terminal_print(move + " - invalid move !")
                     previous_board_click = ""
                     board_click = ""
                     banner_do_move = True
@@ -891,24 +902,13 @@ while 1:
 
                 if chessgame.status == chessgame.CHECK:
                     # print " *************** check ! ******************"
-                    terminal_text_second += " check!"
+                    terminal_print(" check!", False)
 
                 #            if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
                     print("mate! we won!")
                     mate_we_won = True
 
-            if move_history:
-                if len(move_history) == 1:
-                    terminal_text_first = ''
-                    terminal_text_second = 'white move: {}'.format(move_history[0])
-                else:
-                    if len(move_history) % 2 == 0:
-                        sides = ('white', 'black')
-                    else:
-                        sides = ('black', 'white')
-                    terminal_text_first = '{} move: {}'.format(sides[0], move_history[-2])
-                    terminal_text_second = '{} move: {}'.format(sides[1], move_history[-1])
             show_board(board_state, 178, 40)
 
             # -------------------- show banners -------------------------
@@ -1136,7 +1136,7 @@ while 1:
 
                     move_history = []
                     board_history = [board_state]
-                    terminal_text_first = "New game, depth=" + str(difficulty + 1)
+                    terminal_print("New game, depth={}".format(difficulty + 1))
                     previous_board_click = ""
                     board_click = ""
                     do_user_move = False
