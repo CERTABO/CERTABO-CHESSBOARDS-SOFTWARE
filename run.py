@@ -357,8 +357,8 @@ while 1:
     scr.fill(white)  # clear screen
 
     x, y = pygame.mouse.get_pos()  # mouse position
-    x = x / x_multiplier;
-    y = y / y_multiplier;
+    x = x / x_multiplier
+    y = y / y_multiplier
 
     mbutton = pygame.mouse.get_pressed()
     if DEBUG: txt(str((x, y)), 80, 300, lightgrey)
@@ -368,7 +368,8 @@ while 1:
         left_click = False
 
     if x < 110 and y < 101 and mbutton[0] == 1:
-        if datetime.now() - poweroff_time >= timedelta(seconds=2): do_poweroff(usb_proc)
+        if datetime.now() - poweroff_time >= timedelta(seconds=2):
+            do_poweroff(usb_proc)
     else:
         poweroff_time = datetime.now()
 
@@ -665,7 +666,10 @@ while 1:
                         s2 = board_state_usb.split(' ')[0]
                         if s1 != s2:
                             if banner_do_move:
-                                move = codes.FENs2move(board_state, board_state_usb, play_white)
+                                if human_game:
+                                    move = codes.FENs2move(board_state, board_state_usb, len(move_history) % 2 == 0)
+                                else:
+                                    move = codes.FENs2move(board_state, board_state_usb, play_white)
                                 if move != "":
                                     banner_do_move = False
                                     do_user_move = True
