@@ -837,7 +837,7 @@ while 1:
                     print("   stockfish move: ", ai_move)
                     print("after stockfish move: ", board_state)
                     board_history.append(board_state)
-                    side = ('white', 'black')[len(move_history) % 2]
+                    side = ('black', 'white')[len(move_history) % 2]
                     terminal_print('{} move: {}'.format(side, ai_move))
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
@@ -881,7 +881,7 @@ while 1:
                     #                   terminal_text = "white move: "+ai_move
 
                     print("   user move: ", move)
-                    side = ('white', 'black')[len(move_history) % 2]
+                    side = ('black', 'white')[len(move_history) % 2]
                     terminal_print('{} move: {}'.format(side, move))
                     if not human_game:
                         do_ai_move = True
