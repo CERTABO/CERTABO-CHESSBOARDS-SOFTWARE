@@ -820,25 +820,6 @@ while 1:
                 # banner_do_move = True
                 show_board_and_animated_move(board_state, ai_move, 178, 40)
 
-                if human_game:
-                    if move_history:
-                        if len(move_history) == 1:
-                            terminal_text_first = ''
-                            terminal_text_second = 'white move: {}'.format(move_history[0])
-                        else:
-                            if len(move_history) % 2 == 0:
-                                sides = ('white', 'black')
-                            else:
-                                sides = ('black', 'white')
-                            terminal_text_first = '{} move: {}'.format(sides[0], move_history[-2])
-                            terminal_text_second = '{} move: {}'.format(sides[1], move_history[-1])
-                else:
-                    if play_white:
-                        terminal_text_second += ", black move: " + ai_move
-                    else:
-                        terminal_text_first = terminal_text_second
-                        terminal_text_second = "white move: " + ai_move
-
                 try:
                     chessgame = Game(fen=board_state)
                     chessgame.apply_move(ai_move)  # validate move
@@ -892,12 +873,6 @@ while 1:
                     if not human_game:
                         do_ai_move = True
                         hint_text = ""
-                    if play_white:
-                        terminal_text_first = terminal_text_second
-                        terminal_text_second = "white move: " + move
-                    else:
-                        terminal_text_second += ", black move: " + move
-
                 except:
                     print("   ----invalid user move! ---- ", move)
                     terminal_text_first = terminal_text_second
@@ -923,6 +898,17 @@ while 1:
                     print("mate! we won!")
                     mate_we_won = True
 
+            if move_history:
+                if len(move_history) == 1:
+                    terminal_text_first = ''
+                    terminal_text_second = 'white move: {}'.format(move_history[0])
+                else:
+                    if len(move_history) % 2 == 0:
+                        sides = ('white', 'black')
+                    else:
+                        sides = ('black', 'white')
+                    terminal_text_first = '{} move: {}'.format(sides[0], move_history[-2])
+                    terminal_text_second = '{} move: {}'.format(sides[1], move_history[-1])
             show_board(board_state, 178, 40)
 
             # -------------------- show banners -------------------------
