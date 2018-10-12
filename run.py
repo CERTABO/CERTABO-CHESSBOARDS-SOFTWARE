@@ -992,6 +992,7 @@ while 1:
                             banner_do_move = False
                             do_user_move = False
                             banner_right_places = True
+                            banner_place_pieces = True
 
                             hint_text = ""
                         else:
