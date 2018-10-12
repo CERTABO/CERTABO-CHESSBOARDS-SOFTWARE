@@ -687,6 +687,7 @@ while 1:
                                 if DEBUG:
                                     print("Place pieces on their places")
                                 banner_right_places = True
+                                banner_place_pieces = True
                         else:
                             if DEBUG:
                                 print("All pieces on right places")
