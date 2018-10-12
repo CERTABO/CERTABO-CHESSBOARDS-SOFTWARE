@@ -689,7 +689,7 @@ while 1:
                                 banner_right_places = True
                                 if not human_game:
                                     white_to_move = len(move_history) % 2 == 0
-                                    if play_white == white_to_move:
+                                    if play_white != white_to_move:
                                         banner_place_pieces = True
                                 else:
                                     banner_place_pieces = True
