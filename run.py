@@ -278,7 +278,7 @@ do_user_move = False
 conversion_dialog = False
 mate_we_lost = False
 mate_we_won = False
-
+human_game = False
 renew = True
 left_click = False
 
@@ -466,8 +466,8 @@ while 1:
         show("back", 3, 146)
         show("delete-game", 103, 283)
 
-        pygame.draw.rect(scr, lightestgrey, \
-                         (113 * x_multiplier, 41 * y_multiplier + resume_file_selected * 29 * y_multiplier, \
+        pygame.draw.rect(scr, lightestgrey,
+                         (113 * x_multiplier, 41 * y_multiplier + resume_file_selected * 29 * y_multiplier,
                           330 * x_multiplier, 30 * y_multiplier))  # selection
 
         for i in range(len(saved_files)):
@@ -476,7 +476,7 @@ while 1:
             txt_large(saved_files[i + resume_file_start].replace('.sav', ''), 117, 41 + i * 29, grey)
             v = saved_files_time[i]
 
-            txt_large("%d-%d-%d  %d:%d" % (v.tm_year, v.tm_mon, v.tm_mday, v.tm_hour, v.tm_min), \
+            txt_large("%d-%d-%d  %d:%d" % (v.tm_year, v.tm_mon, v.tm_mday, v.tm_hour, v.tm_min),
                       300, 41 + i * 29, lightgrey)
 
         if dialog == "delete":
@@ -605,9 +605,9 @@ while 1:
                         game.headers['Date'] = datetime.now().strftime('%Y.%m.%d')
                         if play_white:
                             game.headers['White'] = 'Human'
-                            game.headers['Black'] = 'Computer'
+                            game.headers['Black'] = 'Computer' if not human_game else 'Human'
                         else:
-                            game.headers['White'] = 'Computer'
+                            game.headers['White'] = 'Computer' if not human_game else 'Human'
                             game.headers['Black'] = 'Human'
                         if mate_we_lost:
                             game.headers['Result'] = '0-1' if play_white else '1-0'
@@ -683,10 +683,11 @@ while 1:
                             # start with black, do move just right after right initial board placement
                             white_to_move = len(move_history) % 2 == 0
 
-                            if white_to_move != play_white:
-                                do_ai_move = True
-                            else:
-                                do_ai_move = False
+                            if not human_game:
+                                if white_to_move != play_white:
+                                    do_ai_move = True
+                                else:
+                                    do_ai_move = False
 
                             if not game_process_just_started and not do_user_move and not do_ai_move:
                                 banner_place_pieces = False
@@ -702,7 +703,8 @@ while 1:
 
         # buttons
         show("take_back", 5, 140 + 22)
-        show("hint", 5, 140 + 40 + 22)
+        if not human_game:
+            show("hint", 5, 140 + 40 + 22)
         show("save", 5, 140 + 100)
         show("exit", 5, 140 + 140)
 
@@ -737,7 +739,7 @@ while 1:
 
 
         else:  # usual game process
-            if do_ai_move and (not mate_we_won and not mate_we_lost):
+            if not human_game and do_ai_move and (not mate_we_won and not mate_we_lost):
                 do_ai_move = False
 
                 # stockfish chess engine interrogation
@@ -870,8 +872,9 @@ while 1:
                     #                   terminal_text = "white move: "+ai_move
 
                     print("   user move: ", move)
-                    do_ai_move = True
-                    hint_text = ""
+                    if not human_game:
+                        do_ai_move = True
+                        hint_text = ""
                     if play_white:
                         terminal_text_line2 = terminal_text
                         terminal_text = "white move: " + move
@@ -1039,54 +1042,65 @@ while 1:
 
     # ---------------- new game dialog ----------------
     elif window == "new game":
-
-        txt_large("Depth:", 203, 115, green)
-        show("depth" + str(difficulty + 1), 214, 151)
-        txt_large("<", 189, 156, grey)
-        txt_large(">", 265, 156, grey)
-        txt_large('Engine:', 250, 20, grey)
-        pygame.draw.rect(scr, darkergreen if engine == 'lc0' else grey, (120 * x_multiplier, 55 * y_multiplier,
+        if not human_game:
+            txt_large("Depth:", 203, 115, green)
+            show("depth" + str(difficulty + 1), 214, 151)
+            txt_large("<", 189, 156, grey)
+            txt_large(">", 265, 156, grey)
+        txt_large('Opponent:', 250, 20, grey)
+        pygame.draw.rect(scr, darkergreen if engine == 'lc0' and not human_game else grey, (120 * x_multiplier, 55 * y_multiplier,
                                      45 * x_multiplier, 40 * y_multiplier))
         txt_large('LC0', 125, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' else grey, (170 * x_multiplier, 55 * y_multiplier,
+        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' and not human_game else grey, (170 * x_multiplier, 55 * y_multiplier,
                                      90 * x_multiplier, 40 * y_multiplier))
         txt_large('Stockfish', 175, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' else grey, (265 * x_multiplier, 55 * y_multiplier,
+        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' and not human_game else grey, (265 * x_multiplier, 55 * y_multiplier,
                                      80 * x_multiplier, 40 * y_multiplier))
         txt_large('Houdini', 270, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'fire' else grey, (350 * x_multiplier, 55 * y_multiplier,
+        pygame.draw.rect(scr, darkergreen if engine == 'fire' and not human_game else grey, (350 * x_multiplier, 55 * y_multiplier,
                                                                              45 * x_multiplier, 40 * y_multiplier))
         txt_large('Fire', 355, 60, white)
+        pygame.draw.rect(scr, darkergreen if human_game else grey, (400 * x_multiplier, 55 * y_multiplier,
+                                                                          70 * x_multiplier, 40 * y_multiplier))
+        txt_large('Human', 405, 60, white)
         x0 = 213
-        if difficulty == 0:
-            txt("Easiest", x0, 191, grey)
-        elif difficulty < 4:
-            txt("Easy", x0 + 6, 191, grey)
-        elif difficulty > 18:
-            txt("Very hard", x0 - 10, 191, grey)
-        elif difficulty > 10:
-            txt("Hard", x0 + 6, 191, grey)
-        else:
-            txt("Normal", x0, 191, grey)
+        if not human_game:
+            if difficulty == 0:
+                txt("Easiest", x0, 191, grey)
+            elif difficulty < 4:
+                txt("Easy", x0 + 6, 191, grey)
+            elif difficulty > 18:
+                txt("Very hard", x0 - 10, 191, grey)
+            elif difficulty > 10:
+                txt("Hard", x0 + 6, 191, grey)
+            else:
+                txt("Normal", x0, 191, grey)
 
         show("back", 14, 269)
         show("start", 363, 269)
-        txt_large("Color to play:", 175, 232, green)
-        if play_white:
-            show("white", 184, 269)
-        else:
-            show("black", 184, 269)
+        if not human_game:
+            txt_large("Color to play:", 175, 232, green)
+            if play_white:
+                show("white", 184, 269)
+            else:
+                show("black", 184, 269)
 
         if left_click:
             if 55 < y < 95:
                 if 120 < x < 165:
                     engine = 'lc0'
+                    human_game = False
                 elif 170 < x < 260:
                     engine = 'stockfish'
+                    human_game = False
                 elif 265 < x < 345:
                     engine = 'houdini6'
+                    human_game = False
                 elif 350 < x < 395:
                     engine = 'fire'
+                    human_game = False
+                elif 400 < x < 470:
+                    human_game = True
             if 149 < y < 188:
                 if x > 233:
                     if difficulty < 19:
