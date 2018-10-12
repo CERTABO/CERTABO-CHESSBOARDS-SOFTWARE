@@ -965,16 +965,19 @@ while 1:
                         dialog = "exit"  # start dialog inside Game page
 
                     if 6 < x < 127 and (143 + 22) < y < (174 + 22):  # Take back button
-                        if len(board_history) > 2:
+                        if (human_game and len(board_history) > 1) or (not human_game and len(board_history) > 2):
                             print("--------- before take back: ")
                             print(board_history)
                             print(move_history)
-
-                            board_history.pop()  # remove last element
-                            board_history.pop()  # remove last element
-                            board_state = board_history[len(board_history) - 1]
-                            move_history.pop()  # it's for stockfish engine
-                            move_history.pop()  # it's for stockfish engine
+                            if human_game:
+                                board_history.pop()  # remove last element
+                                move_history.pop()  # it's for stockfish engine
+                            else:
+                                board_history.pop()  # remove last element
+                                board_history.pop()  # remove last element
+                                move_history.pop()  # it's for stockfish engine
+                                move_history.pop()  # it's for stockfish engine
+                            board_state = board_history[-1]
 
                             print("--------- after take back: ")
                             print(board_history)
