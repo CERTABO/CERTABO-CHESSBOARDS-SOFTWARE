@@ -24,7 +24,7 @@ def load_calibration():
     print("codes.py - loading calibration")
     try:
         p, r, n, b, k, q, P, R, N, B, K, Q = pickle.load( open(os.path.join(CERTABO_DATA_PATH, "calibration.bin"), "rb" ) )
-    except OSError:
+    except (IOError, OSError):
         return False
     return True
 
