@@ -25,15 +25,16 @@ logging.basicConfig(level='INFO')
 
 import codes
 from Chessnut import Game
-from constants import CERTABO_SAVE_PATH
+from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 
 stockfish.TO_EXE = TO_EXE
 
 
-try:
-    os.makedirs(CERTABO_SAVE_PATH)
-except OSError:
-    pass
+for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
+    try:
+        os.makedirs(d)
+    except OSError:
+        pass
 
 
 def txt(s, x, y, color):

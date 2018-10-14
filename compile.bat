@@ -10,7 +10,6 @@ xcopy /s /e /h /y dist\run dist\result
 xcopy /s /e /h /y dist\usbtool dist\result\
 
 copy stockfish.exe dist\result\
-copy calibration.bin dist\result\
 copy screen.ini dist\result\
 
 mkdir dist\result\pics

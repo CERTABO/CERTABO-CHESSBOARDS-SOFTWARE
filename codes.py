@@ -1,5 +1,7 @@
 from __future__ import print_function
 import pickle
+import os
+from constants import CERTABO_DATA_PATH
 
 # data conversion
 p, r, n, b, k, q, P, R, N, B, K, Q = [], [], [], [], [], [], [], [], [], [], [], []
@@ -20,7 +22,11 @@ def compare_cells(x, y):
 def load_calibration():
     global p, r, n, b, k, q, P, R, N, B, K, Q
     print("codes.py - loading calibration")
-    p, r, n, b, k, q, P, R, N, B, K, Q = pickle.load( open( "calibration.bin", "rb" ) )
+    try:
+        p, r, n, b, k, q, P, R, N, B, K, Q = pickle.load( open(os.path.join(CERTABO_DATA_PATH, "calibration.bin"), "rb" ) )
+    except OSError:
+        return False
+    return True
 
 
  
@@ -242,7 +248,7 @@ def calibration( usb_data, new_setup ):
         print("------- not new setup ----")
         results = pn, rn, nn, bn, kn, qn, Pn, Rn, Nn, Bn, Kn, Qn
         p, r, n, b, k, q, P, R, N, B, K, Q = pn, rn, nn, bn, kn, qn, Pn, Rn, Nn, Bn, Kn, Qn
-    pickle.dump( results, open( "calibration.bin", "wb" ) )
+    pickle.dump( results, open(os.path.join(CERTABO_DATA_PATH, "calibration.bin"), "wb" ) )
 
     print("----------------")
     #print r

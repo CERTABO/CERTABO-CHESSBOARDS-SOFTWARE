@@ -8,6 +8,7 @@ python-chess = "*"
 pygame = "*"
 pillow = "*"
 pyserial = "*"
+appdirs = "*"
 
 [dev-packages]
 pyinstaller = "*"
