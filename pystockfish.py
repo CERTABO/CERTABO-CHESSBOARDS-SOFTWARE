@@ -273,16 +273,11 @@ class Engine(subprocess.Popen):
             else:
                 logging.debug('PV in last_info: %s', last_info['pv'])
                 result = {'move': last_info['pv'].split()[0]}
-            if split_text[1] == "depth":
-                try:
-                    depth = int(split_text[2])
-                except (ValueError, TypeError):
-                    logging.debug('Depth not found')
-                    return
-                else:
-                    logging.debug('Depth found: %s', depth)
-                if depth > self.depth:
-                    result['depth'] = depth
+            if 'depth' not in last_info:
+                logging.debug('Depth not found')
+                return
+            if last_info['depth'] > self.depth:
+                result['depth'] = self.depth
             return result
         if split_text[0] == "bestmove":
             ponder = None if len(split_text) < 3 else split_text[2]
