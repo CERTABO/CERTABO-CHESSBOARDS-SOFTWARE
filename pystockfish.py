@@ -283,6 +283,7 @@ class Engine(subprocess.Popen):
                 return
             else:
                 logging.debug('PV in last_info: %s', last_info['pv'])
+                return {'move': last_info['pv'].split()[0]}
         if split_text[0] == "bestmove":
             ponder = None if len(split_text) < 3 else split_text[2]
             return {'move': split_text[1],
