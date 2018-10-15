@@ -288,7 +288,7 @@ class Engine(subprocess.Popen):
             ponder = None if len(split_text) < 3 else split_text[2]
             return {'move': split_text[1],
                     'ponder': ponder,
-                    'bestmove': True}
+                    'best_move': True}
 
     def bestmove(self):
         """
