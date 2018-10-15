@@ -83,15 +83,17 @@ class EngineThread(threading.Thread):
             if self.stop_engine and not self.stop_sent:
                 self.engine.put('stop')
                 self.stop_sent = True
-            try:
-                best_move = self.engine.trybestmove()
-            except MaxDepthReached:
-                logging.debug('Caught MaxDepthReached, stopping...')
-                self.stop()
-            else:
-                if best_move:
+            best_move = self.engine.trybestmove()
+            if best_move:
+                if best_move['best_move']:
                     self.best_move = best_move['move']
                     break
+                if 'depth' in best_move:
+                    if best_move['depth'] > self.difficulty:
+                        if self.best_move:
+                            break
+                        self.best_move = best_move['move']
+                        break
         self.engine.kill()
 
     def stop(self):
