@@ -270,8 +270,12 @@ class Engine(subprocess.Popen):
                 try:
                     depth = int(split_text[2])
                 except (ValueError, TypeError):
+                    logging.debug('Depth not found')
                     return
+                else:
+                    logging.debug('Depth found: %s', depth)
                 if depth > self.depth:
+                    logging.debug('Maximum depth reached: %s > %s', depth, self.depth)
                     raise MaxDepthReached()
             last_info = Engine._bestmove_get_info(text)
             if 'pv' not in last_info:
