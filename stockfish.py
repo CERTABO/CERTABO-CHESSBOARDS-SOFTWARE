@@ -86,6 +86,7 @@ class EngineThread(threading.Thread):
             try:
                 best_move = self.engine.trybestmove()
             except MaxDepthReached:
+                logging.debug('Caught MaxDepthReached, stopping...')
                 self.stop()
             else:
                 if best_move:
