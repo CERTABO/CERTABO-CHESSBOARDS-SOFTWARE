@@ -85,7 +85,7 @@ class EngineThread(threading.Thread):
                 self.stop_sent = True
             best_move = self.engine.trybestmove()
             if best_move:
-                if best_move['best_move']:
+                if best_move.get('best_move'):
                     self.best_move = best_move['move']
                     break
                 if 'depth' in best_move:
