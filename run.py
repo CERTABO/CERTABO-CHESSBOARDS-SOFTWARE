@@ -20,7 +20,7 @@ import stockfish
 import subprocess
 import logging
 
-logging.basicConfig(level='DEBUG')
+logging.basicConfig(level='INFO')
 
 
 import codes
