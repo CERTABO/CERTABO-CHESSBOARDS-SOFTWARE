@@ -3,7 +3,7 @@ from __future__ import print_function
 DEBUG = False
 
 # for exe compile run python 1.py py2exe
-
+import argparse
 import datetime
 import time
 from select import *
@@ -13,6 +13,9 @@ print("--- usbtool started ---")
 
 import serial.tools.list_ports
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--port', type=str)
+args = parser.parse_args()
 
 ports = list(serial.tools.list_ports.comports())
 
@@ -38,17 +41,27 @@ ports = s, ""
 # ports = result
 print(ports)
 
+if args.port:
+    try:
+        value = int(args.port)
+    except (ValueError, TypeError):
+        if args.port.upper().startswith('COM'):
+            selected_port = args.port.upper()
+        else:
+            raise ValueError('Unknown port {}'.format(args.port))
+else:
+    selected_port = ports[0]
 
 uart_ok = False
 try:
-    uart = serial.Serial(ports[0], 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
+    uart = serial.Serial(selected_port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
     uart_ok = True
 except:
     print("can't open Serial port")
 
 if not uart_ok:
     try:
-        uart = serial.Serial(ports[0], 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
+        uart = serial.Serial(selected_port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
         uart_ok = True
     except:
         print("can't open Serial")
@@ -93,11 +106,11 @@ while 1:
     if not uart_ok:
         try:
             uart = serial.Serial(
-                ports[0], 38400, timeout=2.5
+                selected_port, 38400, timeout=2.5
             )  # 0-COM1, 1-COM2 / speed /
             uart_ok = True
         except:
-            print("can't open Serial at ", ports[0])
+            print("can't open Serial at ", selected_port)
 
     time.sleep(0.001)
     t = datetime.datetime.now()
