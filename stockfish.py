@@ -13,7 +13,7 @@ TO_EXE = True
 # import multiprocessing
 
 # Contempt Integer, Default: 0, Min: -100, Max: 100
-# Roughly equivalent to "optimism." Positive values of contempt favor more "risky" play, 
+# Roughly equivalent to "optimism." Positive values of contempt favor more "risky" play,
 # while negative values will favor draws. Zero is neutral.
 
 # ?? Min Split Depth Integer, Default: 0, Min: 0, Max: 12
@@ -48,20 +48,24 @@ params = {
     "Skill Level": 20,
     "Move Overhead": 30,
     "Minimum Thinking Time": 20,
-    "Slow Mover": 80
+    "Slow Mover": 80,
 }
 
 
 class EngineThread(threading.Thread):
-    def __init__(self, move_history, difficulty, engine='stockfish', *args, **kwargs):
+    def __init__(self, move_history, difficulty, engine="stockfish", *args, **kwargs):
         self.engine = engine
-        self.engine_path = os.path.join(ENGINE_PATH, '{}.exe'.format(self.engine))
+        self.engine_path = os.path.join(ENGINE_PATH, "{}.exe".format(self.engine))
         self.engine_parameters = None
         try:
-            with open(os.path.join(ENGINE_PATH, '{}.parameters.json'.format(self.engine))) as f:
+            with open(
+                os.path.join(ENGINE_PATH, "{}.parameters.json".format(self.engine))
+            ) as f:
                 self.engine_parameters = json.load(f)
         except:
-            logging.warning('Could not load params for engine %s. Defaults will be used')
+            logging.warning(
+                "Could not load params for engine %s. Defaults will be used"
+            )
             pass
         self.move_history = move_history
         self.please_stop = False
@@ -74,25 +78,27 @@ class EngineThread(threading.Thread):
         super(EngineThread, self).__init__(*args, **kwargs)
 
     def run(self):
-        logging.info('Starting engine...')
-        self.engine = Engine(depth=self.difficulty, binary=self.engine_path, param=self.engine_parameters)
-        logging.info('Setting position to %s', self.move_history)
+        logging.info("Starting engine...")
+        self.engine = Engine(
+            depth=self.difficulty, binary=self.engine_path, param=self.engine_parameters
+        )
+        logging.info("Setting position to %s", self.move_history)
         self.engine.setposition(self.move_history)
         self.engine.go()
         while True:
             if self.stop_engine and not self.stop_sent:
-                self.engine.put('stop')
+                self.engine.put("stop")
                 self.stop_sent = True
             best_move = self.engine.trybestmove()
             if best_move:
-                if best_move.get('best_move'):
-                    self.best_move = best_move['move']
+                if best_move.get("best_move"):
+                    self.best_move = best_move["move"]
                     break
-                if 'depth' in best_move:
-                    if best_move['depth'] > self.difficulty:
+                if "depth" in best_move:
+                    if best_move["depth"] > self.difficulty:
                         if self.best_move:
                             break
-                        self.best_move = best_move['move']
+                        self.best_move = best_move["move"]
                         break
         self.engine.kill()
 
@@ -101,12 +107,12 @@ class EngineThread(threading.Thread):
 
 
 def main():
-    logging.basicConfig(level='DEBUG')
+    logging.basicConfig(level="DEBUG")
     et = EngineThread(move_history=[], difficulty=5)
     et.start()
     et.join()
     print(et.best_move)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

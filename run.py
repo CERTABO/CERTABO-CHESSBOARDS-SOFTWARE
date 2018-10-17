@@ -3,7 +3,7 @@ import sys
 
 DEBUG = False
 
-TO_EXE = getattr(sys, 'frozen', False)
+TO_EXE = getattr(sys, "frozen", False)
 
 XRESOLUTION = 1920
 
@@ -20,7 +20,7 @@ import stockfish
 import subprocess
 import logging
 
-logging.basicConfig(level='INFO')
+logging.basicConfig(level="INFO")
 
 
 import codes
@@ -50,17 +50,18 @@ def txt_large(s, x, y, color):
 
 
 def do_poweroff(proc):
-    subprocess.call(['taskkill', '/F', '/T', '/PID', str(proc.pid)])
+    subprocess.call(["taskkill", "/F", "/T", "/PID", str(proc.pid)])
     pygame.display.quit()
     pygame.quit()
     sys.exit()
 
 
-f = open('screen.ini', 'rb')
+f = open("screen.ini", "rb")
 try:
     XRESOLUTION = int(f.readline().split(" #")[0])
     print(XRESOLUTION)
-    if XRESOLUTION == 1380: XRESOLUTION = 1366
+    if XRESOLUTION == 1380:
+        XRESOLUTION = 1366
 except:
     print("Cannot read resolution from screen.ini")
 if XRESOLUTION != 480 and XRESOLUTION != 1366 and XRESOLUTION != 1920:
@@ -68,7 +69,7 @@ if XRESOLUTION != 480 and XRESOLUTION != 1366 and XRESOLUTION != 1920:
     XRESOLUTION = 1366
 try:
     s = f.readline().split(" #")[0]
-    if s == 'fullscreen':
+    if s == "fullscreen":
         fullscreen = True
     else:
         fullscreen = False
@@ -84,7 +85,7 @@ red = 200, 0, 0
 black = 0, 0, 0
 blue = 0, 0, 200
 white = 255, 255, 255
-terminal_text_color = 0xcf, 0xe0, 0x9a
+terminal_text_color = 0xCF, 0xE0, 0x9A
 grey = 100, 100, 100
 lightgrey = 190, 190, 190
 lightestgrey = 230, 230, 230
@@ -96,7 +97,7 @@ else:
 
 tt.sleep(1)  # time to make stable COMx connection
 
-os.environ['SDL_VIDEO_WINDOW_POS'] = "90,20"
+os.environ["SDL_VIDEO_WINDOW_POS"] = "90,20"
 pygame.init()
 
 # auto reduce a screen's resolution
@@ -104,8 +105,10 @@ infoObject = pygame.display.Info()
 xmax, ymax = infoObject.current_w, infoObject.current_h
 print("Xmax=", xmax)
 print("XRESOLUTION =", XRESOLUTION)
-if xmax < XRESOLUTION: XRESOLUTION = 1366
-if xmax < XRESOLUTION: XRESOLUTION = 480
+if xmax < XRESOLUTION:
+    XRESOLUTION = 1366
+if xmax < XRESOLUTION:
+    XRESOLUTION = 480
 
 if XRESOLUTION == 480:
     screen_width, screen_height = 480, 320
@@ -116,12 +119,17 @@ elif XRESOLUTION == 1366:
 x_multiplier, y_multiplier = float(screen_width) / 480, float(screen_height) / 320
 
 if fullscreen:
-    scr = pygame.display.set_mode((screen_width, screen_height),
-                                  pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.FULLSCREEN, 32)
+    scr = pygame.display.set_mode(
+        (screen_width, screen_height),
+        pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.FULLSCREEN,
+        32,
+    )
 else:
-    scr = pygame.display.set_mode((screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF, 32)
+    scr = pygame.display.set_mode(
+        (screen_width, screen_height), pygame.HWSURFACE | pygame.DOUBLEBUF, 32
+    )
 
-pygame.display.set_caption('Chess software')
+pygame.display.set_caption("Chess software")
 font = pygame.font.Font("Fonts//OpenSans-Regular.ttf", int(13 * y_multiplier))
 font_large = pygame.font.Font("Fonts//OpenSans-Regular.ttf", int(19 * y_multiplier))
 
@@ -136,26 +144,81 @@ pygame.display.flip()  # copy to screen
 #    pygame.mouse.set_cursor(*cursor_sizer)
 
 # ----------- load sprites
-names = "black_bishop", "black_king", "black_knight", "black_pawn", "black_queen", "black_rook", \
-        "white_bishop", "white_king", "white_knight", "white_pawn", "white_queen", "white_rook", "terminal", \
-        "logo", "chessboard_xy", "new_game", "resume_game", "save", "exit", "hint", "setup", \
-        "take_back", "resume_back", \
-        "analysing", "back", "black", "confirm", "delete-game", "depth1", "depth2", "depth3", "depth4", \
-        "depth5", "depth6", "depth7", "depth8", "depth9", "depth10", "depth11", "depth12", "depth13", \
-        "depth14", "depth15", "depth16", "depth17", "depth18", "depth19", "depth20", "done", \
-        "force-move", "select-depth", "start", "welcome", "white", "hide_back", "start-up-logo", \
-        "do-your-move", "move-certabo", "place-pieces", "place-pieces-on-chessboard", "new-setup", \
-        "please-wait", "check-mate-banner"
+names = (
+    "black_bishop",
+    "black_king",
+    "black_knight",
+    "black_pawn",
+    "black_queen",
+    "black_rook",
+    "white_bishop",
+    "white_king",
+    "white_knight",
+    "white_pawn",
+    "white_queen",
+    "white_rook",
+    "terminal",
+    "logo",
+    "chessboard_xy",
+    "new_game",
+    "resume_game",
+    "save",
+    "exit",
+    "hint",
+    "setup",
+    "take_back",
+    "resume_back",
+    "analysing",
+    "back",
+    "black",
+    "confirm",
+    "delete-game",
+    "depth1",
+    "depth2",
+    "depth3",
+    "depth4",
+    "depth5",
+    "depth6",
+    "depth7",
+    "depth8",
+    "depth9",
+    "depth10",
+    "depth11",
+    "depth12",
+    "depth13",
+    "depth14",
+    "depth15",
+    "depth16",
+    "depth17",
+    "depth18",
+    "depth19",
+    "depth20",
+    "done",
+    "force-move",
+    "select-depth",
+    "start",
+    "welcome",
+    "white",
+    "hide_back",
+    "start-up-logo",
+    "do-your-move",
+    "move-certabo",
+    "place-pieces",
+    "place-pieces-on-chessboard",
+    "new-setup",
+    "please-wait",
+    "check-mate-banner",
+)
 
 sprite = {}
 for name in names:
     if XRESOLUTION == 480:
-        path = 'sprites//'
+        path = "sprites//"
     elif XRESOLUTION == 1920:
-        path = 'sprites_1920//'
+        path = "sprites_1920//"
     elif XRESOLUTION == 1366:
-        path = 'sprites_1380//'
-    sprite[name] = pygame.image.load(path + name + '.png')
+        path = "sprites_1380//"
+    sprite[name] = pygame.image.load(path + name + ".png")
 
 
 # show sprite by name from names
@@ -165,9 +228,20 @@ def show(name, x, y):
 
 # Show chessboard using FEN string like
 # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-FEN = {"b": "black_bishop", "k": "black_king", "n": "black_knight", "p": "black_pawn", \
-       "q": "black_queen", "r": "black_rook", "B": "white_bishop", "K": "white_king", \
-       "N": "white_knight", "P": "white_pawn", "Q": "white_queen", "R": "white_rook"}
+FEN = {
+    "b": "black_bishop",
+    "k": "black_king",
+    "n": "black_knight",
+    "p": "black_pawn",
+    "q": "black_queen",
+    "r": "black_rook",
+    "B": "white_bishop",
+    "K": "white_king",
+    "N": "white_knight",
+    "P": "white_pawn",
+    "Q": "white_queen",
+    "R": "white_rook",
+}
 
 
 def show_board(FEN_string, x0, y0):
@@ -263,17 +337,15 @@ timer = 0
 play_white = True
 difficulty = 0
 board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-terminal_lines = [
-    "Game started",
-    "Terminal text here"
-]
+terminal_lines = ["Game started", "Terminal text here"]
+
 
 def terminal_print(s, newline=True):
     global terminal_lines
     if newline:
         terminal_lines = [terminal_lines[1], s]
     else:
-        terminal_lines[1] = '{}{}'.format(terminal_lines[1], s)
+        terminal_lines[1] = "{}{}".format(terminal_lines[1], s)
 
 
 pressed_key = ""
@@ -294,14 +366,14 @@ human_game = False
 renew = True
 left_click = False
 
-engine = 'stockfish'
+engine = "stockfish"
 
 saved_files = []
 resume_file_selected = 0
 resume_file_start = 0  # starting filename to show
 
-KUDA_POSYLAT = ('127.0.0.1', 3002)  # send to
-NASH_ADRES = ('127.0.0.1', 3003)  # listen to
+KUDA_POSYLAT = ("127.0.0.1", 3002)  # send to
+NASH_ADRES = ("127.0.0.1", 3003)  # listen to
 sock = socket(AF_INET, SOCK_DGRAM)
 sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
 sock.bind(NASH_ADRES)
@@ -328,14 +400,25 @@ banner_do_move = False
 new_setup = False
 
 # sock.sendto( chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0), KUDA_POSYLAT )
-message = chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF) + chr(0xFF)
+message = (
+    chr(0xFF)
+    + chr(0xFF)
+    + chr(0xFF)
+    + chr(0xFF)
+    + chr(0xFF)
+    + chr(0xFF)
+    + chr(0xFF)
+    + chr(0xFF)
+)
 sock.sendto(message, KUDA_POSYLAT)
 
 scr.fill(white)  # clear screen
 show("start-up-logo", 7, 0)
 pygame.display.flip()  # copy to screen
 tt.sleep(2)
-sock.sendto(chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0), KUDA_POSYLAT)
+sock.sendto(
+    chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0), KUDA_POSYLAT
+)
 
 poweroff_time = datetime.now()
 
@@ -373,7 +456,8 @@ while 1:
     y = y / y_multiplier
 
     mbutton = pygame.mouse.get_pressed()
-    if DEBUG: txt(str((x, y)), 80, 300, lightgrey)
+    if DEBUG:
+        txt(str((x, y)), 80, 300, lightgrey)
     if mbutton[0] == 1 and old_left_click == 0:
         left_click = True
     else:
@@ -396,7 +480,8 @@ while 1:
                 usb_data_history_filled = True
                 usb_data_history_i = 0
 
-            if DEBUG: print("usb_data_history_i = ", usb_data_history_i)
+            if DEBUG:
+                print("usb_data_history_i = ", usb_data_history_i)
             usb_data_history[usb_data_history_i] = usb_data[:]
             usb_data_history_i += 1
             if usb_data_history_filled:
@@ -414,7 +499,9 @@ while 1:
                 calibration_samples_counter += 1
                 if calibration_samples_counter >= 15:
                     print("------- we have collected enough samples for averaging ----")
-                    usb_data = codes.statistic_processing_for_calibration(calibration_samples, False)
+                    usb_data = codes.statistic_processing_for_calibration(
+                        calibration_samples, False
+                    )
                     # print usb_data
                     codes.calibration(usb_data, new_setup)
                     board_state = codes.usb_data_to_FEN(usb_data)
@@ -454,21 +541,34 @@ while 1:
 
             if 6 < x < 123 and 150 < y < 190:  # new game pressed
                 window = "new game"
-                sock.sendto(chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0),
-                            KUDA_POSYLAT)  # switch off LEDs
+                sock.sendto(
+                    chr(0)
+                    + chr(0)
+                    + chr(0)
+                    + chr(0)
+                    + chr(0)
+                    + chr(0)
+                    + chr(0)
+                    + chr(0),
+                    KUDA_POSYLAT,
+                )  # switch off LEDs
 
             if 6 < x < 163 and 191 < y < 222:  # resume pressed
                 window = "resume"
                 # update saved files list to load
                 files = os.listdir(CERTABO_SAVE_PATH)
-                saved_files = [v for v in files if '.sav' in v]
+                saved_files = [v for v in files if ".sav" in v]
                 saved_files_time = []
                 terminal_lines = ["", ""]
                 mate_we_won = False
                 mate_we_lost = False
 
                 for name in saved_files:
-                    saved_files_time.append(tt.gmtime(os.stat(os.path.join(CERTABO_SAVE_PATH, name)).st_mtime))
+                    saved_files_time.append(
+                        tt.gmtime(
+                            os.stat(os.path.join(CERTABO_SAVE_PATH, name)).st_mtime
+                        )
+                    )
 
     # ---------------- Resume game dialog ----------------
     elif window == "resume":
@@ -478,18 +578,35 @@ while 1:
         show("back", 3, 146)
         show("delete-game", 103, 283)
 
-        pygame.draw.rect(scr, lightestgrey,
-                         (113 * x_multiplier, 41 * y_multiplier + resume_file_selected * 29 * y_multiplier,
-                          330 * x_multiplier, 30 * y_multiplier))  # selection
+        pygame.draw.rect(
+            scr,
+            lightestgrey,
+            (
+                113 * x_multiplier,
+                41 * y_multiplier + resume_file_selected * 29 * y_multiplier,
+                330 * x_multiplier,
+                30 * y_multiplier,
+            ),
+        )  # selection
 
         for i in range(len(saved_files)):
             if i > 7:
                 break
-            txt_large(saved_files[i + resume_file_start].replace('.sav', ''), 117, 41 + i * 29, grey)
+            txt_large(
+                saved_files[i + resume_file_start].replace(".sav", ""),
+                117,
+                41 + i * 29,
+                grey,
+            )
             v = saved_files_time[i]
 
-            txt_large("%d-%d-%d  %d:%d" % (v.tm_year, v.tm_mon, v.tm_mday, v.tm_hour, v.tm_min),
-                      300, 41 + i * 29, lightgrey)
+            txt_large(
+                "%d-%d-%d  %d:%d"
+                % (v.tm_year, v.tm_mon, v.tm_mday, v.tm_hour, v.tm_min),
+                300,
+                41 + i * 29,
+                lightgrey,
+            )
 
         if dialog == "delete":
             show("hide_back", 0, 0)
@@ -505,11 +622,17 @@ while 1:
                     dialog = ""
                     if x > (200 + 105):  # confirm button
                         print("do delete")
-                        os.system("del " + os.path.join(CERTABO_SAVE_PATH, saved_files[resume_file_selected + resume_file_start]))
+                        os.system(
+                            "del "
+                            + os.path.join(
+                                CERTABO_SAVE_PATH,
+                                saved_files[resume_file_selected + resume_file_start],
+                            )
+                        )
                         # update saved files list to load
 
                         files = os.listdir(r"")
-                        saved_files = [v for v in files if '.sav' in v]
+                        saved_files = [v for v in files if ".sav" in v]
                         saved_files_time = []
                         for name in saved_files:
                             saved_files_time.append(tt.gmtime(os.stat(name).st_mtime))
@@ -531,9 +654,16 @@ while 1:
                     resume_file_selected = i
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
-                f = open(os.path.join(CERTABO_SAVE_PATH, saved_files[resume_file_selected + resume_file_start]), 'rb')
-                move_history, board_state, terminal_lines[1], terminal_lines[0], board_history, timer, \
-                play_white, difficulty = pickle.load(f)
+                f = open(
+                    os.path.join(
+                        CERTABO_SAVE_PATH,
+                        saved_files[resume_file_selected + resume_file_start],
+                    ),
+                    "rb",
+                )
+                move_history, board_state, terminal_lines[1], terminal_lines[
+                    0
+                ], board_history, timer, play_white, difficulty = pickle.load(f)
                 f.close()
                 previous_board_click = ""
                 board_click = ""
@@ -552,19 +682,22 @@ while 1:
                     if (resume_file_start + 8) < len(saved_files):
                         resume_file_start += 1
 
-
     # ---------------- Save game dialog ----------------
     elif window == "save":
 
         txt_large("Enter game name to save", 159, 41, grey)
         show("terminal", 139, 80)
-        txt_large(name_to_save, 273 - len(name_to_save) * (51 / 10.0), 86, terminal_text_color)
+        txt_large(
+            name_to_save, 273 - len(name_to_save) * (51 / 10.0), 86, terminal_text_color
+        )
 
-        # show keyboard        
-        keyboard_buttons = ('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-'), \
-                           ('q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'), \
-                           ('a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'), \
-                           ('z', 'x', 'c', 'v', 'b', 'n', 'm')
+        # show keyboard
+        keyboard_buttons = (
+            ("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-"),
+            ("q", "w", "e", "r", "t", "y", "u", "i", "o", "p"),
+            ("a", "s", "d", "f", "g", "h", "j", "k", "l"),
+            ("z", "x", "c", "v", "b", "n", "m"),
+        )
 
         lenx = 42  # size of buttons
         leny = 38  # size of buttons
@@ -574,15 +707,31 @@ while 1:
 
         hover_key = ""
 
-        pygame.draw.rect(scr, lightgrey, (
-        431 * x_multiplier, 81 * y_multiplier, lenx * x_multiplier - 2, leny * y_multiplier - 2))  # back space
+        pygame.draw.rect(
+            scr,
+            lightgrey,
+            (
+                431 * x_multiplier,
+                81 * y_multiplier,
+                lenx * x_multiplier - 2,
+                leny * y_multiplier - 2,
+            ),
+        )  # back space
         txt_large("<", (431 + 14), (81 + 4), black)
 
         for row in keyboard_buttons:
             kx = x0
             for key in row:
-                pygame.draw.rect(scr, lightgrey, (
-                kx * x_multiplier, ky * y_multiplier, lenx * x_multiplier - 2, leny * y_multiplier - 2))
+                pygame.draw.rect(
+                    scr,
+                    lightgrey,
+                    (
+                        kx * x_multiplier,
+                        ky * y_multiplier,
+                        lenx * x_multiplier - 2,
+                        leny * y_multiplier - 2,
+                    ),
+                )
                 txt_large(key, kx + 14, ky + 4, black)
                 if kx < x < (kx + lenx) and ky < y < (ky + leny):
                     hover_key = key
@@ -590,9 +739,16 @@ while 1:
             ky += leny
             x0 += 20
 
-        pygame.draw.rect(scr, lightgrey, (
-        x0 * x_multiplier + lenx * x_multiplier, ky * y_multiplier, 188 * x_multiplier,
-        leny * y_multiplier - 2))  # spacebar
+        pygame.draw.rect(
+            scr,
+            lightgrey,
+            (
+                x0 * x_multiplier + lenx * x_multiplier,
+                ky * y_multiplier,
+                188 * x_multiplier,
+                leny * y_multiplier - 2,
+            ),
+        )  # spacebar
         if (x0 + lenx) < x < (x0 + lenx + 188) and ky < y < (ky + leny):
             hover_key = " "
         show("save", 388, 264)
@@ -606,31 +762,50 @@ while 1:
 
             if hover_key != "":
                 if hover_key == "save":
-                    OUTPUT_SAV = os.path.join(CERTABO_SAVE_PATH, '{}.sav'.format(name_to_save))
-                    OUTPUT_PGN = os.path.join(CERTABO_SAVE_PATH, '{}.pgn'.format(name_to_save))
-                    f = open(OUTPUT_SAV, 'wb')
-                    pickle.dump([move_history, board_state, terminal_lines[1], terminal_lines[0], board_history,
-                                 timer, play_white, difficulty], f)
+                    OUTPUT_SAV = os.path.join(
+                        CERTABO_SAVE_PATH, "{}.sav".format(name_to_save)
+                    )
+                    OUTPUT_PGN = os.path.join(
+                        CERTABO_SAVE_PATH, "{}.pgn".format(name_to_save)
+                    )
+                    f = open(OUTPUT_SAV, "wb")
+                    pickle.dump(
+                        [
+                            move_history,
+                            board_state,
+                            terminal_lines[1],
+                            terminal_lines[0],
+                            board_history,
+                            timer,
+                            play_white,
+                            difficulty,
+                        ],
+                        f,
+                    )
                     f.close()
                     if move_history:
                         game = chess.pgn.Game()
-                        game.headers['Date'] = datetime.now().strftime('%Y.%m.%d')
+                        game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
                         if play_white:
-                            game.headers['White'] = 'Human'
-                            game.headers['Black'] = 'Computer' if not human_game else 'Human'
+                            game.headers["White"] = "Human"
+                            game.headers["Black"] = (
+                                "Computer" if not human_game else "Human"
+                            )
                         else:
-                            game.headers['White'] = 'Computer' if not human_game else 'Human'
-                            game.headers['Black'] = 'Human'
+                            game.headers["White"] = (
+                                "Computer" if not human_game else "Human"
+                            )
+                            game.headers["Black"] = "Human"
                         if mate_we_lost:
-                            game.headers['Result'] = '0-1' if play_white else '1-0'
+                            game.headers["Result"] = "0-1" if play_white else "1-0"
                         if mate_we_won:
-                            game.headers['Result'] = '1-0' if play_white else '0-1'
+                            game.headers["Result"] = "1-0" if play_white else "0-1"
                         if not mate_we_won and not mate_we_lost:
-                            game.headers['Result'] = '*'
+                            game.headers["Result"] = "*"
                         node = game.add_variation(chess.Move.from_uci(move_history[0]))
                         for move in move_history[1:]:
                             node = node.add_variation(chess.Move.from_uci(move))
-                        with open(OUTPUT_PGN, 'w') as f:
+                        with open(OUTPUT_PGN, "w") as f:
                             exporter = chess.pgn.FileExporter(f)
                             game.accept(exporter)
                     window = "game"
@@ -640,10 +815,9 @@ while 1:
                     left_click = False
                     conversion_dialog = False
 
-
                 elif hover_key == "<":
                     if len(name_to_save) > 0:
-                        name_to_save = name_to_save[:len(name_to_save) - 1]
+                        name_to_save = name_to_save[: len(name_to_save) - 1]
                 else:
                     if len(name_to_save) < 22:
                         name_to_save += hover_key
@@ -653,7 +827,8 @@ while 1:
 
         if new_usb_data:
             new_usb_data = False
-            if DEBUG: print("Virtual board: ", board_state)
+            if DEBUG:
+                print("Virtual board: ", board_state)
 
             banners_counter += 1
 
@@ -673,14 +848,20 @@ while 1:
                         game_process_just_started = False
 
                         # compare virtual board state and state from usb
-                        s1 = board_state.split(' ')[0]
-                        s2 = board_state_usb.split(' ')[0]
+                        s1 = board_state.split(" ")[0]
+                        s2 = board_state_usb.split(" ")[0]
                         if s1 != s2:
                             if banner_do_move:
                                 if human_game:
-                                    move = codes.FENs2move(board_state, board_state_usb, len(move_history) % 2 == 0)
+                                    move = codes.FENs2move(
+                                        board_state,
+                                        board_state_usb,
+                                        len(move_history) % 2 == 0,
+                                    )
                                 else:
-                                    move = codes.FENs2move(board_state, board_state_usb, play_white)
+                                    move = codes.FENs2move(
+                                        board_state, board_state_usb, play_white
+                                    )
                                 if move != "":
                                     banner_do_move = False
                                     do_user_move = True
@@ -697,8 +878,17 @@ while 1:
                         else:
                             if DEBUG:
                                 print("All pieces on right places")
-                            sock.sendto(chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0),
-                                        KUDA_POSYLAT)
+                            sock.sendto(
+                                chr(0)
+                                + chr(0)
+                                + chr(0)
+                                + chr(0)
+                                + chr(0)
+                                + chr(0)
+                                + chr(0)
+                                + chr(0),
+                                KUDA_POSYLAT,
+                            )
                             banner_right_places = False
                             banner_place_pieces = False
                             # start with black, do move just right after right initial board placement
@@ -710,7 +900,11 @@ while 1:
                                 else:
                                     do_ai_move = False
 
-                            if not game_process_just_started and not do_user_move and not do_ai_move:
+                            if (
+                                not game_process_just_started
+                                and not do_user_move
+                                and not do_ai_move
+                            ):
                                 banner_place_pieces = False
                                 banner_do_move = True
                 else:
@@ -731,9 +925,26 @@ while 1:
 
         if dialog == "exit":
             show_board(board_state, 178, 40)
-            pygame.draw.rect(scr, lightgrey,
-                             (229 * x_multiplier, 79 * y_multiplier, 200 * x_multiplier, 78 * y_multiplier))
-            pygame.draw.rect(scr, white, (227 * x_multiplier, 77 * y_multiplier, 200 * x_multiplier, 78 * y_multiplier))
+            pygame.draw.rect(
+                scr,
+                lightgrey,
+                (
+                    229 * x_multiplier,
+                    79 * y_multiplier,
+                    200 * x_multiplier,
+                    78 * y_multiplier,
+                ),
+            )
+            pygame.draw.rect(
+                scr,
+                white,
+                (
+                    227 * x_multiplier,
+                    77 * y_multiplier,
+                    200 * x_multiplier,
+                    78 * y_multiplier,
+                ),
+            )
             txt("Save the game or not ?", 227 + 37, 77 + 15, grey)
             show("save", 238, 77 + 40)
             show("exit", 238 + 112, 77 + 40)
@@ -743,7 +954,9 @@ while 1:
                     if x > (238 + 105):  # exit button
                         dialog = ""
                         window = "home"
-                        board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                        board_state = (
+                            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                        )
                         terminal_lines = ["", ""]
                         pressed_key = ""
                         hint_text = ""
@@ -756,7 +969,6 @@ while 1:
                         window = "save"
                         previous_board_click = ""
                         board_click = ""
-
 
         else:  # usual game process
             if not human_game and do_ai_move and (not mate_we_won and not mate_we_lost):
@@ -777,10 +989,26 @@ while 1:
                 # print "continues..."
 
                 show_board(board_state, 178, 40)
-                pygame.draw.rect(scr, lightgrey,
-                                 (229 * x_multiplier, 79 * y_multiplier, 200 * x_multiplier, 78 * y_multiplier))
-                pygame.draw.rect(scr, white,
-                                 (227 * x_multiplier, 77 * y_multiplier, 200 * x_multiplier, 78 * y_multiplier))
+                pygame.draw.rect(
+                    scr,
+                    lightgrey,
+                    (
+                        229 * x_multiplier,
+                        79 * y_multiplier,
+                        200 * x_multiplier,
+                        78 * y_multiplier,
+                    ),
+                )
+                pygame.draw.rect(
+                    scr,
+                    white,
+                    (
+                        227 * x_multiplier,
+                        77 * y_multiplier,
+                        200 * x_multiplier,
+                        78 * y_multiplier,
+                    ),
+                )
                 txt_large("Analysing...", 227 + 55, 77 + 8, grey)
                 show("force-move", 247, 77 + 39)
                 pygame.display.flip()  # copy to screen
@@ -804,7 +1032,9 @@ while 1:
 
                     # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
                     # pygame.display.flip() # copy to screen
-                    if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
+                    if (
+                        mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
+                    ):  # pressed Force move button
                         print("------------------------------------")
                         proc.stop()
                         proc.join()
@@ -820,7 +1050,9 @@ while 1:
                 print("AI move: ", ai_move)
 
                 # highlight right LED
-                i, value, i_source, value_source = codes.move2led(ai_move)  # error here if checkmate before
+                i, value, i_source, value_source = codes.move2led(
+                    ai_move
+                )  # error here if checkmate before
                 message = ""
                 for j in range(8):
                     if j != i and j != i_source:
@@ -844,8 +1076,8 @@ while 1:
                     print("   stockfish move: ", ai_move)
                     print("after stockfish move: ", board_state)
                     board_history.append(board_state)
-                    side = ('black', 'white')[len(move_history) % 2]
-                    terminal_print('{} move: {}'.format(side, ai_move))
+                    side = ("black", "white")[len(move_history) % 2]
+                    terminal_print("{} move: {}".format(side, ai_move))
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
                     terminal_print(ai_move + " - invalid move !")
@@ -888,8 +1120,8 @@ while 1:
                     #                   terminal_text = "white move: "+ai_move
 
                     print("   user move: ", move)
-                    side = ('black', 'white')[len(move_history) % 2]
-                    terminal_print('{} move: {}'.format(side, move))
+                    side = ("black", "white")[len(move_history) % 2]
+                    terminal_print("{} move: {}".format(side, move))
                     if not human_game:
                         do_ai_move = True
                         hint_text = ""
@@ -958,8 +1190,10 @@ while 1:
                 if conversion_dialog:
                     if (227 + 15) < x < (424) and (77 + 33) < y < (77 + 33 + 30):
                         i = (x - (227 + 15 - 15)) / 50
-                        if i < 0: i = 0
-                        if i > 3: i = 3
+                        if i < 0:
+                            i = 0
+                        if i > 3:
+                            i = 3
                         icon = icon_codes[i]
                         if len(move) == 4:
                             move += icon
@@ -968,11 +1202,15 @@ while 1:
                             do_user_move = True
                 else:
 
-                    if 6 < x < 123 and (140 + 140) < y < (140 + 140 + 40):  # Exit button
+                    if 6 < x < 123 and (140 + 140) < y < (
+                        140 + 140 + 40
+                    ):  # Exit button
                         dialog = "exit"  # start dialog inside Game page
 
                     if 6 < x < 127 and (143 + 22) < y < (174 + 22):  # Take back button
-                        if (human_game and len(board_history) > 1) or (not human_game and len(board_history) > 2):
+                        if (human_game and len(board_history) > 1) or (
+                            not human_game and len(board_history) > 2
+                        ):
                             print("--------- before take back: ")
                             print(board_history)
                             print(move_history)
@@ -1003,20 +1241,41 @@ while 1:
 
                             hint_text = ""
                         else:
-                            print("cannot do takeback, len(board_history) = ", len(board_history))
+                            print(
+                                "cannot do takeback, len(board_history) = ",
+                                len(board_history),
+                            )
 
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
-                        proc = stockfish.EngineThread(move_history, difficulty, engine=engine)
+                        proc = stockfish.EngineThread(
+                            move_history, difficulty, engine=engine
+                        )
                         proc.start()
                         # print "continues..."
 
                         show_board(board_state, 178, 40)
-                        pygame.draw.rect(scr, lightgrey, (229 * x_multiplier, 79 * y_multiplier, \
-                                                          200 * x_multiplier, 78 * y_multiplier))
-                        pygame.draw.rect(scr, white, (227 * x_multiplier, 77 * y_multiplier, \
-                                                      200 * x_multiplier, 78 * y_multiplier))
+                        pygame.draw.rect(
+                            scr,
+                            lightgrey,
+                            (
+                                229 * x_multiplier,
+                                79 * y_multiplier,
+                                200 * x_multiplier,
+                                78 * y_multiplier,
+                            ),
+                        )
+                        pygame.draw.rect(
+                            scr,
+                            white,
+                            (
+                                227 * x_multiplier,
+                                77 * y_multiplier,
+                                200 * x_multiplier,
+                                78 * y_multiplier,
+                            ),
+                        )
                         txt_large("Analysing...", 227 + 55, 77 + 8, grey)
                         show("force-move", 247, 77 + 39)
                         pygame.display.flip()  # copy to screen
@@ -1037,7 +1296,9 @@ while 1:
                             mbutton = pygame.mouse.get_pressed()
                             # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
                             # pygame.display.flip() # copy to screen
-                            if mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149:  # pressed Force move button
+                            if (
+                                mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
+                            ):  # pressed Force move button
                                 proc.stop()
                                 proc.join()
                                 hint_text = proc.best_move
@@ -1053,7 +1314,6 @@ while 1:
                         previous_board_click = ""
                         board_click = ""
 
-
     # ---------------- new game dialog ----------------
     elif window == "new game":
         if not human_game:
@@ -1061,22 +1321,62 @@ while 1:
             show("depth" + str(difficulty + 1), 214, 151)
             txt_large("<", 189, 156, grey)
             txt_large(">", 265, 156, grey)
-        txt_large('Opponent:', 250, 20, grey)
-        pygame.draw.rect(scr, darkergreen if engine == 'lc0' and not human_game else grey, (120 * x_multiplier, 55 * y_multiplier,
-                                     45 * x_multiplier, 40 * y_multiplier))
-        txt_large('LC0', 125, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'stockfish' and not human_game else grey, (170 * x_multiplier, 55 * y_multiplier,
-                                     90 * x_multiplier, 40 * y_multiplier))
-        txt_large('Stockfish', 175, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'houdini6' and not human_game else grey, (265 * x_multiplier, 55 * y_multiplier,
-                                     80 * x_multiplier, 40 * y_multiplier))
-        txt_large('Houdini', 270, 60, white)
-        pygame.draw.rect(scr, darkergreen if engine == 'fire' and not human_game else grey, (350 * x_multiplier, 55 * y_multiplier,
-                                                                             45 * x_multiplier, 40 * y_multiplier))
-        txt_large('Fire', 355, 60, white)
-        pygame.draw.rect(scr, darkergreen if human_game else grey, (400 * x_multiplier, 55 * y_multiplier,
-                                                                          70 * x_multiplier, 40 * y_multiplier))
-        txt_large('Human', 405, 60, white)
+        txt_large("Opponent:", 250, 20, grey)
+        pygame.draw.rect(
+            scr,
+            darkergreen if engine == "lc0" and not human_game else grey,
+            (
+                120 * x_multiplier,
+                55 * y_multiplier,
+                45 * x_multiplier,
+                40 * y_multiplier,
+            ),
+        )
+        txt_large("LC0", 125, 60, white)
+        pygame.draw.rect(
+            scr,
+            darkergreen if engine == "stockfish" and not human_game else grey,
+            (
+                170 * x_multiplier,
+                55 * y_multiplier,
+                90 * x_multiplier,
+                40 * y_multiplier,
+            ),
+        )
+        txt_large("Stockfish", 175, 60, white)
+        pygame.draw.rect(
+            scr,
+            darkergreen if engine == "houdini6" and not human_game else grey,
+            (
+                265 * x_multiplier,
+                55 * y_multiplier,
+                80 * x_multiplier,
+                40 * y_multiplier,
+            ),
+        )
+        txt_large("Houdini", 270, 60, white)
+        pygame.draw.rect(
+            scr,
+            darkergreen if engine == "fire" and not human_game else grey,
+            (
+                350 * x_multiplier,
+                55 * y_multiplier,
+                45 * x_multiplier,
+                40 * y_multiplier,
+            ),
+        )
+        txt_large("Fire", 355, 60, white)
+        pygame.draw.rect(
+            scr,
+            darkergreen if human_game else grey,
+            (
+                400 * x_multiplier,
+                55 * y_multiplier,
+                70 * x_multiplier,
+                40 * y_multiplier,
+            ),
+        )
+        txt_large("Human", 405, 60, white)
         x0 = 213
         if not human_game:
             if difficulty == 0:
@@ -1102,16 +1402,16 @@ while 1:
         if left_click:
             if 55 < y < 95:
                 if 120 < x < 165:
-                    engine = 'lc0'
+                    engine = "lc0"
                     human_game = False
                 elif 170 < x < 260:
-                    engine = 'stockfish'
+                    engine = "stockfish"
                     human_game = False
                 elif 265 < x < 345:
-                    engine = 'houdini6'
+                    engine = "houdini6"
                     human_game = False
                 elif 350 < x < 395:
-                    engine = 'fire'
+                    engine = "fire"
                     human_game = False
                 elif 400 < x < 470:
                     human_game = True
@@ -1139,7 +1439,9 @@ while 1:
 
                 if 365 < x < 467:  # start game ->
                     window = "game"
-                    board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                    board_state = (
+                        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                    )
 
                     move_history = []
                     board_history = [board_state]

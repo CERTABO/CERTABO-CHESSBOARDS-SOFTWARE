@@ -4,7 +4,7 @@ from PIL import Image
 
 
 def resize(filename):
-    img = Image.open('sprites//' + filename)  # pics for 480x320
+    img = Image.open("sprites//" + filename)  # pics for 480x320
     kx1 = 1500.0 / 480
     ky1 = 1000.0 / 320
     kx2 = 900.0 / 480
@@ -18,29 +18,84 @@ def resize(filename):
     print(filename, img.size[0], w1, w2)
     img.close()
 
-    img = Image.open('big_pngs//' + filename)  # pics for 480x320
+    img = Image.open("big_pngs//" + filename)  # pics for 480x320
     img1 = img.resize((w1, h1), PIL.Image.ANTIALIAS)
     img1.save("sprites_1920//" + filename)
     img1 = img.resize((w2, h2), PIL.Image.ANTIALIAS)
     img1.save("sprites_1380//" + filename)
 
 
-names = ("black_bishop", "black_king", "black_knight", "black_pawn", "black_queen", "black_rook",
-         "white_bishop", "white_king", "white_knight", "white_pawn", "white_queen", "white_rook", "terminal",
-         "logo", "chessboard_xy", "new_game", "resume_game", "save", "exit", "hint", "setup",
-         "take_back", "resume_back",
-         "analysing", "back", "black", "confirm", "delete-game", "depth1", "depth2", "depth3", "depth4",
-         "depth5", "depth6", "depth7", "depth8", "depth9", "depth10", "depth11", "depth12", "depth13",
-         "depth14", "depth15", "depth16", "depth17", "depth18", "depth19", "depth20", "done",
-         "force-move", "select-depth", "start", "welcome", "white", "hide_back", "start-up-logo",
-         "do-your-move", "move-certabo", "place-pieces", "place-pieces-on-chessboard", "new-setup",
-         "please-wait", "check-mate-banner")
+names = (
+    "black_bishop",
+    "black_king",
+    "black_knight",
+    "black_pawn",
+    "black_queen",
+    "black_rook",
+    "white_bishop",
+    "white_king",
+    "white_knight",
+    "white_pawn",
+    "white_queen",
+    "white_rook",
+    "terminal",
+    "logo",
+    "chessboard_xy",
+    "new_game",
+    "resume_game",
+    "save",
+    "exit",
+    "hint",
+    "setup",
+    "take_back",
+    "resume_back",
+    "analysing",
+    "back",
+    "black",
+    "confirm",
+    "delete-game",
+    "depth1",
+    "depth2",
+    "depth3",
+    "depth4",
+    "depth5",
+    "depth6",
+    "depth7",
+    "depth8",
+    "depth9",
+    "depth10",
+    "depth11",
+    "depth12",
+    "depth13",
+    "depth14",
+    "depth15",
+    "depth16",
+    "depth17",
+    "depth18",
+    "depth19",
+    "depth20",
+    "done",
+    "force-move",
+    "select-depth",
+    "start",
+    "welcome",
+    "white",
+    "hide_back",
+    "start-up-logo",
+    "do-your-move",
+    "move-certabo",
+    "place-pieces",
+    "place-pieces-on-chessboard",
+    "new-setup",
+    "please-wait",
+    "check-mate-banner",
+)
 
 sprite = {}
 print(len(names))
 for name in names:
-    filename = name + '.png'
-    img = Image.open('big_pngs//' + filename)
+    filename = name + ".png"
+    img = Image.open("big_pngs//" + filename)
 
     # sprite[ name ] = pygame.image.load('sprites//'+name+'.png')
     # print name, img.size[0],img.size[1]
