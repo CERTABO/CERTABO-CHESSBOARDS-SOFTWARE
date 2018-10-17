@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import argparse
 
 DEBUG = False
 
@@ -29,6 +30,9 @@ from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 
 stockfish.TO_EXE = TO_EXE
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--port")
+args = parser.parse_args()
 
 for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
     try:
@@ -91,10 +95,12 @@ lightgrey = 190, 190, 190
 lightestgrey = 230, 230, 230
 
 if TO_EXE:
-    usb_proc = subprocess.Popen("usbtool.exe", shell=True)
+    usb_command = ["usbtool.exe"]
 else:
-    usb_proc = subprocess.Popen("python usbtool.py", shell=True)
-
+    usb_command = ["python", "usbtool.py"]
+if args.port:
+    usb_command.extend(["--port", args.port])
+usb_proc = subprocess.Popen(usb_command)
 tt.sleep(1)  # time to make stable COMx connection
 
 os.environ["SDL_VIDEO_WINDOW_POS"] = "90,20"
