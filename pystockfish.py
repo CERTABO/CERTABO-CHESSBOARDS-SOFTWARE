@@ -265,21 +265,26 @@ class Engine(subprocess.Popen):
             return
         text = text.strip()
         split_text = text.split(' ')
+        result = {}
         if split_text[0] == "info":
-            if split_text[1] == "depth":
-                try:
-                    depth = int(split_text[2])
-                except (ValueError, TypeError):
-                    return
-                if depth > self.depth:
-                    raise MaxDepthReached()
             last_info = Engine._bestmove_get_info(text)
             if 'pv' not in last_info:
+                logging.debug('No pv in last_info')
                 return
+            else:
+                logging.debug('PV in last_info: %s', last_info['pv'])
+                result = {'move': last_info['pv'].split()[0]}
+            if 'depth' not in last_info:
+                logging.debug('Depth not found')
+                return
+            if last_info['depth'] > self.depth:
+                result['depth'] = last_info['depth']
+            return result
         if split_text[0] == "bestmove":
             ponder = None if len(split_text) < 3 else split_text[2]
             return {'move': split_text[1],
-                    'ponder': ponder}
+                    'ponder': ponder,
+                    'best_move': True}
 
     def bestmove(self):
         """
