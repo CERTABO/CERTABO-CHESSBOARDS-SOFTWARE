@@ -27,12 +27,23 @@ logging.basicConfig(level="INFO")
 import codes
 from Chessnut import Game
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
+from utils import port2number, port2udp
 
 stockfish.TO_EXE = TO_EXE
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port")
 args = parser.parse_args()
+
+if args.port is None:
+    port = None
+else:
+    port = port2number(args.port)
+
+board_listen_port, gui_listen_port = port2udp(port)
+
+SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
+LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
 
 for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
     try:
@@ -98,8 +109,8 @@ if TO_EXE:
     usb_command = ["usbtool.exe"]
 else:
     usb_command = ["python", "usbtool.py"]
-if args.port:
-    usb_command.extend(["--port", args.port])
+if port:
+    usb_command.extend(["--port", port])
 usb_proc = subprocess.Popen(usb_command)
 tt.sleep(1)  # time to make stable COMx connection
 
@@ -378,11 +389,10 @@ saved_files = []
 resume_file_selected = 0
 resume_file_start = 0  # starting filename to show
 
-KUDA_POSYLAT = ("127.0.0.1", 3002)  # send to
-NASH_ADRES = ("127.0.0.1", 3003)  # listen to
+
 sock = socket(AF_INET, SOCK_DGRAM)
 sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-sock.bind(NASH_ADRES)
+sock.bind(LISTEN_SOCKET)
 sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 recv_list = [sock]
 new_usb_data = False
@@ -416,14 +426,14 @@ message = (
     + chr(0xFF)
     + chr(0xFF)
 )
-sock.sendto(message, KUDA_POSYLAT)
+sock.sendto(message, SEND_SOCKET)
 
 scr.fill(white)  # clear screen
 show("start-up-logo", 7, 0)
 pygame.display.flip()  # copy to screen
 tt.sleep(2)
 sock.sendto(
-    chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0), KUDA_POSYLAT
+    chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0), SEND_SOCKET
 )
 
 poweroff_time = datetime.now()
@@ -556,7 +566,7 @@ while 1:
                     + chr(0)
                     + chr(0)
                     + chr(0),
-                    KUDA_POSYLAT,
+                    SEND_SOCKET,
                 )  # switch off LEDs
 
             if 6 < x < 163 and 191 < y < 222:  # resume pressed
@@ -893,7 +903,7 @@ while 1:
                                 + chr(0)
                                 + chr(0)
                                 + chr(0),
-                                KUDA_POSYLAT,
+                                SEND_SOCKET,
                             )
                             banner_right_places = False
                             banner_place_pieces = False
@@ -1070,7 +1080,7 @@ while 1:
                     else:
                         message += chr(value_source)
 
-                sock.sendto(message, KUDA_POSYLAT)
+                sock.sendto(message, SEND_SOCKET)
                 # banner_do_move = True
                 show_board_and_animated_move(board_state, ai_move, 178, 40)
 

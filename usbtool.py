@@ -8,14 +8,17 @@ import datetime
 import time
 from select import *
 from socket import *
+from utils import port2udp
 
 print("--- usbtool started ---")
 
 import serial.tools.list_ports
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--port', type=str)
+parser.add_argument('--port', type=int)
 args = parser.parse_args()
+
+board_listen_port, gui_listen_port = port2udp(args.port)
 
 ports = list(serial.tools.list_ports.comports())
 
@@ -42,13 +45,7 @@ ports = s, ""
 print(ports)
 
 if args.port:
-    try:
-        value = int(args.port)
-    except (ValueError, TypeError):
-        if args.port.upper().startswith('COM'):
-            selected_port = args.port.upper()
-        else:
-            raise ValueError('Unknown port {}'.format(args.port))
+    selected_port = args.port
 else:
     selected_port = ports[0]
 
@@ -81,10 +78,10 @@ message = ""
 
 k = 0
 
-KUDA_POSYLAT = ("127.0.0.1", 3003)  # send to
-NASH_ADRES = ("127.0.0.1", 3002)  # listen to
+SEND_SOCKET = ("127.0.0.1", gui_listen_port)  # send to
+LISTEN_SOCKET = ("127.0.0.1", board_listen_port)  # listen to
 sock = socket(AF_INET, SOCK_DGRAM)
-sock.bind(NASH_ADRES)
+sock.bind(LISTEN_SOCKET)
 sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 recv_list = [sock]
 # sock.sendto( message, KUDA_POSYLAT )
@@ -162,7 +159,7 @@ while 1:
                             #                        sock = socket(AF_INET, SOCK_DGRAM)
                             #                        sock.bind( NASH_ADRES )
                             #                        sock.setsockopt( SOL_SOCKET,SO_BROADCAST, 1 )
-                            sock.sendto(message, KUDA_POSYLAT)
+                            sock.sendto(message, SEND_SOCKET)
                         #                        sock.close()
                         except:
                             print("can't send UDP")
