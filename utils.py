@@ -1,4 +1,5 @@
 import os
+import serial
 from constants import BASE_PORT
 
 
@@ -30,4 +31,10 @@ def port2udp(port_number):
 
 
 def find_port():
-    return comports()[0][0]
+    for port in comports():
+        try:
+           s = serial.Serial(port)
+           s.close()
+           return port[0]
+        except:
+           continue
