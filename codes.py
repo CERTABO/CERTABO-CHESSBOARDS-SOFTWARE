@@ -22,12 +22,19 @@ def compare_cells(x, y):
         return False
 
 
-def load_calibration():
+def get_calibration_file_name(port):
+    if port is None:
+        return "calibration.bin"
+    else:
+        return "calibration-com{}.bin".format(port + 1)
+
+
+def load_calibration(port):
     global p, r, n, b, k, q, P, R, N, B, K, Q
     print("codes.py - loading calibration")
     try:
         p, r, n, b, k, q, P, R, N, B, K, Q = pickle.load(
-            open(os.path.join(CERTABO_DATA_PATH, "calibration.bin"), "rb")
+            open(os.path.join(CERTABO_DATA_PATH, get_calibration_file_name(port)), "rb")
         )
     except (IOError, OSError):
         return False
@@ -187,7 +194,7 @@ def cell_empty(x):
         return False
 
 
-def calibration(usb_data, new_setup):
+def calibration(usb_data, new_setup, port):
     global p, r, n, b, k, q, P, R, N, B, K, Q
     prev_results = p, r, n, b, k, q, P, R, N, B, K, Q
 
@@ -289,7 +296,7 @@ def calibration(usb_data, new_setup):
             Kn,
             Qn,
         )
-    pickle.dump(results, open(os.path.join(CERTABO_DATA_PATH, "calibration.bin"), "wb"))
+    pickle.dump(results, open(os.path.join(CERTABO_DATA_PATH, get_calibration_file_name(port)), "wb"))
 
     print("----------------")
     # print r

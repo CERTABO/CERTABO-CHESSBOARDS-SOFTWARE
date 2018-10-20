@@ -398,7 +398,7 @@ recv_list = [sock]
 new_usb_data = False
 usb_data_exist = False
 
-codes.load_calibration()
+codes.load_calibration(port)
 calibration = False
 calibration_samples_counter = 0
 calibration_samples = []
@@ -519,7 +519,7 @@ while 1:
                         calibration_samples, False
                     )
                     # print usb_data
-                    codes.calibration(usb_data, new_setup)
+                    codes.calibration(usb_data, new_setup, port)
                     board_state = codes.usb_data_to_FEN(usb_data)
                     calibration = False
 
