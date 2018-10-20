@@ -1,6 +1,12 @@
 from constants import BASE_PORT
 
 
+if os.name == 'nt':  # sys.platform == 'win32':
+    from serial.tools.list_ports_windows import comports
+elif os.name == 'posix':
+    from serial.tools.list_ports_posix import comports
+
+
 def port2number(port):
     if isinstance(port, str):
         try:
@@ -20,3 +26,7 @@ def port2udp(port_number):
     board_listen_port = BASE_PORT + (port_number + 1) * 2
     gui_listen_port = board_listen_port + 1
     return board_listen_port, gui_listen_port
+
+
+def find_port():
+    return comports()[0][0]

@@ -12,8 +12,6 @@ from utils import port2udp, port2number
 
 print("--- usbtool started ---")
 
-import serial.tools.list_ports
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--port')
 args = parser.parse_args()

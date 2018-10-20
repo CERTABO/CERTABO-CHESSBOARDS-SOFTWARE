@@ -27,7 +27,7 @@ logging.basicConfig(level="INFO")
 import codes
 from Chessnut import Game
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
-from utils import port2number, port2udp
+from utils import port2number, port2udp, find_port
 
 stockfish.TO_EXE = TO_EXE
 
@@ -36,9 +36,10 @@ parser.add_argument("--port")
 args = parser.parse_args()
 
 if args.port is None:
-    port = None
+    portname = find_port()
 else:
-    port = port2number(args.port)
+    portname = args.port
+port = port2number(args.port)
 
 board_listen_port, gui_listen_port = port2udp(port)
 
@@ -110,7 +111,7 @@ if TO_EXE:
 else:
     usb_command = ["python", "usbtool.py"]
 if port:
-    usb_command.extend(["--port", args.port])
+    usb_command.extend(["--port", portname])
 usb_proc = subprocess.Popen(usb_command)
 tt.sleep(1)  # time to make stable COMx connection
 
