@@ -8,17 +8,17 @@ import datetime
 import time
 from select import *
 from socket import *
-from utils import port2udp
+from utils import port2udp, port2number
 
 print("--- usbtool started ---")
 
 import serial.tools.list_ports
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--port', type=int)
+parser.add_argument('--port')
 args = parser.parse_args()
 
-board_listen_port, gui_listen_port = port2udp(args.port)
+board_listen_port, gui_listen_port = port2udp(port2number(args.port))
 
 ports = list(serial.tools.list_ports.comports())
 

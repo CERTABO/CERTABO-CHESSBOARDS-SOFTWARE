@@ -110,7 +110,7 @@ if TO_EXE:
 else:
     usb_command = ["python", "usbtool.py"]
 if port:
-    usb_command.extend(["--port", port])
+    usb_command.extend(["--port", args.port])
 usb_proc = subprocess.Popen(usb_command)
 tt.sleep(1)  # time to make stable COMx connection
 
