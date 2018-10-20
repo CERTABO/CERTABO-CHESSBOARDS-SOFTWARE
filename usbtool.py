@@ -1,5 +1,5 @@
 from __future__ import print_function
-
+import serial.tools.list_ports
 DEBUG = False
 
 # for exe compile run python 1.py py2exe
