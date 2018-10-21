@@ -34,16 +34,17 @@ def port2udp(port_number):
 def find_port():
     logging.debug('Searching for port...')
     for port in comports():
+        device = port[0]
         try:
-            logging.debug('Trying %s', port)
-            s = serial.Serial(port[0])
+            logging.debug('Trying %s', device)
+            s = serial.Serial(device)
         except serial.SerialException:
             logging.debug('Port is busy, continuing...')
             continue
         else:
             s.close()
-            logging.debug('Port is found!')
-            return port[0]
+            logging.debug('Port is found! - %s', device)
+            return device
     else:
         logging.debug('Port not found')
         return

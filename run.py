@@ -110,7 +110,7 @@ if TO_EXE:
     usb_command = ["usbtool.exe"]
 else:
     usb_command = ["python", "usbtool.py"]
-if port is not None:
+if portname is not None:
     usb_command.extend(["--port", portname])
 logging.debug('Calling %s', usb_command)
 usb_proc = subprocess.Popen(usb_command)
