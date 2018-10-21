@@ -44,6 +44,8 @@ def find_port():
         else:
             s.close()
             logging.debug('Port is found! - %s', device)
+            if isinstance(device, unicode):
+                device = device.encode('utf-8')
             return device
     else:
         logging.debug('Port not found')
