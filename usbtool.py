@@ -15,51 +15,27 @@ print("--- usbtool started ---")
 parser = argparse.ArgumentParser()
 parser.add_argument('--port')
 args = parser.parse_args()
+if args.port:
+    print('Got port argument', args.port)
+else:
+    print('No port argument speicified')
 
 board_listen_port, gui_listen_port = port2udp(port2number(args.port))
 
-ports = list(serial.tools.list_ports.comports())
-
-if not ports:
-    print("No serial ports were detected. Exiting.")
-    exit(1)
-
-for p in ports:
-    print(p)
-
-s = str(ports[0]).split(" ")[0]
-ports = s, ""
-# ports = ['COM%s' % (i + 1) for i in range(256)]
-
-# result = []
-# for port in ports:
-#    try:
-#        s = serial.Serial(port)
-#        s.close()
-#        result.append(port)
-#    except:
-#        pass
-# ports = result
-print(ports)
-
-if args.port:
-    selected_port = args.port
-else:
-    selected_port = ports[0]
-
 uart_ok = False
 try:
-    uart = serial.Serial(selected_port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
+    uart = serial.Serial(args.port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
     uart_ok = True
 except:
     print("can't open Serial port")
 
 if not uart_ok:
     try:
-        uart = serial.Serial(selected_port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
+        uart = serial.Serial(args.port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /
         uart_ok = True
     except:
         print("can't open Serial")
+        exit(1)
 
 # time.sleep(3) # without it, .write not work
 
@@ -101,11 +77,11 @@ while 1:
     if not uart_ok:
         try:
             uart = serial.Serial(
-                selected_port, 38400, timeout=2.5
+                args.port, 38400, timeout=2.5
             )  # 0-COM1, 1-COM2 / speed /
             uart_ok = True
         except:
-            print("can't open Serial at ", selected_port)
+            print("can't open Serial at ", args.port)
 
     time.sleep(0.001)
     t = datetime.datetime.now()
