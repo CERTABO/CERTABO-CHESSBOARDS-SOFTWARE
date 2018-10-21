@@ -33,8 +33,9 @@ def port2udp(port_number):
 def find_port():
     for port in comports():
         try:
-           s = serial.Serial(port)
-           s.close()
-           return port[0]
-        except:
+           s = serial.Serial(port[0])
+        except serial.SerialException:
            continue
+        s.close()
+        return port[0]
+
