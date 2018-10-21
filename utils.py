@@ -1,3 +1,4 @@
+import logging
 import os
 import serial
 from constants import BASE_PORT
@@ -31,11 +32,20 @@ def port2udp(port_number):
 
 
 def find_port():
+    logging.debug('Searching for port...')
     for port in comports():
         try:
-           s = serial.Serial(port[0])
+            logging.debug('Trying %s', port)
+            s = serial.Serial(port[0])
         except serial.SerialException:
-           continue
-        s.close()
-        return port[0]
+            logging.debug('Port is busy, continuing...')
+            continue
+        else:
+            s.close()
+            logging.debug('Port is found!')
+            return port[0]
+    else:
+        logging.debug('Port not found')
+        return
+
 
