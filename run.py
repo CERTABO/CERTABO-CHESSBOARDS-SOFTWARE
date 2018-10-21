@@ -39,7 +39,7 @@ if args.port is None:
     portname = find_port()
 else:
     portname = args.port
-port = port2number(args.port)
+port = port2number(portname)
 
 board_listen_port, gui_listen_port = port2udp(port)
 
