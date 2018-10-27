@@ -1123,6 +1123,7 @@ while 1:
                         publish()
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
+                    logging.exception('Exception: ')
                     terminal_print(ai_move + " - invalid move !")
 
                 print("\n\n", board_state)
@@ -1172,6 +1173,7 @@ while 1:
                         publish()
                 except:
                     print("   ----invalid user move! ---- ", move)
+                    logging.exception('Exception: ')
                     terminal_print(move + " - invalid move !")
                     previous_board_click = ""
                     board_click = ""
