@@ -56,6 +56,7 @@ if args.publish:
 
 
 def publish():
+    global pgn_queue
     pgn_queue.put(generate_pgn())
 
 
