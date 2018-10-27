@@ -378,7 +378,7 @@ def generate_pgn():
     node = game.add_variation(chess.Move.from_uci(move_history[0]))
     for move in move_history[1:]:
         node = node.add_variation(chess.Move.from_uci(move))
-    exporter = chess.pgn.StringExporter(f)
+    exporter = chess.pgn.StringExporter()
     return game.accept(exporter)
 
 
