@@ -20,6 +20,7 @@ import pygame
 import stockfish
 import subprocess
 import logging
+import Queue
 
 logging.basicConfig(level="DEBUG")
 
@@ -28,6 +29,7 @@ import codes
 from Chessnut import Game
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 from utils import port2number, port2udp, find_port
+from publish import Publisher
 
 stockfish.TO_EXE = TO_EXE
 
@@ -46,6 +48,16 @@ board_listen_port, gui_listen_port = port2udp(port)
 
 SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
 LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
+
+if args.publish:
+    pgn_queue = Queue.Queue()
+    publisher = Publisher(args.publish, pgn_queue)
+    publisher.start()
+
+
+def publish():
+    pgn_queue.put(generate_pgn())
+
 
 for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
     try:
@@ -67,6 +79,8 @@ def txt_large(s, x, y, color):
 
 
 def do_poweroff(proc):
+    if args.publish:
+        publisher.stop()
     subprocess.call(["taskkill", "/F", "/T", "/PID", str(proc.pid)])
     pygame.display.quit()
     pygame.quit()
@@ -1044,6 +1058,8 @@ while 1:
                     # event from system & keyboard
                     for event in pygame.event.get():  # all values in event list
                         if event.type == pygame.QUIT:
+                            if args.publish:
+                                publisher.stop()
                             pygame.display.quit()
                             pygame.quit()
                             sys.exit()
@@ -1102,6 +1118,8 @@ while 1:
                     board_history.append(board_state)
                     side = ("black", "white")[len(move_history) % 2]
                     terminal_print("{} move: {}".format(side, ai_move))
+                    if args.publish:
+                        publish()
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
                     terminal_print(ai_move + " - invalid move !")
@@ -1149,6 +1167,8 @@ while 1:
                     if not human_game:
                         do_ai_move = True
                         hint_text = ""
+                    if args.publish:
+                        publish()
                 except:
                     print("   ----invalid user move! ---- ", move)
                     terminal_print(move + " - invalid move !")
@@ -1309,6 +1329,7 @@ while 1:
                             # event from system & keyboard
                             for event in pygame.event.get():  # all values in event list
                                 if event.type == pygame.QUIT:
+                                    publisher.stop()
                                     pygame.display.quit()
                                     pygame.quit()
                                     sys.exit()
