@@ -33,6 +33,7 @@ stockfish.TO_EXE = TO_EXE
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port")
+parser.add_argument("--publish", help="URL to publish data")
 args = parser.parse_args()
 
 if args.port is None:
@@ -337,6 +338,33 @@ def show_board_and_animated_move(FEN_string, move, x0, y0):
         # tt.sleep(0.1)
         pygame.display.flip()  # copy to screen
         tt.sleep(0.01)
+
+
+def generate_pgn():
+    global play_white, human_game, mate_we_lost, mate_we_won, move_history
+    game = chess.pgn.Game()
+    game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
+    if play_white:
+        game.headers["White"] = "Human"
+        game.headers["Black"] = (
+            "Computer" if not human_game else "Human"
+        )
+    else:
+        game.headers["White"] = (
+            "Computer" if not human_game else "Human"
+        )
+        game.headers["Black"] = "Human"
+    if mate_we_lost:
+        game.headers["Result"] = "0-1" if play_white else "1-0"
+    if mate_we_won:
+        game.headers["Result"] = "1-0" if play_white else "0-1"
+    if not mate_we_won and not mate_we_lost:
+        game.headers["Result"] = "*"
+    node = game.add_variation(chess.Move.from_uci(move_history[0]))
+    for move in move_history[1:]:
+        node = node.add_variation(chess.Move.from_uci(move))
+    exporter = chess.pgn.StringExporter(f)
+    return game.accept(exporter)
 
 
 # ------------- start point --------------------------------------------------------
@@ -802,30 +830,8 @@ while 1:
                     )
                     f.close()
                     if move_history:
-                        game = chess.pgn.Game()
-                        game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
-                        if play_white:
-                            game.headers["White"] = "Human"
-                            game.headers["Black"] = (
-                                "Computer" if not human_game else "Human"
-                            )
-                        else:
-                            game.headers["White"] = (
-                                "Computer" if not human_game else "Human"
-                            )
-                            game.headers["Black"] = "Human"
-                        if mate_we_lost:
-                            game.headers["Result"] = "0-1" if play_white else "1-0"
-                        if mate_we_won:
-                            game.headers["Result"] = "1-0" if play_white else "0-1"
-                        if not mate_we_won and not mate_we_lost:
-                            game.headers["Result"] = "*"
-                        node = game.add_variation(chess.Move.from_uci(move_history[0]))
-                        for move in move_history[1:]:
-                            node = node.add_variation(chess.Move.from_uci(move))
                         with open(OUTPUT_PGN, "w") as f:
-                            exporter = chess.pgn.FileExporter(f)
-                            game.accept(exporter)
+                            f.write(generate_pgn())
                     window = "game"
                     # banner_do_move = False
                     previous_board_click = ""
