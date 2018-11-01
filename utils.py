@@ -58,3 +58,8 @@ def get_engine_list():
         if filename.endswith('.exe'):
             result.append(filename[:-4])
     return result
+
+
+def coords_in(x, y, area):
+    lx, ty, rx, by = area
+    return lx < x < rx and ty < y < by

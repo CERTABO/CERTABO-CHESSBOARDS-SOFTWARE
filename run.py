@@ -27,7 +27,7 @@ logging.basicConfig(level="DEBUG")
 import codes
 from Chessnut import Game
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
-from utils import port2number, port2udp, find_port, get_engine_list
+from utils import port2number, port2udp, find_port, get_engine_list, coords_in
 
 stockfish.TO_EXE = TO_EXE
 
@@ -1374,36 +1374,39 @@ while 1:
                             dialog = ''
                         break
         else:
-
+            txt_large("Mode:", 150, 20, grey)
+            human_game_button_area = button('Human', 210, 15, text_color=white, color=darkergreen if human_game else grey)
+            _, _, human_game_button_x, _ = human_game_button_area
+            computer_game_button_area = button('Engine', human_game_button_x + 5, 15, text_color=white, color=darkergreen if not human_game else grey)
             if not human_game:
                 txt_large("Depth:", 203, 115, green)
                 show("depth" + str(difficulty + 1), 214, 151)
                 txt_large("<", 189, 156, grey)
                 txt_large(">", 265, 156, grey)
-            txt_large("Engine: {}".format(engine), 150, 70, grey)
-            pygame.draw.rect(
-                scr,
-                darkergreen,
-                (
-                    440 * x_multiplier,
-                    72 * y_multiplier,
-                    25 * x_multiplier,
-                    25 * y_multiplier,
-                ),
-            )
-            txt_large("...", 445, 70, white)
-            x0 = 213
-            if not human_game:
-                if difficulty == 0:
-                    txt("Easiest", x0, 191, grey)
-                elif difficulty < 4:
-                    txt("Easy", x0 + 6, 191, grey)
-                elif difficulty > 18:
-                    txt("Very hard", x0 - 10, 191, grey)
-                elif difficulty > 10:
-                    txt("Hard", x0 + 6, 191, grey)
-                else:
-                    txt("Normal", x0, 191, grey)
+                txt_large("Engine: {}".format(engine), 150, 70, grey)
+                pygame.draw.rect(
+                    scr,
+                    darkergreen,
+                    (
+                        440 * x_multiplier,
+                        72 * y_multiplier,
+                        25 * x_multiplier,
+                        25 * y_multiplier,
+                    ),
+                )
+                txt_large("...", 445, 70, white)
+                x0 = 213
+                if not human_game:
+                    if difficulty == 0:
+                        txt("Easiest", x0, 191, grey)
+                    elif difficulty < 4:
+                        txt("Easy", x0 + 6, 191, grey)
+                    elif difficulty > 18:
+                        txt("Very hard", x0 - 10, 191, grey)
+                    elif difficulty > 10:
+                        txt("Hard", x0 + 6, 191, grey)
+                    else:
+                        txt("Normal", x0, 191, grey)
 
             show("back", 14, 269)
             show("start", 363, 269)
@@ -1415,6 +1418,10 @@ while 1:
                     show("black", 184, 269)
 
             if left_click:
+                if coords_in(x, y, human_game_button_area):
+                    human_game = True
+                if coords_in(x, y, computer_game_button_area):
+                    human_game = False
                 if 72 < y < 97:
                     if 440 < x < 465:
                         dialog = "select_engine"
