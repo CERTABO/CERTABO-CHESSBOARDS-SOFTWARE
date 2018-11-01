@@ -431,6 +431,7 @@ game_process_just_startted = True
 banner_do_move = False
 
 new_setup = False
+current_engine_page = 0
 
 # sock.sendto( chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0), KUDA_POSYLAT )
 message = (
@@ -1350,6 +1351,7 @@ while 1:
     # ---------------- new game dialog ----------------
     elif window == "new game":
         if dialog == "select_engine":
+            engines_per_page = 6
             show("hide_back", 0, 0)
             engines = get_engine_list()
             txt_large("Select engine:", 250, 20, black)
@@ -1358,13 +1360,25 @@ while 1:
             engine_button_x = 250
             engine_button_y = 50
             engine_button_vertical_margin = 5
-            for engine_name in get_engine_list():
+            engine_list = get_engine_list()
+            if (current_engine_page + 1) * engines_per_page > len(engine_list):
+                current_engine_page = len(engine_list) // engines_per_page
+            page_engines = engine_list[current_engine_page * engines_per_page:(current_engine_page + 1) * engines_per_page]
+            has_next = len(engine_list) > (current_engine_page + 1) * engines_per_page
+            has_prev = current_engine_page > 0
+            for engine_name in page_engines:
                 engine_button_area = button(engine_name, engine_button_x, engine_button_y, text_color=white, color=darkergreen if engine == engine_name else grey)
                 button_coords.append(('select_engine', engine_name, engine_button_area))
                 _, _, _, engine_button_y = engine_button_area
                 engine_button_y += engine_button_vertical_margin
             done_button_area = button('Done', 415, 275, color=darkergreen, text_color=white)
             button_coords.append(('select_engine_done', None, done_button_area))
+            if has_next:
+                next_page_button_area = button(' > ', 415, 150, color=darkergreen, text_color=white)
+                button_coords.append(('next_page', None, next_page_button_area))
+            if has_prev:
+                prev_page_button_area = button(' < ', 200, 150, color=darkergreen, text_color=white)
+                button_coords.append(('prev_page', None, prev_page_button_area))
             if left_click:
                 for action, value, (lx, ty, rx, by) in button_coords:
                     if lx < x < rx and ty < y < by:
@@ -1372,6 +1386,10 @@ while 1:
                             engine = value
                         elif action == 'select_engine_done':
                             dialog = ''
+                        elif action == 'next_page':
+                            current_engine_page += 1
+                        elif action == 'prev_page':
+                            current_engine_page -= 1
                         break
         else:
             txt_large("Mode:", 150, 20, grey)
@@ -1425,6 +1443,7 @@ while 1:
                 if 72 < y < 97:
                     if 440 < x < 465:
                         dialog = "select_engine"
+                        current_engine_page = 0
                 if 149 < y < 188:
                     if x > 233:
                         if difficulty < 19:

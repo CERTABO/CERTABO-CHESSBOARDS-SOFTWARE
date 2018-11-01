@@ -57,6 +57,7 @@ def get_engine_list():
     for filename in os.listdir(ENGINE_PATH):
         if filename.endswith('.exe'):
             result.append(filename[:-4])
+    result.sort()
     return result
 
 
