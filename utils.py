@@ -1,7 +1,7 @@
 import logging
 import os
 import serial
-from constants import BASE_PORT
+from constants import BASE_PORT, ENGINE_PATH
 
 
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -52,3 +52,9 @@ def find_port():
         return
 
 
+def get_engine_list():
+    result = []
+    for filename in os.listdir(ENGINE_PATH):
+        if filename.endswith('.exe'):
+            result.append(filename[:-4])
+    return result
