@@ -245,6 +245,21 @@ def show(name, x, y):
     scr.blit(sprite[name], (x * x_multiplier, y * y_multiplier))
 
 
+def button(text, x, y, padding = (5, 5, 5, 5), color=white, text_color=grey, font=font_large, font_size=22):
+    ptop, pleft, pbottom, pright = padding
+    text_width, text_height = font.size(text)
+    widget_width = pleft * x_multiplier + text_width + pright * x_multiplier
+    widget_height = ptop * y_multiplier + text_height + pbottom * y_multiplier
+    pygame.draw.rect(
+        scr,
+        color,
+        (x * x_multiplier, y * y_multiplier, widget_width, widget_height),
+    )
+    img = font.render(text, font_size, text_color)
+    pos = (x + pleft) * x_multiplier, (y + ptop) * y_multiplier
+    scr.blit(img, pos)
+    return x, y, x + int(widget_width // x_multiplier), y + int(widget_height // y_multiplier)
+
 # Show chessboard using FEN string like
 # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 FEN = {
@@ -1339,6 +1354,16 @@ while 1:
             engines = get_engine_list()
             txt_large("Select engine:", 250, 20, black)
             # draw engine buttons
+            button_coords = []
+            engine_button_x = 250
+            engine_button_y = 50
+            engine_button_vertical_margin = 5
+            for engine_name in get_engine_list():
+                engine_button_area = button(engine_name, engine_button_x, engine_button_y, text_color=white, color=darkergreen if engine == engine_name else grey)
+                button_coords.append((engine_name, engine_button_area))
+                _, _, _, engine_button_y = engine_button_area
+                engine_button_y += engine_button_vertical_margin
+
             if left_click:
                 dialog = ""
         else:
