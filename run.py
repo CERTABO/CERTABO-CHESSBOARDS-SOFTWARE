@@ -1360,17 +1360,19 @@ while 1:
             engine_button_vertical_margin = 5
             for engine_name in get_engine_list():
                 engine_button_area = button(engine_name, engine_button_x, engine_button_y, text_color=white, color=darkergreen if engine == engine_name else grey)
-                button_coords.append((engine_name, engine_button_area))
+                button_coords.append(('select_engine', engine_name, engine_button_area))
                 _, _, _, engine_button_y = engine_button_area
                 engine_button_y += engine_button_vertical_margin
-
+            done_button_area = button('Done', 415, 275, color=darkergreen, text_color=white)
+            button_coords.append(('select_engine_done', None, done_button_area))
             if left_click:
-                for engine_name, (lx, ty, rx, by) in button_coords:
+                for action, value, (lx, ty, rx, by) in button_coords:
                     if lx < x < rx and ty < y < by:
-                        engine = engine_name
+                        if action == 'select_engine':
+                            engine = value
+                        elif action == 'select_engine_done':
+                            dialog = ''
                         break
-                else:
-                    dialog = ""
         else:
 
             if not human_game:
