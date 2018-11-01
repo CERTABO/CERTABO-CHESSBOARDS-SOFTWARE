@@ -1365,7 +1365,12 @@ while 1:
                 engine_button_y += engine_button_vertical_margin
 
             if left_click:
-                dialog = ""
+                for engine_name, (lx, ty, rx, by) in button_coords:
+                    if lx < x < rx and ty < y < by:
+                        engine = engine_name
+                        break
+                else:
+                    dialog = ""
         else:
 
             if not human_game:
