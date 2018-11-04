@@ -656,16 +656,16 @@ while 1:
                     dialog = ""
                     if x > (200 + 105):  # confirm button
                         print("do delete")
-                        os.system(
-                            "del "
-                            + os.path.join(
+                        os.unlink(
+                            os.path.join(
                                 CERTABO_SAVE_PATH,
-                                saved_files[resume_file_selected + resume_file_start],
+                                saved_files[resume_file_selected + resume_file_start]
                             )
                         )
+
                         # update saved files list to load
 
-                        files = os.listdir(r"")
+                        files = os.listdir(CERTABO_SAVE_PATH)
                         saved_files = [v for v in files if ".sav" in v]
                         saved_files_time = []
                         for name in saved_files:
