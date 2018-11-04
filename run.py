@@ -669,7 +669,13 @@ while 1:
                         saved_files = [v for v in files if ".sav" in v]
                         saved_files_time = []
                         for name in saved_files:
-                            saved_files_time.append(tt.gmtime(os.stat(name).st_mtime))
+                            saved_files_time.append(
+                                tt.gmtime(
+                                    os.stat(
+                                        os.path.join(CERTABO_SAVE_PATH, name)
+                                    ).st_mtime
+                                )
+                            )
 
                         resume_file_selected = 0
                         resume_file_start = 0
