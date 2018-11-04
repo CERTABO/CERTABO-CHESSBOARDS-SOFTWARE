@@ -11,6 +11,7 @@ PUBLISHER_SLEEP_INTERVAL = 0.1
 class Publisher(threading.Thread):
     def __init__(self, url, queue):
         self.url = url
+        self.game_id = None
         if not self.url.endswith('/'):
             self.url += '/'
         super(Publisher, self).__init__()
@@ -18,7 +19,6 @@ class Publisher(threading.Thread):
         self.please_stop = threading.Event()
 
     def run(self):
-        game_id = None
         while not self.please_stop.is_set():
             try:
                 message = self.queue.get_nowait()
@@ -26,18 +26,22 @@ class Publisher(threading.Thread):
                 time.sleep(PUBLISHER_SLEEP_INTERVAL)
                 continue
             data = {'pgn_data': message}
-            if game_id:
-                data["id"] = game_id
-                url = '{}api/game/{}/'.format(self.url, game_id)
-            else:
-                url = '{}api/game/'.format(self.url)
             try:
-                response = requests.post(url, data=data)
+                if self.game_id:
+                    url = '{}api/game/{}/'.format(self.url, self.game_id)
+                    response = requests.patch(url, data=data)
+                else:
+                    url = '{}api/game/'.format(self.url)
+                    response = requests.post(url, data=data)
             except requests.RequestException:
                 logging.exception('Error publishing data to server')
             else:
-                data = response.json()
-                game_id = data['id']
+                if not self.game_id:
+                    data = response.json()
+                    self.game_id = data['id']
+
+    def reset_game(self):
+        self.game_id = None
 
     def stop(self):
         self.please_stop.set()
