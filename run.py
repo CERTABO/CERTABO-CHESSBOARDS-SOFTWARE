@@ -49,10 +49,17 @@ board_listen_port, gui_listen_port = port2udp(port)
 SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
 LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
 
-if args.publish:
+pgn_queue = None
+publisher = None
+
+def make_publisher():
+    global pgn_queue, publisher
+    if publisher:
+        publisher.stop()
     pgn_queue = Queue.Queue()
     publisher = Publisher(args.publish, pgn_queue)
     publisher.start()
+    return pgn_queue, publisher
 
 
 def publish():
@@ -1520,6 +1527,7 @@ while 1:
                         banner_do_move = False
                         game_process_just_started = True
                         banner_place_pieces = True
+                        make_publisher()
 
     left_click = False
     old_left_click = mbutton[0]
