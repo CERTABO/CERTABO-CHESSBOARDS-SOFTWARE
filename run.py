@@ -28,7 +28,7 @@ logging.basicConfig(level="DEBUG")
 import codes
 from Chessnut import Game
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
-from utils import port2number, port2udp, find_port
+from utils import port2number, port2udp, find_port, get_engine_list, coords_in
 from publish import Publisher
 
 stockfish.TO_EXE = TO_EXE
@@ -261,6 +261,21 @@ def show(name, x, y):
     scr.blit(sprite[name], (x * x_multiplier, y * y_multiplier))
 
 
+def button(text, x, y, padding = (5, 5, 5, 5), color=white, text_color=grey, font=font_large, font_size=22):
+    ptop, pleft, pbottom, pright = padding
+    text_width, text_height = font.size(text)
+    widget_width = pleft * x_multiplier + text_width + pright * x_multiplier
+    widget_height = ptop * y_multiplier + text_height + pbottom * y_multiplier
+    pygame.draw.rect(
+        scr,
+        color,
+        (x * x_multiplier, y * y_multiplier, widget_width, widget_height),
+    )
+    img = font.render(text, font_size, text_color)
+    pos = (x + pleft) * x_multiplier, (y + ptop) * y_multiplier
+    scr.blit(img, pos)
+    return x, y, x + int(widget_width // x_multiplier), y + int(widget_height // y_multiplier)
+
 # Show chessboard using FEN string like
 # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 FEN = {
@@ -459,6 +474,7 @@ game_process_just_startted = True
 banner_do_move = False
 
 new_setup = False
+current_engine_page = 0
 
 # sock.sendto( chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0), KUDA_POSYLAT )
 message = (
@@ -1364,151 +1380,146 @@ while 1:
 
     # ---------------- new game dialog ----------------
     elif window == "new game":
-        if not human_game:
-            txt_large("Depth:", 203, 115, green)
-            show("depth" + str(difficulty + 1), 214, 151)
-            txt_large("<", 189, 156, grey)
-            txt_large(">", 265, 156, grey)
-        txt_large("Opponent:", 250, 20, grey)
-        pygame.draw.rect(
-            scr,
-            darkergreen if engine == "lc0" and not human_game else grey,
-            (
-                120 * x_multiplier,
-                55 * y_multiplier,
-                45 * x_multiplier,
-                40 * y_multiplier,
-            ),
-        )
-        txt_large("LC0", 125, 60, white)
-        pygame.draw.rect(
-            scr,
-            darkergreen if engine == "stockfish" and not human_game else grey,
-            (
-                170 * x_multiplier,
-                55 * y_multiplier,
-                90 * x_multiplier,
-                40 * y_multiplier,
-            ),
-        )
-        txt_large("Stockfish", 175, 60, white)
-        pygame.draw.rect(
-            scr,
-            darkergreen if engine == "houdini6" and not human_game else grey,
-            (
-                265 * x_multiplier,
-                55 * y_multiplier,
-                80 * x_multiplier,
-                40 * y_multiplier,
-            ),
-        )
-        txt_large("Houdini", 270, 60, white)
-        pygame.draw.rect(
-            scr,
-            darkergreen if engine == "fire" and not human_game else grey,
-            (
-                350 * x_multiplier,
-                55 * y_multiplier,
-                45 * x_multiplier,
-                40 * y_multiplier,
-            ),
-        )
-        txt_large("Fire", 355, 60, white)
-        pygame.draw.rect(
-            scr,
-            darkergreen if human_game else grey,
-            (
-                400 * x_multiplier,
-                55 * y_multiplier,
-                70 * x_multiplier,
-                40 * y_multiplier,
-            ),
-        )
-        txt_large("Human", 405, 60, white)
-        x0 = 213
-        if not human_game:
-            if difficulty == 0:
-                txt("Easiest", x0, 191, grey)
-            elif difficulty < 4:
-                txt("Easy", x0 + 6, 191, grey)
-            elif difficulty > 18:
-                txt("Very hard", x0 - 10, 191, grey)
-            elif difficulty > 10:
-                txt("Hard", x0 + 6, 191, grey)
-            else:
-                txt("Normal", x0, 191, grey)
-
-        show("back", 14, 269)
-        show("start", 363, 269)
-        if not human_game:
-            txt_large("Color to play:", 175, 232, green)
-            if play_white:
-                show("white", 184, 269)
-            else:
-                show("black", 184, 269)
-
-        if left_click:
-            if 55 < y < 95:
-                if 120 < x < 165:
-                    engine = "lc0"
-                    human_game = False
-                elif 170 < x < 260:
-                    engine = "stockfish"
-                    human_game = False
-                elif 265 < x < 345:
-                    engine = "houdini6"
-                    human_game = False
-                elif 350 < x < 395:
-                    engine = "fire"
-                    human_game = False
-                elif 400 < x < 470:
-                    human_game = True
-            if 149 < y < 188:
-                if x > 233:
-                    if difficulty < 19:
-                        difficulty += 1
+        if dialog == "select_engine":
+            engines_per_page = 6
+            show("hide_back", 0, 0)
+            engines = get_engine_list()
+            txt_large("Select engine:", 250, 20, black)
+            # draw engine buttons
+            button_coords = []
+            engine_button_x = 250
+            engine_button_y = 50
+            engine_button_vertical_margin = 5
+            engine_list = get_engine_list()
+            if (current_engine_page + 1) * engines_per_page > len(engine_list):
+                current_engine_page = len(engine_list) // engines_per_page
+            page_engines = engine_list[current_engine_page * engines_per_page:(current_engine_page + 1) * engines_per_page]
+            has_next = len(engine_list) > (current_engine_page + 1) * engines_per_page
+            has_prev = current_engine_page > 0
+            for engine_name in page_engines:
+                engine_button_area = button(engine_name, engine_button_x, engine_button_y, text_color=white, color=darkergreen if engine == engine_name else grey)
+                button_coords.append(('select_engine', engine_name, engine_button_area))
+                _, _, _, engine_button_y = engine_button_area
+                engine_button_y += engine_button_vertical_margin
+            done_button_area = button('Done', 415, 275, color=darkergreen, text_color=white)
+            button_coords.append(('select_engine_done', None, done_button_area))
+            if has_next:
+                next_page_button_area = button(' > ', 415, 150, color=darkergreen, text_color=white)
+                button_coords.append(('next_page', None, next_page_button_area))
+            if has_prev:
+                prev_page_button_area = button(' < ', 200, 150, color=darkergreen, text_color=white)
+                button_coords.append(('prev_page', None, prev_page_button_area))
+            if left_click:
+                for action, value, (lx, ty, rx, by) in button_coords:
+                    if lx < x < rx and ty < y < by:
+                        if action == 'select_engine':
+                            engine = value
+                        elif action == 'select_engine_done':
+                            dialog = ''
+                        elif action == 'next_page':
+                            current_engine_page += 1
+                        elif action == 'prev_page':
+                            current_engine_page -= 1
+                        break
+        else:
+            txt_large("Mode:", 150, 20, grey)
+            human_game_button_area = button('Human', 210, 15, text_color=white, color=darkergreen if human_game else grey)
+            _, _, human_game_button_x, _ = human_game_button_area
+            computer_game_button_area = button('Engine', human_game_button_x + 5, 15, text_color=white, color=darkergreen if not human_game else grey)
+            if not human_game:
+                txt_large("Depth:", 203, 115, green)
+                show("depth" + str(difficulty + 1), 214, 151)
+                txt_large("<", 189, 156, grey)
+                txt_large(">", 265, 156, grey)
+                txt_large("Engine: {}".format(engine), 150, 70, grey)
+                pygame.draw.rect(
+                    scr,
+                    darkergreen,
+                    (
+                        440 * x_multiplier,
+                        72 * y_multiplier,
+                        25 * x_multiplier,
+                        25 * y_multiplier,
+                    ),
+                )
+                txt_large("...", 445, 70, white)
+                x0 = 213
+                if not human_game:
+                    if difficulty == 0:
+                        txt("Easiest", x0, 191, grey)
+                    elif difficulty < 4:
+                        txt("Easy", x0 + 6, 191, grey)
+                    elif difficulty > 18:
+                        txt("Very hard", x0 - 10, 191, grey)
+                    elif difficulty > 10:
+                        txt("Hard", x0 + 6, 191, grey)
                     else:
-                        difficulty = 0
+                        txt("Normal", x0, 191, grey)
+
+            show("back", 14, 269)
+            show("start", 363, 269)
+            if not human_game:
+                txt_large("Color to play:", 175, 232, green)
+                if play_white:
+                    show("white", 184, 269)
                 else:
-                    if difficulty > 0:
-                        difficulty -= 1
+                    show("black", 184, 269)
+
+            if left_click:
+                if coords_in(x, y, human_game_button_area):
+                    human_game = True
+                if coords_in(x, y, computer_game_button_area):
+                    human_game = False
+                if 72 < y < 97:
+                    if 440 < x < 465:
+                        dialog = "select_engine"
+                        current_engine_page = 0
+                if 149 < y < 188:
+                    if x > 233:
+                        if difficulty < 19:
+                            difficulty += 1
+                        else:
+                            difficulty = 0
                     else:
-                        difficulty = 19
+                        if difficulty > 0:
+                            difficulty -= 1
+                        else:
+                            difficulty = 19
 
-            if 268 < y < (275 + 31):
-                if 14 < x < 109:  # <- back
-                    window = "home"
+                if 268 < y < (275 + 31):
+                    if 14 < x < 109:  # <- back
+                        window = "home"
 
-                if 174 < x < 292:  # blacl/white toggle
-                    if play_white:
-                        play_white = False
-                    else:
-                        play_white = True
+                    if 174 < x < 292:  # blacl/white toggle
+                        if play_white:
+                            play_white = False
+                        else:
+                            play_white = True
 
-                if 365 < x < 467:  # start game ->
-                    window = "game"
-                    board_state = (
-                        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-                    )
+                    if 365 < x < 467:  # start game ->
+                        window = "game"
+                        board_state = (
+                            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                        )
 
-                    move_history = []
-                    board_history = [board_state]
-                    terminal_print("New game, depth={}".format(difficulty + 1))
-                    previous_board_click = ""
-                    board_click = ""
-                    do_user_move = False
-                    do_ai_move = False
+                        move_history = []
+                        board_history = [board_state]
+                        terminal_print("New game, depth={}".format(difficulty + 1))
+                        previous_board_click = ""
+                        board_click = ""
+                        do_user_move = False
+                        do_ai_move = False
 
-                    # if play_white:
-                    #    do_ai_move = False # first do user move
-                    # else:
-                    #    do_ai_move = True
-                    conversion_dialog = False
-                    mate_we_lost = False
-                    mate_we_won = False
-                    banner_do_move = False
-                    game_process_just_started = True
-                    banner_place_pieces = True
+                        # if play_white:
+                        #    do_ai_move = False # first do user move
+                        # else:
+                        #    do_ai_move = True
+                        conversion_dialog = False
+                        mate_we_lost = False
+                        mate_we_won = False
+                        banner_do_move = False
+                        game_process_just_started = True
+                        banner_place_pieces = True
 
     left_click = False
     old_left_click = mbutton[0]
