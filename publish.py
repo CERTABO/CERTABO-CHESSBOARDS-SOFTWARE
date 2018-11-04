@@ -34,7 +34,7 @@ class Publisher(threading.Thread):
             try:
                 response = requests.post(url, data=data)
             except requests.RequestException:
-                logging.warning('Error publishing data to server')
+                logging.exception('Error publishing data to server')
             else:
                 data = response.json()
                 game_id = data['id']
