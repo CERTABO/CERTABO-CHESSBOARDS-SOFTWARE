@@ -12,6 +12,7 @@ class Publisher(threading.Thread):
     def __init__(self, url, queue):
         self.url = url
         self.game_id = None
+        self.game_key = None
         if not self.url.endswith('/'):
             self.url += '/'
         super(Publisher, self).__init__()
@@ -29,6 +30,7 @@ class Publisher(threading.Thread):
             try:
                 if self.game_id:
                     url = '{}api/game/{}/'.format(self.url, self.game_id)
+                    data['key'] = self.game_key
                     response = requests.patch(url, data=data)
                 else:
                     url = '{}api/game/'.format(self.url)
@@ -39,6 +41,7 @@ class Publisher(threading.Thread):
                 if not self.game_id:
                     data = response.json()
                     self.game_id = data['id']
+                    self.game_key = data['key']
 
     def reset_game(self):
         self.game_id = None
