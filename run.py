@@ -36,6 +36,8 @@ stockfish.TO_EXE = TO_EXE
 parser = argparse.ArgumentParser()
 parser.add_argument("--port")
 parser.add_argument("--publish", help="URL to publish data")
+parser.add_argument("--game-id", help="Game ID")
+parser.add_argument("--game-key", help="Game key")
 args = parser.parse_args()
 
 if args.port is None:
@@ -57,7 +59,7 @@ def make_publisher():
     if publisher:
         publisher.stop()
     pgn_queue = Queue.Queue()
-    publisher = Publisher(args.publish, pgn_queue)
+    publisher = Publisher(args.publish, pgn_queue, args.game_id, args.game_key)
     publisher.start()
     return pgn_queue, publisher
 

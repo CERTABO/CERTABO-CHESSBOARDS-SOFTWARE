@@ -9,10 +9,10 @@ PUBLISHER_SLEEP_INTERVAL = 0.1
 
 
 class Publisher(threading.Thread):
-    def __init__(self, url, queue):
+    def __init__(self, url, queue, game_id=None, game_key=None):
         self.url = url
-        self.game_id = None
-        self.game_key = None
+        self.game_id = game_id
+        self.game_key = game_key
         if not self.url.endswith('/'):
             self.url += '/'
         super(Publisher, self).__init__()
