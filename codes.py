@@ -556,6 +556,7 @@ def get_moves(board, fen):
     :return:
     """
     board_fen = fen.split()[0]
+    print('Getting diff between {} and {}'.format(board.board_fen(), board_fen))
     copy_board = board.copy()  # type: chess.Board
     moves = list(board.generate_legal_moves())
     for move in moves:
