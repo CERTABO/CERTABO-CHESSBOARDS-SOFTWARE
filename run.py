@@ -922,16 +922,7 @@ while 1:
                         s2 = board_state_usb.split(" ")[0]
                         if s1 != s2:
                             if banner_do_move:
-                                if human_game:
-                                    move = codes.get_moves(chessboard, board_state_usb)
-                                else:
-                                    move = codes.FENs2move(
-                                        board_state, board_state_usb, play_white
-                                    )
-                                    if move:
-                                        move = [move]
-                                    else:
-                                        move = []
+                                move = codes.get_moves(chessboard, board_state_usb)
                                 if move:
                                     banner_do_move = False
                                     do_user_move = True
