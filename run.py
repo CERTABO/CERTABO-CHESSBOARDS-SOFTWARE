@@ -743,6 +743,7 @@ while 1:
                     resume_file_selected = i
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
+                logging.info('Resuming game')
                 f = open(
                     os.path.join(
                         CERTABO_SAVE_PATH,
@@ -754,6 +755,7 @@ while 1:
                     0
                 ], board_history, timer, play_white, difficulty = pickle.load(f)
                 f.close()
+                logging.info('Move history - %s', move_history)
                 chessboard = chess.Board()
                 for resumed_move in move_history:
                     chessboard.push_uci(resumed_move)
