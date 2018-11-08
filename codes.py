@@ -557,11 +557,15 @@ def get_moves(board, fen):
     """
     board_fen = fen.split()[0]
     print('Getting diff between {} and {}'.format(board.board_fen(), board_fen))
+    if board.board_fen() == board_fen:
+        print('Positions identical')
+        return []
     copy_board = board.copy()  # type: chess.Board
     moves = list(board.generate_legal_moves())
     for move in moves:
         copy_board.push(move)
         if board_fen == copy_board.board_fen():
+            print('Single move detected - {}'.format(move))
             return [move]
         copy_board.pop()
     for move in moves:
@@ -570,8 +574,10 @@ def get_moves(board, fen):
         for move2 in legal_moves2:
             copy_board.push(move2)
             if board_fen == copy_board.board_fen():
+                print('Double move detected - {}'.format(move, move2))
                 return [move, move2]
             copy_board.pop()
         copy_board.pop()
+    print('Unable to detect moves')
     return None
 
