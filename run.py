@@ -1293,11 +1293,14 @@ while 1:
                             if human_game:
                                 board_history.pop()  # remove last element
                                 move_history.pop()  # it's for stockfish engine
+                                chessboard.pop()
                             else:
                                 board_history.pop()  # remove last element
                                 board_history.pop()  # remove last element
                                 move_history.pop()  # it's for stockfish engine
                                 move_history.pop()  # it's for stockfish engine
+                                chessboard.pop()
+                                chessboard.pop()
                             board_state = board_history[-1]
 
                             print("--------- after take back: ")
