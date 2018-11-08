@@ -1536,7 +1536,8 @@ while 1:
                         banner_do_move = False
                         game_process_just_started = True
                         banner_place_pieces = True
-                        make_publisher()
+                        if args.publish:
+                            make_publisher()
 
     left_click = False
     old_left_click = mbutton[0]
