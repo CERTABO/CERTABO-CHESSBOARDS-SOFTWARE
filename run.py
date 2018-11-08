@@ -39,6 +39,7 @@ parser.add_argument("--port")
 parser.add_argument("--publish", help="URL to publish data")
 parser.add_argument("--game-id", help="Game ID")
 parser.add_argument("--game-key", help="Game key")
+parser.add_argument("--robust", help="Robust", action='store_true')
 args = parser.parse_args()
 
 if args.port is None:
@@ -475,7 +476,7 @@ calibration = False
 calibration_samples_counter = 0
 calibration_samples = []
 
-usb_data_history_depth = 5
+usb_data_history_depth = 3
 usb_data_history = range(usb_data_history_depth)
 usb_data_history_filled = False
 usb_data_history_i = 0
@@ -599,7 +600,8 @@ while 1:
                     # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
             # do a calibration
         show("new_game", 5, 149)
-        show("resume_game", 5, 149 + 40)
+        if not args.robust:
+            show("resume_game", 5, 149 + 40)
         show("setup", 5, 149 + 80)
         show("new-setup", 5, 149 + 120)
 
@@ -1134,7 +1136,8 @@ while 1:
 
                 sock.sendto(message, SEND_SOCKET)
                 # banner_do_move = True
-                show_board_and_animated_move(board_state, ai_move, 178, 40)
+                if not args.robust:
+                    show_board_and_animated_move(board_state, ai_move, 178, 40)
 
                 try:
                     chessgame = Game(fen=board_state)
