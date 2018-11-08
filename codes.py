@@ -565,8 +565,8 @@ def get_moves(board, fen):
     for move in moves:
         copy_board.push(move)
         if board_fen == copy_board.board_fen():
-            print('Single move detected - {}'.format(move))
-            return [move]
+            print('Single move detected - {}'.format(move.uci()))
+            return [move.uci()]
         copy_board.pop()
     for move in moves:
         copy_board.push(move)
@@ -574,8 +574,8 @@ def get_moves(board, fen):
         for move2 in legal_moves2:
             copy_board.push(move2)
             if board_fen == copy_board.board_fen():
-                print('Double move detected - {}, {}'.format(move, move2))
-                return [move, move2]
+                print('Double move detected - {}, {}'.format(move.uci(), move2.uci()))
+                return [move.uci(), move2.uci()]
             copy_board.pop()
         copy_board.pop()
     print('Unable to detect moves')
