@@ -579,5 +579,5 @@ def get_moves(board, fen):
             copy_board.pop()
         copy_board.pop()
     print('Unable to detect moves')
-    return None
+    return []
 
