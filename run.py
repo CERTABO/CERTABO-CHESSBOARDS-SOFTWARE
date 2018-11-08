@@ -476,10 +476,12 @@ calibration = False
 calibration_samples_counter = 0
 calibration_samples = []
 
-usb_data_history_depth = 3
+usb_data_history_depth = 2
 usb_data_history = range(usb_data_history_depth)
 usb_data_history_filled = False
 usb_data_history_i = 0
+move_detect_tries = 0
+move_detect_max_tries = 3
 
 banner_right_places = False
 banners_counter = 0
@@ -929,10 +931,17 @@ while 1:
                         s2 = board_state_usb.split(" ")[0]
                         if s1 != s2:
                             if banner_do_move:
-                                move = codes.get_moves(chessboard, board_state_usb)
-                                if move:
-                                    banner_do_move = False
-                                    do_user_move = True
+                                try:
+                                    move_detect_tries += 1
+                                    move = codes.get_moves(chessboard, board_state_usb)
+                                except codes.InvalidMove:
+                                    if move_detect_tries > move_detect_max_tries:
+                                        terminal_print('Invalid move')
+                                else:
+                                    move_detect_tries = 0
+                                    if move:
+                                        banner_do_move = False
+                                        do_user_move = True
                             else:
                                 if DEBUG:
                                     print("Place pieces on their places")
