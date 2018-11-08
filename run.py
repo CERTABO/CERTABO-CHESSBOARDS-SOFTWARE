@@ -756,9 +756,12 @@ while 1:
                 ], board_history, timer, play_white, difficulty = pickle.load(f)
                 f.close()
                 logging.info('Move history - %s', move_history)
-                chessboard = chess.Board()
-                for resumed_move in move_history:
-                    chessboard.push_uci(resumed_move)
+                if move_history:
+                    chessboard = chess.Board()
+                    for resumed_move in move_history:
+                        chessboard.push_uci(resumed_move)
+                else:
+                    chessboard = chess.Board(board_state)
                 previous_board_click = ""
                 board_click = ""
                 do_ai_move = False
