@@ -14,6 +14,7 @@ from select import *
 from socket import *
 
 import chess.pgn
+import chess
 import os
 import pickle
 import pygame
@@ -302,6 +303,8 @@ FEN = {
     "R": "white_rook",
 }
 
+
+chessboard = None
 
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
@@ -917,16 +920,16 @@ while 1:
                         if s1 != s2:
                             if banner_do_move:
                                 if human_game:
-                                    move = codes.FENs2move(
-                                        board_state,
-                                        board_state_usb,
-                                        len(move_history) % 2 == 0,
-                                    )
+                                    move = codes.get_moves(chessboard, board_state_usb)
                                 else:
                                     move = codes.FENs2move(
                                         board_state, board_state_usb, play_white
                                     )
-                                if move != "":
+                                    if move:
+                                        move = [move]
+                                    else:
+                                        move = []
+                                if not move:
                                     banner_do_move = False
                                     do_user_move = True
                             else:
@@ -1137,6 +1140,7 @@ while 1:
                 try:
                     chessgame = Game(fen=board_state)
                     chessgame.apply_move(ai_move)  # validate move
+                    chessboard.push_uci(ai_move)
                     move_history.append(ai_move)
                     board_state = str(chessgame)
                     print("   stockfish move: ", ai_move)
@@ -1174,28 +1178,29 @@ while 1:
             if do_user_move and (not mate_we_won and not mate_we_lost):
                 do_user_move = False
                 try:
-                    chessgame = Game(fen=board_state)
-                    chessgame.apply_move(move)  # validation
-                    move_history.append(move)
+                    for m in move:
+                        chessgame = Game(fen=board_state)
+                        chessgame.apply_move(m)  # validation
+                        move_history.append(m)
 
-                    board_state = str(chessgame)
-                    board_history.append(board_state)
+                        board_state = str(chessgame)
+                        board_history.append(board_state)
 
-                    # codes.FENs2move( board_history[ len(board_history)-2 ], board_state, play_white )
-                    #                if play_white:
-                    #                   terminal_text += ", black move: "+ai_move
-                    #               else:
-                    #                   terminal_text_line2 = terminal_text
-                    #                   terminal_text = "white move: "+ai_move
+                        # codes.FENs2move( board_history[ len(board_history)-2 ], board_state, play_white )
+                        #                if play_white:
+                        #                   terminal_text += ", black m: "+ai_move
+                        #               else:
+                        #                   terminal_text_line2 = terminal_text
+                        #                   terminal_text = "white m: "+ai_move
 
-                    print("   user move: ", move)
-                    side = ("black", "white")[len(move_history) % 2]
-                    terminal_print("{} move: {}".format(side, move))
-                    if not human_game:
-                        do_ai_move = True
-                        hint_text = ""
-                    if args.publish:
-                        publish()
+                        print("   user move: ", m)
+                        side = ("black", "white")[len(move_history) % 2]
+                        terminal_print("{} move: {}".format(side, m))
+                        if not human_game:
+                            do_ai_move = True
+                            hint_text = ""
+                        if args.publish:
+                            publish()
                 except:
                     print("   ----invalid user move! ---- ", move)
                     logging.exception('Exception: ')
@@ -1267,9 +1272,9 @@ while 1:
                         if i > 3:
                             i = 3
                         icon = icon_codes[i]
-                        if len(move) == 4:
-                            move += icon
-                            print("move for conversion: ", move)
+                        if len(move[0]) == 4:
+                            move[0] += icon
+                            print("move for conversion: ", move[0])
                             conversion_dialog = False
                             do_user_move = True
                 else:
@@ -1507,6 +1512,8 @@ while 1:
 
                     if 365 < x < 467:  # start game ->
                         window = "game"
+                        chessboard = chess.Board()
+
                         board_state = (
                             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
                         )

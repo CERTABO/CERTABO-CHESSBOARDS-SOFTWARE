@@ -1,6 +1,8 @@
 from __future__ import print_function
 import pickle
 import os
+import chess
+import chess
 from constants import CERTABO_DATA_PATH
 
 # data conversion
@@ -543,3 +545,32 @@ def FENs2move(FEN_prev, FEN, play_white):
 
     print("------------ move found:", move, "---------------")
     return move
+
+
+def get_moves(board, fen):
+    """
+    :param board:
+    :type board: chess.Board
+    :param fen:
+    :param max_depth:
+    :return:
+    """
+    board_fen = fen.split()[0]
+    copy_board = board.copy()  # type: chess.Board
+    moves = list(board.generate_legal_moves())
+    for move in moves:
+        copy_board.push(move)
+        if board_fen == copy_board.board_fen():
+            return [move]
+        copy_board.pop()
+    for move in moves:
+        copy_board.push(move)
+        legal_moves2 = list(copy_board.generate_legal_moves())
+        for move2 in legal_moves2:
+            copy_board.push(move2)
+            if board_fen == copy_board.board_fen():
+                return [move, move2]
+            copy_board.pop()
+        copy_board.pop()
+    return None
+
