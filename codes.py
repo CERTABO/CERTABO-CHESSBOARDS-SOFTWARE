@@ -574,7 +574,7 @@ def get_moves(board, fen):
         for move2 in legal_moves2:
             copy_board.push(move2)
             if board_fen == copy_board.board_fen():
-                print('Double move detected - {}'.format(move, move2))
+                print('Double move detected - {}, {}'.format(move, move2))
                 return [move, move2]
             copy_board.pop()
         copy_board.pop()

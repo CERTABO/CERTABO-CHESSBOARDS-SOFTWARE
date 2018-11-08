@@ -929,7 +929,7 @@ while 1:
                                         move = [move]
                                     else:
                                         move = []
-                                if not move:
+                                if move:
                                     banner_do_move = False
                                     do_user_move = True
                             else:
