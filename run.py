@@ -1182,7 +1182,7 @@ while 1:
                         chessgame = Game(fen=board_state)
                         chessgame.apply_move(m)  # validation
                         move_history.append(m)
-
+                        chessboard.push_uci(m)
                         board_state = str(chessgame)
                         board_history.append(board_state)
 
