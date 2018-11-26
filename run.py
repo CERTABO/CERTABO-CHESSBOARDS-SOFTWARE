@@ -112,7 +112,7 @@ else:
     usb_command = ["python", "usbtool.py"]
 if portname is not None:
     usb_command.extend(["--port", portname])
-logging.debug('Calling %s', usb_command)
+logging.debug("Calling %s", usb_command)
 usb_proc = subprocess.Popen(usb_command)
 tt.sleep(1)  # time to make stable COMx connection
 
@@ -245,20 +245,33 @@ def show(name, x, y):
     scr.blit(sprite[name], (x * x_multiplier, y * y_multiplier))
 
 
-def button(text, x, y, padding = (5, 5, 5, 5), color=white, text_color=grey, font=font_large, font_size=22):
+def button(
+    text,
+    x,
+    y,
+    padding=(5, 5, 5, 5),
+    color=white,
+    text_color=grey,
+    font=font_large,
+    font_size=22,
+):
     ptop, pleft, pbottom, pright = padding
     text_width, text_height = font.size(text)
     widget_width = pleft * x_multiplier + text_width + pright * x_multiplier
     widget_height = ptop * y_multiplier + text_height + pbottom * y_multiplier
     pygame.draw.rect(
-        scr,
-        color,
-        (x * x_multiplier, y * y_multiplier, widget_width, widget_height),
+        scr, color, (x * x_multiplier, y * y_multiplier, widget_width, widget_height)
     )
     img = font.render(text, font_size, text_color)
     pos = (x + pleft) * x_multiplier, (y + ptop) * y_multiplier
     scr.blit(img, pos)
-    return x, y, x + int(widget_width // x_multiplier), y + int(widget_height // y_multiplier)
+    return (
+        x,
+        y,
+        x + int(widget_width // x_multiplier),
+        y + int(widget_height // y_multiplier),
+    )
+
 
 # Show chessboard using FEN string like
 # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -281,7 +294,7 @@ FEN = {
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
     if rotate180:
-        FEN_string = '/'.join(row[::-1] for row in FEN_string.split(' ')[0].split('/'))
+        FEN_string = "/".join(row[::-1] for row in FEN_string.split(" ")[0].split("/"))
     x, y = 0, 0
     for c in FEN_string:
         if c in FEN:
@@ -301,11 +314,20 @@ letter = "a", "b", "c", "d", "e", "f", "g", "h"
 
 def show_board_and_animated_move(FEN_string, move, x0, y0):
     piece = ""
+    if rotate180:
+        FEN_string = "/".join(row[::-1] for row in FEN_string.split(" ")[0].split("/"))
 
     xa = letter.index(move[0])
     ya = 8 - int(move[1])
     xb = letter.index(move[2])
     yb = 8 - int(move[3])
+
+    if rotate180:
+        xa = 8 - xa
+        ya = 8 - ya
+        xb = 8 - xb
+        yb = 8 - yb
+
     xstart, ystart = x0 + 26 + 31.8 * xa, y0 + 23 + ya * 31.8
     xend, yend = x0 + 26 + 31.8 * xb, y0 + 23 + yb * 31.8
 
@@ -661,7 +683,7 @@ while 1:
                         os.unlink(
                             os.path.join(
                                 CERTABO_SAVE_PATH,
-                                saved_files[resume_file_selected + resume_file_start]
+                                saved_files[resume_file_selected + resume_file_start],
                             )
                         )
 
@@ -1371,41 +1393,75 @@ while 1:
             engine_list = get_engine_list()
             if (current_engine_page + 1) * engines_per_page > len(engine_list):
                 current_engine_page = len(engine_list) // engines_per_page
-            page_engines = engine_list[current_engine_page * engines_per_page:(current_engine_page + 1) * engines_per_page]
+            page_engines = engine_list[
+                current_engine_page
+                * engines_per_page : (current_engine_page + 1)
+                * engines_per_page
+            ]
             has_next = len(engine_list) > (current_engine_page + 1) * engines_per_page
             has_prev = current_engine_page > 0
             for engine_name in page_engines:
-                engine_button_area = button(engine_name, engine_button_x, engine_button_y, text_color=white, color=darkergreen if engine == engine_name else grey)
-                button_coords.append(('select_engine', engine_name, engine_button_area))
+                engine_button_area = button(
+                    engine_name,
+                    engine_button_x,
+                    engine_button_y,
+                    text_color=white,
+                    color=darkergreen if engine == engine_name else grey,
+                )
+                button_coords.append(("select_engine", engine_name, engine_button_area))
                 _, _, _, engine_button_y = engine_button_area
                 engine_button_y += engine_button_vertical_margin
-            done_button_area = button('Done', 415, 275, color=darkergreen, text_color=white)
-            button_coords.append(('select_engine_done', None, done_button_area))
+            done_button_area = button(
+                "Done", 415, 275, color=darkergreen, text_color=white
+            )
+            button_coords.append(("select_engine_done", None, done_button_area))
             if has_next:
-                next_page_button_area = button(' > ', 415, 150, color=darkergreen, text_color=white)
-                button_coords.append(('next_page', None, next_page_button_area))
+                next_page_button_area = button(
+                    " > ", 415, 150, color=darkergreen, text_color=white
+                )
+                button_coords.append(("next_page", None, next_page_button_area))
             if has_prev:
-                prev_page_button_area = button(' < ', 200, 150, color=darkergreen, text_color=white)
-                button_coords.append(('prev_page', None, prev_page_button_area))
+                prev_page_button_area = button(
+                    " < ", 200, 150, color=darkergreen, text_color=white
+                )
+                button_coords.append(("prev_page", None, prev_page_button_area))
             if left_click:
                 for action, value, (lx, ty, rx, by) in button_coords:
                     if lx < x < rx and ty < y < by:
-                        if action == 'select_engine':
+                        if action == "select_engine":
                             engine = value
-                        elif action == 'select_engine_done':
-                            dialog = ''
-                        elif action == 'next_page':
+                        elif action == "select_engine_done":
+                            dialog = ""
+                        elif action == "next_page":
                             current_engine_page += 1
-                        elif action == 'prev_page':
+                        elif action == "prev_page":
                             current_engine_page -= 1
                         break
         else:
             txt_large("Mode:", 150, 20, grey)
-            human_game_button_area = button('Human', 210, 15, text_color=white, color=darkergreen if human_game else grey)
+            human_game_button_area = button(
+                "Human",
+                210,
+                15,
+                text_color=white,
+                color=darkergreen if human_game else grey,
+            )
             _, _, human_game_button_x, _ = human_game_button_area
-            computer_game_button_area = button('Engine', human_game_button_x + 5, 15, text_color=white, color=darkergreen if not human_game else grey)
+            computer_game_button_area = button(
+                "Engine",
+                human_game_button_x + 5,
+                15,
+                text_color=white,
+                color=darkergreen if not human_game else grey,
+            )
             _, _, computer_game_button_x, _ = computer_game_button_area
-            flip_board_button_area = button('Flip board', computer_game_button_x + 5, 15, text_color=white, color=darkergreen if rotate180 else grey)
+            flip_board_button_area = button(
+                "Flip board",
+                computer_game_button_x + 5,
+                15,
+                text_color=white,
+                color=darkergreen if rotate180 else grey,
+            )
             if not human_game:
                 txt_large("Depth:", 203, 115, green)
                 show("depth" + str(difficulty + 1), 214, 151)
