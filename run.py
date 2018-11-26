@@ -323,10 +323,10 @@ def show_board_and_animated_move(FEN_string, move, x0, y0):
     yb = 8 - int(move[3])
 
     if rotate180:
-        xa = 8 - xa
-        ya = 8 - ya
-        xb = 8 - xb
-        yb = 8 - yb
+        xa = 7 - xa
+        ya = 7 - ya
+        xb = 7 - xb
+        yb = 7 - yb
 
     xstart, ystart = x0 + 26 + 31.8 * xa, y0 + 23 + ya * 31.8
     xend, yend = x0 + 26 + 31.8 * xb, y0 + 23 + yb * 31.8
