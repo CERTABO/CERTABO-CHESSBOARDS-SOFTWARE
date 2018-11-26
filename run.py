@@ -1092,7 +1092,7 @@ while 1:
 
                 # highlight right LED
                 i, value, i_source, value_source = codes.move2led(
-                    ai_move
+                    ai_move, rotate180
                 )  # error here if checkmate before
                 message = ""
                 for j in range(8):

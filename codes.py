@@ -350,13 +350,20 @@ def calibration(usb_data, new_setup, port):
 
 
 letter = "a", "b", "c", "d", "e", "f", "g", "h"
+reversed_letter = tuple(reversed(letter))
 
 
-def move2led(move):
-    i = letter.index(move[2])
-    j = int(move[3])
-    k = letter.index(move[0])
-    l = int(move[1])
+def move2led(move, rotate180=False):
+    if rotate180:
+        i = reversed_letter.index(move[2])
+        j = 9 - int(move[3])
+        k = reversed_letter.index(move[0])
+        l = 9 - int(move[1])
+    else:
+        i = letter.index(move[2])
+        j = int(move[3])
+        k = letter.index(move[0])
+        l = int(move[1])
     return 8 - j, 2 ** i, 8 - l, 2 ** k
 
 
