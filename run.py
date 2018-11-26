@@ -388,6 +388,7 @@ move_history = []
 board_history = []
 name_to_save = ""
 
+rotate180 = False
 board_letters = "a", "b", "c", "d", "e", "f", "g", "h"
 previous_board_click = ""  # example: "e2"
 board_click = ""  # example: "e2"
@@ -521,7 +522,7 @@ while 1:
             if usb_data_history_filled:
                 usb_data_processed = codes.statistic_processing(usb_data_history, False)
                 if usb_data_processed != []:
-                    test_state = codes.usb_data_to_FEN(usb_data_processed)
+                    test_state = codes.usb_data_to_FEN(usb_data_processed, rotate180)
                     if test_state != "":
                         board_state = test_state
                 else:
@@ -538,7 +539,7 @@ while 1:
                     )
                     # print usb_data
                     codes.calibration(usb_data, new_setup, port)
-                    board_state = codes.usb_data_to_FEN(usb_data)
+                    board_state = codes.usb_data_to_FEN(usb_data, rotate180)
                     calibration = False
 
                     # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -882,7 +883,7 @@ while 1:
             if usb_data_history_filled:
                 usb_data_processed = codes.statistic_processing(usb_data_history, False)
                 if usb_data_processed != []:
-                    test_state = codes.usb_data_to_FEN(usb_data_processed)
+                    test_state = codes.usb_data_to_FEN(usb_data_processed, rotate180)
                     if test_state != "":
                         board_state_usb = test_state
                         game_process_just_started = False
@@ -1402,6 +1403,8 @@ while 1:
             human_game_button_area = button('Human', 210, 15, text_color=white, color=darkergreen if human_game else grey)
             _, _, human_game_button_x, _ = human_game_button_area
             computer_game_button_area = button('Engine', human_game_button_x + 5, 15, text_color=white, color=darkergreen if not human_game else grey)
+            _, _, computer_game_button_x, _ = computer_game_button_area
+            flip_board_button_area = button('Flip board', computer_game_button_x + 5, 15, text_color=white, color=darkergreen if rotate180 else grey)
             if not human_game:
                 txt_large("Depth:", 203, 115, green)
                 show("depth" + str(difficulty + 1), 214, 151)
@@ -1446,6 +1449,8 @@ while 1:
                     human_game = True
                 if coords_in(x, y, computer_game_button_area):
                     human_game = False
+                if coords_in(x, y, flip_board_button_area):
+                    rotate180 = not rotate180
                 if 72 < y < 97:
                     if 440 < x < 465:
                         dialog = "select_engine"

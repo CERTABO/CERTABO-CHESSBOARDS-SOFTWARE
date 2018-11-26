@@ -360,7 +360,7 @@ def move2led(move):
     return 8 - j, 2 ** i, 8 - l, 2 ** k
 
 
-def usb_data_to_FEN(usb_data):
+def usb_data_to_FEN(usb_data, rotate180=False):
     global letter
     empty_cell = [0, 0, 0, 0, 0]
     s = ""
@@ -437,6 +437,8 @@ def usb_data_to_FEN(usb_data):
         # for i in range(8):
 
     # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    if rotate180:
+        s = '/'.join(row[::-1] for row in reversed(s.split('/')))
     s += " w KQkq - 0 1"
     if was_unknown_piece:
         return ""

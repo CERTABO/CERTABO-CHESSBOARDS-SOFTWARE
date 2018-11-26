@@ -1,6 +1,7 @@
 from __future__ import print_function
 import PIL  # pip install pillow
 from PIL import Image
+import os
 
 
 def resize(filename):
