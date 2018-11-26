@@ -294,7 +294,7 @@ FEN = {
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
     if rotate180:
-        FEN_string = "/".join(row[::-1] for row in FEN_string.split(" ")[0].split("/"))
+        FEN_string = "/".join(row[::-1] for row in reversed(FEN_string.split(" ")[0].split("/")))
     x, y = 0, 0
     for c in FEN_string:
         if c in FEN:
@@ -315,7 +315,7 @@ letter = "a", "b", "c", "d", "e", "f", "g", "h"
 def show_board_and_animated_move(FEN_string, move, x0, y0):
     piece = ""
     if rotate180:
-        FEN_string = "/".join(row[::-1] for row in FEN_string.split(" ")[0].split("/"))
+        FEN_string = "/".join(row[::-1] for row in reversed(FEN_string.split(" ")[0].split("/")))
 
     xa = letter.index(move[0])
     ya = 8 - int(move[1])
