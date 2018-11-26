@@ -280,7 +280,8 @@ FEN = {
 
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
-
+    if rotate180:
+        FEN_string = '/'.join(row[::-1] for row in FEN_string.split(' ')[0].split('/'))
     x, y = 0, 0
     for c in FEN_string:
         if c in FEN:
