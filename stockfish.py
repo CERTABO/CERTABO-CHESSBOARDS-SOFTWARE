@@ -4,6 +4,7 @@ import os  # , Queue
 import time
 import threading
 import json
+import chess
 from constants import ENGINE_PATH
 
 from pystockfish import *
@@ -53,7 +54,15 @@ params = {
 
 
 class EngineThread(threading.Thread):
-    def __init__(self, move_history, difficulty, engine="stockfish", *args, **kwargs):
+    def __init__(
+        self,
+        move_history,
+        difficulty,
+        engine="stockfish",
+        starting_position=chess.STARTING_FEN,
+        *args,
+        **kwargs
+    ):
         self.engine = engine
         self.engine_path = os.path.join(ENGINE_PATH, "{}.exe".format(self.engine))
         self.engine_parameters = None
@@ -75,6 +84,7 @@ class EngineThread(threading.Thread):
         self.best_move = None
         self.difficulty = difficulty
         self.stop_sent = False
+        self.starting_position = starting_position
         super(EngineThread, self).__init__(*args, **kwargs)
 
     def run(self):
@@ -83,7 +93,7 @@ class EngineThread(threading.Thread):
             depth=self.difficulty, binary=self.engine_path, param=self.engine_parameters
         )
         logging.info("Setting position to %s", self.move_history)
-        self.engine.setposition(self.move_history)
+        self.engine.setposition(self.move_history, starting_position=self.starting_position)
         self.engine.go()
         while True:
             if self.stop_engine and not self.stop_sent:

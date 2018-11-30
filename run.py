@@ -1105,7 +1105,12 @@ while 1:
 
                 #                ai_move = game_engine.bestmove()['move']
 
-                proc = stockfish.EngineThread(move_history, difficulty, engine=engine)
+                proc = stockfish.EngineThread(
+                    move_history,
+                    difficulty,
+                    engine=engine,
+                    starting_position=starting_position,
+                )
                 proc.start()
                 # print "continues..."
 
@@ -1610,9 +1615,7 @@ while 1:
                         window = "game"
                         chessboard = chess.Board()
 
-                        board_state = (
-                            chess.STARTING_FEN
-                        )
+                        board_state = chess.STARTING_FEN
 
                         starting_position = chess.STARTING_FEN
                         move_history = []

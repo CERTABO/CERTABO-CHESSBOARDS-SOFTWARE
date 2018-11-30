@@ -18,6 +18,9 @@ import subprocess
 import threading
 from random import randint
 
+import chess
+
+
 MAX_MOVES = 200
 UCI_MOVE_REGEX = "[a-h]\d[a-h]\d[qrnb]?"
 PV_REGEX = " pv (?P<move_list>{0}( {0})*)".format(UCI_MOVE_REGEX)
@@ -243,11 +246,15 @@ class Engine(subprocess.Popen):
         if stdout.find("No such") >= 0:
             print("stockfish was unable to set option %s" % optionname)
 
-    def setposition(self, moves=[]):
+    def setposition(self, moves=(), starting_position=None):
         """
         Move list is a list of moves (i.e. ['e2e4', 'e7e5', ...]) each entry as a string.  Moves must be in full algebraic notation.
         """
-        self.put("position startpos moves %s" % Engine._movelisttostr(moves))
+        if starting_position:
+            position = "fen {}".format(starting_position)
+        else:
+            position = "startpos"
+        self.put("position {} moves {}".format(position, Engine._movelisttostr(moves)))
         self.isready()
 
     def setfenposition(self, fen):
