@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 import argparse
+import random
 
 DEBUG = False
 
@@ -39,7 +40,7 @@ parser.add_argument("--port")
 parser.add_argument("--publish", help="URL to publish data")
 parser.add_argument("--game-id", help="Game ID")
 parser.add_argument("--game-key", help="Game key")
-parser.add_argument("--robust", help="Robust", action='store_true')
+parser.add_argument("--robust", help="Robust", action="store_true")
 args = parser.parse_args()
 
 if args.port is None:
@@ -55,6 +56,9 @@ LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
 
 pgn_queue = None
 publisher = None
+
+DEFAULT_ENGINES = ("stockfish", "houdini", "komodo", "fire", "lczero")
+
 
 def make_publisher():
     global pgn_queue, publisher
@@ -320,10 +324,13 @@ FEN = {
 
 chessboard = None
 
+
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
     if rotate180:
-        FEN_string = "/".join(row[::-1] for row in reversed(FEN_string.split(" ")[0].split("/")))
+        FEN_string = "/".join(
+            row[::-1] for row in reversed(FEN_string.split(" ")[0].split("/"))
+        )
     x, y = 0, 0
     for c in FEN_string:
         if c in FEN:
@@ -344,7 +351,9 @@ letter = "a", "b", "c", "d", "e", "f", "g", "h"
 def show_board_and_animated_move(FEN_string, move, x0, y0):
     piece = ""
     if rotate180:
-        FEN_string = "/".join(row[::-1] for row in reversed(FEN_string.split(" ")[0].split("/")))
+        FEN_string = "/".join(
+            row[::-1] for row in reversed(FEN_string.split(" ")[0].split("/"))
+        )
 
     xa = letter.index(move[0])
     ya = 8 - int(move[1])
@@ -412,13 +421,9 @@ def generate_pgn():
     game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
     if play_white:
         game.headers["White"] = "Human"
-        game.headers["Black"] = (
-            "Computer" if not human_game else "Human"
-        )
+        game.headers["Black"] = "Computer" if not human_game else "Human"
     else:
-        game.headers["White"] = (
-            "Computer" if not human_game else "Human"
-        )
+        game.headers["White"] = "Computer" if not human_game else "Human"
         game.headers["Black"] = "Human"
     if mate_we_lost:
         game.headers["Result"] = "0-1" if play_white else "1-0"
@@ -777,7 +782,7 @@ while 1:
                     resume_file_selected = i
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
-                logging.info('Resuming game')
+                logging.info("Resuming game")
                 f = open(
                     os.path.join(
                         CERTABO_SAVE_PATH,
@@ -789,7 +794,7 @@ while 1:
                     0
                 ], board_history, timer, play_white, difficulty = pickle.load(f)
                 f.close()
-                logging.info('Move history - %s', move_history)
+                logging.info("Move history - %s", move_history)
                 if move_history:
                     chessboard = chess.Board()
                     for resumed_move in move_history:
@@ -803,6 +808,13 @@ while 1:
                 conversion_dialog = False
                 banner_do_move = False
                 banner_place_pieces = True
+
+                engines = get_engine_list()
+                for _engine in DEFAULT_ENGINES:
+                    if _engine in engines:
+                        engine = _engine
+                else:
+                    engine = random.choice(engines)
 
                 window = "game"
             if 448 < x < 472:  # arrows
@@ -966,7 +978,7 @@ while 1:
                                     move = codes.get_moves(chessboard, board_state_usb)
                                 except codes.InvalidMove:
                                     if move_detect_tries > move_detect_max_tries:
-                                        terminal_print('Invalid move')
+                                        terminal_print("Invalid move")
                                 else:
                                     move_detect_tries = 0
                                     if move:
@@ -1193,7 +1205,7 @@ while 1:
                         publish()
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
-                    logging.exception('Exception: ')
+                    logging.exception("Exception: ")
                     terminal_print(ai_move + " - invalid move !")
 
                 print("\n\n", board_state)
@@ -1244,7 +1256,7 @@ while 1:
                             publish()
                 except:
                     print("   ----invalid user move! ---- ", move)
-                    logging.exception('Exception: ')
+                    logging.exception("Exception: ")
                     terminal_print(move + " - invalid move !")
                     previous_board_click = ""
                     board_click = ""
