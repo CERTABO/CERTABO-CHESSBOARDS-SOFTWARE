@@ -14,12 +14,14 @@ from select import *
 from socket import *
 
 import chess.pgn
+import chess
 import os
 import pickle
 import pygame
 import stockfish
 import subprocess
 import logging
+import Queue
 
 logging.basicConfig(level="DEBUG")
 
@@ -28,11 +30,16 @@ import codes
 from Chessnut import Game
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 from utils import port2number, port2udp, find_port, get_engine_list, coords_in
+from publish import Publisher
 
 stockfish.TO_EXE = TO_EXE
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port")
+parser.add_argument("--publish", help="URL to publish data")
+parser.add_argument("--game-id", help="Game ID")
+parser.add_argument("--game-key", help="Game key")
+parser.add_argument("--robust", help="Robust", action='store_true')
 args = parser.parse_args()
 
 if args.port is None:
@@ -45,6 +52,24 @@ board_listen_port, gui_listen_port = port2udp(port)
 
 SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
 LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
+
+pgn_queue = None
+publisher = None
+
+def make_publisher():
+    global pgn_queue, publisher
+    if publisher:
+        publisher.stop()
+    pgn_queue = Queue.Queue()
+    publisher = Publisher(args.publish, pgn_queue, args.game_id, args.game_key)
+    publisher.start()
+    return pgn_queue, publisher
+
+
+def publish():
+    global pgn_queue
+    pgn_queue.put(generate_pgn())
+
 
 for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
     try:
@@ -66,6 +91,8 @@ def txt_large(s, x, y, color):
 
 
 def do_poweroff(proc):
+    if args.publish:
+        publisher.stop()
     subprocess.call(["taskkill", "/F", "/T", "/PID", str(proc.pid)])
     pygame.display.quit()
     pygame.quit()
@@ -291,6 +318,8 @@ FEN = {
 }
 
 
+chessboard = None
+
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
     if rotate180:
@@ -377,6 +406,33 @@ def show_board_and_animated_move(FEN_string, move, x0, y0):
         tt.sleep(0.01)
 
 
+def generate_pgn():
+    global play_white, human_game, mate_we_lost, mate_we_won, move_history
+    game = chess.pgn.Game()
+    game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
+    if play_white:
+        game.headers["White"] = "Human"
+        game.headers["Black"] = (
+            "Computer" if not human_game else "Human"
+        )
+    else:
+        game.headers["White"] = (
+            "Computer" if not human_game else "Human"
+        )
+        game.headers["Black"] = "Human"
+    if mate_we_lost:
+        game.headers["Result"] = "0-1" if play_white else "1-0"
+    if mate_we_won:
+        game.headers["Result"] = "1-0" if play_white else "0-1"
+    if not mate_we_won and not mate_we_lost:
+        game.headers["Result"] = "*"
+    node = game.add_variation(chess.Move.from_uci(move_history[0]))
+    for move in move_history[1:]:
+        node = node.add_variation(chess.Move.from_uci(move))
+    exporter = chess.pgn.StringExporter()
+    return game.accept(exporter)
+
+
 # ------------- start point --------------------------------------------------------
 
 timeout = datetime.now() + timedelta(milliseconds=500)
@@ -444,10 +500,12 @@ calibration = False
 calibration_samples_counter = 0
 calibration_samples = []
 
-usb_data_history_depth = 5
+usb_data_history_depth = 2
 usb_data_history = range(usb_data_history_depth)
 usb_data_history_filled = False
 usb_data_history_i = 0
+move_detect_tries = 0
+move_detect_max_tries = 3
 
 banner_right_places = False
 banners_counter = 0
@@ -568,7 +626,8 @@ while 1:
                     # "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
             # do a calibration
         show("new_game", 5, 149)
-        show("resume_game", 5, 149 + 40)
+        if not args.robust:
+            show("resume_game", 5, 149 + 40)
         show("setup", 5, 149 + 80)
         show("new-setup", 5, 149 + 120)
 
@@ -718,6 +777,7 @@ while 1:
                     resume_file_selected = i
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
+                logging.info('Resuming game')
                 f = open(
                     os.path.join(
                         CERTABO_SAVE_PATH,
@@ -729,6 +789,13 @@ while 1:
                     0
                 ], board_history, timer, play_white, difficulty = pickle.load(f)
                 f.close()
+                logging.info('Move history - %s', move_history)
+                if move_history:
+                    chessboard = chess.Board()
+                    for resumed_move in move_history:
+                        chessboard.push_uci(resumed_move)
+                else:
+                    chessboard = chess.Board(board_state)
                 previous_board_click = ""
                 board_click = ""
                 do_ai_move = False
@@ -848,30 +915,8 @@ while 1:
                     )
                     f.close()
                     if move_history:
-                        game = chess.pgn.Game()
-                        game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
-                        if play_white:
-                            game.headers["White"] = "Human"
-                            game.headers["Black"] = (
-                                "Computer" if not human_game else "Human"
-                            )
-                        else:
-                            game.headers["White"] = (
-                                "Computer" if not human_game else "Human"
-                            )
-                            game.headers["Black"] = "Human"
-                        if mate_we_lost:
-                            game.headers["Result"] = "0-1" if play_white else "1-0"
-                        if mate_we_won:
-                            game.headers["Result"] = "1-0" if play_white else "0-1"
-                        if not mate_we_won and not mate_we_lost:
-                            game.headers["Result"] = "*"
-                        node = game.add_variation(chess.Move.from_uci(move_history[0]))
-                        for move in move_history[1:]:
-                            node = node.add_variation(chess.Move.from_uci(move))
                         with open(OUTPUT_PGN, "w") as f:
-                            exporter = chess.pgn.FileExporter(f)
-                            game.accept(exporter)
+                            f.write(generate_pgn())
                     window = "game"
                     # banner_do_move = False
                     previous_board_click = ""
@@ -916,19 +961,17 @@ while 1:
                         s2 = board_state_usb.split(" ")[0]
                         if s1 != s2:
                             if banner_do_move:
-                                if human_game:
-                                    move = codes.FENs2move(
-                                        board_state,
-                                        board_state_usb,
-                                        len(move_history) % 2 == 0,
-                                    )
+                                try:
+                                    move_detect_tries += 1
+                                    move = codes.get_moves(chessboard, board_state_usb)
+                                except codes.InvalidMove:
+                                    if move_detect_tries > move_detect_max_tries:
+                                        terminal_print('Invalid move')
                                 else:
-                                    move = codes.FENs2move(
-                                        board_state, board_state_usb, play_white
-                                    )
-                                if move != "":
-                                    banner_do_move = False
-                                    do_user_move = True
+                                    move_detect_tries = 0
+                                    if move:
+                                        banner_do_move = False
+                                        do_user_move = True
                             else:
                                 if DEBUG:
                                     print("Place pieces on their places")
@@ -1084,6 +1127,8 @@ while 1:
                     # event from system & keyboard
                     for event in pygame.event.get():  # all values in event list
                         if event.type == pygame.QUIT:
+                            if args.publish:
+                                publisher.stop()
                             pygame.display.quit()
                             pygame.quit()
                             sys.exit()
@@ -1130,11 +1175,13 @@ while 1:
 
                 sock.sendto(message, SEND_SOCKET)
                 # banner_do_move = True
-                show_board_and_animated_move(board_state, ai_move, 178, 40)
+                if not args.robust:
+                    show_board_and_animated_move(board_state, ai_move, 178, 40)
 
                 try:
                     chessgame = Game(fen=board_state)
                     chessgame.apply_move(ai_move)  # validate move
+                    chessboard.push_uci(ai_move)
                     move_history.append(ai_move)
                     board_state = str(chessgame)
                     print("   stockfish move: ", ai_move)
@@ -1142,8 +1189,11 @@ while 1:
                     board_history.append(board_state)
                     side = ("black", "white")[len(move_history) % 2]
                     terminal_print("{} move: {}".format(side, ai_move))
+                    if args.publish:
+                        publish()
                 except:
                     print("   ----invalid chess_engine move! ---- ", ai_move)
+                    logging.exception('Exception: ')
                     terminal_print(ai_move + " - invalid move !")
 
                 print("\n\n", board_state)
@@ -1169,28 +1219,32 @@ while 1:
             if do_user_move and (not mate_we_won and not mate_we_lost):
                 do_user_move = False
                 try:
-                    chessgame = Game(fen=board_state)
-                    chessgame.apply_move(move)  # validation
-                    move_history.append(move)
+                    for m in move:
+                        chessgame = Game(fen=board_state)
+                        chessgame.apply_move(m)  # validation
+                        move_history.append(m)
+                        chessboard.push_uci(m)
+                        board_state = str(chessgame)
+                        board_history.append(board_state)
 
-                    board_state = str(chessgame)
-                    board_history.append(board_state)
+                        # codes.FENs2move( board_history[ len(board_history)-2 ], board_state, play_white )
+                        #                if play_white:
+                        #                   terminal_text += ", black m: "+ai_move
+                        #               else:
+                        #                   terminal_text_line2 = terminal_text
+                        #                   terminal_text = "white m: "+ai_move
 
-                    # codes.FENs2move( board_history[ len(board_history)-2 ], board_state, play_white )
-                    #                if play_white:
-                    #                   terminal_text += ", black move: "+ai_move
-                    #               else:
-                    #                   terminal_text_line2 = terminal_text
-                    #                   terminal_text = "white move: "+ai_move
-
-                    print("   user move: ", move)
-                    side = ("black", "white")[len(move_history) % 2]
-                    terminal_print("{} move: {}".format(side, move))
-                    if not human_game:
-                        do_ai_move = True
-                        hint_text = ""
+                        print("   user move: ", m)
+                        side = ("black", "white")[len(move_history) % 2]
+                        terminal_print("{} move: {}".format(side, m))
+                        if not human_game:
+                            do_ai_move = True
+                            hint_text = ""
+                        if args.publish:
+                            publish()
                 except:
                     print("   ----invalid user move! ---- ", move)
+                    logging.exception('Exception: ')
                     terminal_print(move + " - invalid move !")
                     previous_board_click = ""
                     board_click = ""
@@ -1259,9 +1313,9 @@ while 1:
                         if i > 3:
                             i = 3
                         icon = icon_codes[i]
-                        if len(move) == 4:
-                            move += icon
-                            print("move for conversion: ", move)
+                        if len(move[0]) == 4:
+                            move[0] += icon
+                            print("move for conversion: ", move[0])
                             conversion_dialog = False
                             do_user_move = True
                 else:
@@ -1281,11 +1335,14 @@ while 1:
                             if human_game:
                                 board_history.pop()  # remove last element
                                 move_history.pop()  # it's for stockfish engine
+                                chessboard.pop()
                             else:
                                 board_history.pop()  # remove last element
                                 board_history.pop()  # remove last element
                                 move_history.pop()  # it's for stockfish engine
                                 move_history.pop()  # it's for stockfish engine
+                                chessboard.pop()
+                                chessboard.pop()
                             board_state = board_history[-1]
 
                             print("--------- after take back: ")
@@ -1349,6 +1406,7 @@ while 1:
                             # event from system & keyboard
                             for event in pygame.event.get():  # all values in event list
                                 if event.type == pygame.QUIT:
+                                    publisher.stop()
                                     pygame.display.quit()
                                     pygame.quit()
                                     sys.exit()
@@ -1536,6 +1594,8 @@ while 1:
 
                     if 365 < x < 467:  # start game ->
                         window = "game"
+                        chessboard = chess.Board()
+
                         board_state = (
                             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
                         )
@@ -1558,6 +1618,8 @@ while 1:
                         banner_do_move = False
                         game_process_just_started = True
                         banner_place_pieces = True
+                        if args.publish:
+                            make_publisher()
 
     left_click = False
     old_left_click = mbutton[0]

@@ -9,6 +9,7 @@ pygame = "*"
 pillow = "*"
 pyserial = "*"
 appdirs = "*"
+requests = "*"
 
 [dev-packages]
 pyinstaller = "*"
