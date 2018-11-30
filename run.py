@@ -681,7 +681,7 @@ while 1:
                 window = "resume"
                 # update saved files list to load
                 files = os.listdir(CERTABO_SAVE_PATH)
-                saved_files = [v for v in files if ".sav" in v]
+                saved_files = [v for v in files if ".pgn" in v]
                 saved_files_time = []
                 terminal_lines = ["", ""]
                 mate_we_won = False
@@ -716,12 +716,7 @@ while 1:
         for i in range(len(saved_files)):
             if i > 7:
                 break
-            txt_large(
-                saved_files[i + resume_file_start].replace(".sav", ""),
-                117,
-                41 + i * 29,
-                grey,
-            )
+            txt_large(saved_files[i + resume_file_start][:-4], 117, 41 + i * 29, grey)
             v = saved_files_time[i]
 
             txt_large(
@@ -756,7 +751,7 @@ while 1:
                         # update saved files list to load
 
                         files = os.listdir(CERTABO_SAVE_PATH)
-                        saved_files = [v for v in files if ".sav" in v]
+                        saved_files = [v for v in files if ".pgn" in v]
                         saved_files_time = []
                         for name in saved_files:
                             saved_files_time.append(
@@ -785,17 +780,22 @@ while 1:
 
             if 266 < x < 422 and 286 < y < 316:  # Resume button
                 logging.info("Resuming game")
-                f = open(
+                with open(
                     os.path.join(
                         CERTABO_SAVE_PATH,
                         saved_files[resume_file_selected + resume_file_start],
                     ),
                     "rb",
-                )
-                move_history, board_state, terminal_lines[1], terminal_lines[
-                    0
-                ], board_history, timer, play_white, difficulty = pickle.load(f)
-                f.close()
+                ) as f:
+                    _game = chess.pgn.read_game(f)
+                    move_history = list(
+                        filter(None, (_node.move() for _node in _game.main_line()))
+                    )
+                    board_state = _game.end().board().fen()
+                    board_history = [_node.board().fen() for _node in _game.main_line()]
+                    play_white = _game.headers["White"] == "Human"
+                    starting_position = _game.root().board().fen()
+
                 logging.info("Move history - %s", move_history)
                 if move_history:
                     chessboard = chess.Board()
