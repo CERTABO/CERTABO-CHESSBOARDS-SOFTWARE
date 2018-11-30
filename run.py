@@ -431,6 +431,7 @@ def generate_pgn():
         game.headers["Result"] = "1-0" if play_white else "0-1"
     if not mate_we_won and not mate_we_lost:
         game.headers["Result"] = "*"
+    game.setup(chess.Board(starting_position))
     node = game.add_variation(chess.Move.from_uci(move_history[0]))
     for move in move_history[1:]:
         node = node.add_variation(chess.Move.from_uci(move))
@@ -470,6 +471,7 @@ pressed_key = ""
 hint_text = ""
 move_history = []
 board_history = []
+starting_position = chess.STARTING_FEN
 name_to_save = ""
 
 rotate180 = False
@@ -1609,9 +1611,10 @@ while 1:
                         chessboard = chess.Board()
 
                         board_state = (
-                            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                            chess.STARTING_FEN
                         )
 
+                        starting_position = chess.STARTING_FEN
                         move_history = []
                         board_history = [board_state]
                         terminal_print("New game, depth={}".format(difficulty + 1))
