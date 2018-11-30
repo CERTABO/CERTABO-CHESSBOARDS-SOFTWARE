@@ -788,9 +788,9 @@ while 1:
                     "rb",
                 ) as f:
                     _game = chess.pgn.read_game(f)
-                    move_history = list(
+                    move_history = [_move.uci() for _move in
                         filter(None, (_node.move() for _node in _game.main_line()))
-                    )
+                    ]
                     board_state = _game.end().board().fen()
                     board_history = [_node.board().fen() for _node in _game.main_line()]
                     play_white = _game.headers["White"] == "Human"
