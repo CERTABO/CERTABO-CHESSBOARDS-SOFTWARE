@@ -801,6 +801,7 @@ while 1:
                     starting_position = _game.board().fen()
 
                 logging.info("Move history - %s", move_history)
+                logging.info("Board history length = %s", len(board_history))
                 previous_board_click = ""
                 board_click = ""
                 do_ai_move = False
