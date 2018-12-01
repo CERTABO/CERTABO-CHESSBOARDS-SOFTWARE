@@ -792,6 +792,7 @@ while 1:
                     move_history = [_move.uci() for _move in _game.main_line()]
                     board_state = _game.end().board().fen()
                     board_history = []
+                    chessboard = _game.end().board()
                     _node = _game
                     while _node.variations:
                         board_history.append(_node.board().fen())
