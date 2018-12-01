@@ -907,27 +907,9 @@ while 1:
 
             if hover_key != "":
                 if hover_key == "save":
-                    OUTPUT_SAV = os.path.join(
-                        CERTABO_SAVE_PATH, "{}.sav".format(name_to_save)
-                    )
                     OUTPUT_PGN = os.path.join(
                         CERTABO_SAVE_PATH, "{}.pgn".format(name_to_save)
                     )
-                    f = open(OUTPUT_SAV, "wb")
-                    pickle.dump(
-                        [
-                            move_history,
-                            board_state,
-                            terminal_lines[1],
-                            terminal_lines[0],
-                            board_history,
-                            timer,
-                            play_white,
-                            difficulty,
-                        ],
-                        f,
-                    )
-                    f.close()
                     if move_history:
                         with open(OUTPUT_PGN, "w") as f:
                             f.write(generate_pgn())
