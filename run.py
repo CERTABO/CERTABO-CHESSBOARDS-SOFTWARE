@@ -1326,6 +1326,7 @@ while 1:
                             print("--------- before take back: ")
                             print(board_history)
                             print(move_history)
+                            print([_move.uci() for _move in chessboard.move_stack])
                             if human_game:
                                 board_history.pop()  # remove last element
                                 move_history.pop()  # it's for stockfish engine
@@ -1342,6 +1343,7 @@ while 1:
                             print("--------- after take back: ")
                             print(board_history)
                             print(move_history)
+                            print([_move.uci() for _move in chessboard.move_stack])
                             print("----------------------------------")
 
                             previous_board_click = ""
