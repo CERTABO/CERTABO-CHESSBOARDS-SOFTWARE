@@ -508,7 +508,7 @@ calibration = False
 calibration_samples_counter = 0
 calibration_samples = []
 
-usb_data_history_depth = 2
+usb_data_history_depth = 4
 usb_data_history = range(usb_data_history_depth)
 usb_data_history_filled = False
 usb_data_history_i = 0
