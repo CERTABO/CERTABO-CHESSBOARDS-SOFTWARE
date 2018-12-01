@@ -791,12 +791,12 @@ while 1:
                     _game = chess.pgn.read_game(f)
                     move_history = [_move.uci() for _move in _game.main_line()]
                     board_state = _game.end().board().fen()
-                    board_history = []
                     chessboard = _game.end().board()
                     _node = _game
+                    board_history = [_game.board().fen()]
                     while _node.variations:
-                        board_history.append(_node.board().fen())
                         _node = _node.variations[0]
+                        board_history.append(_node.board().fen())
                     play_white = _game.headers["White"] == "Human"
                     starting_position = _game.board().fen()
 
