@@ -793,7 +793,7 @@ while 1:
                     board_history = []
                     _node = _game
                     while _node.variations:
-                        board_history.append(_node.board.fen())
+                        board_history.append(_node.board().fen())
                         _node = _node.variations[0]
                     play_white = _game.headers["White"] == "Human"
                     starting_position = _game.board().fen()
