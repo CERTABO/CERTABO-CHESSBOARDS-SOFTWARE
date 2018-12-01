@@ -788,13 +788,15 @@ while 1:
                     "rb",
                 ) as f:
                     _game = chess.pgn.read_game(f)
-                    move_history = [_move.uci() for _move in
-                        filter(None, (_node.move() for _node in _game.main_line()))
-                    ]
+                    move_history = [_move.uci() for _move in _game.main_line()]
                     board_state = _game.end().board().fen()
-                    board_history = [_node.board().fen() for _node in _game.main_line()]
+                    board_history = []
+                    _node = _game
+                    while _node.variations:
+                        board_history.append(_node.board.fen())
+                        _node = _node.variations[0]
                     play_white = _game.headers["White"] == "Human"
-                    starting_position = _game.root().board().fen()
+                    starting_position = _game.board().fen()
 
                 logging.info("Move history - %s", move_history)
                 if move_history:
