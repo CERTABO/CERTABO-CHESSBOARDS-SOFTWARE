@@ -809,7 +809,7 @@ while 1:
                 banner_place_pieces = True
                 resuming_new_game = True
 
-                window = "new_game"
+                window = "new game"
             if 448 < x < 472:  # arrows
                 if 37 < y < 60:  # arrow up
                     if resume_file_start > 0:
