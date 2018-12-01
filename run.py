@@ -492,6 +492,7 @@ engine = "stockfish"
 saved_files = []
 resume_file_selected = 0
 resume_file_start = 0  # starting filename to show
+resuming_new_game = False
 
 
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -799,12 +800,6 @@ while 1:
                     starting_position = _game.board().fen()
 
                 logging.info("Move history - %s", move_history)
-                if move_history:
-                    chessboard = chess.Board()
-                    for resumed_move in move_history:
-                        chessboard.push_uci(resumed_move)
-                else:
-                    chessboard = chess.Board(board_state)
                 previous_board_click = ""
                 board_click = ""
                 do_ai_move = False
@@ -812,15 +807,9 @@ while 1:
                 conversion_dialog = False
                 banner_do_move = False
                 banner_place_pieces = True
+                resuming_new_game = True
 
-                engines = get_engine_list()
-                for _engine in DEFAULT_ENGINES:
-                    if _engine in engines:
-                        engine = _engine
-                else:
-                    engine = random.choice(engines)
-
-                window = "game"
+                window = "new_game"
             if 448 < x < 472:  # arrows
                 if 37 < y < 60:  # arrow up
                     if resume_file_start > 0:
@@ -1597,13 +1586,14 @@ while 1:
 
                     if 365 < x < 467:  # start game ->
                         window = "game"
-                        chessboard = chess.Board()
-
-                        board_state = chess.STARTING_FEN
-
-                        starting_position = chess.STARTING_FEN
-                        move_history = []
-                        board_history = [board_state]
+                        if resuming_new_game:
+                            resuming_new_game = False
+                        else:
+                            chessboard = chess.Board()
+                            board_state = chess.STARTING_FEN
+                            starting_position = chess.STARTING_FEN
+                            move_history = []
+                            board_history = [board_state]
                         terminal_print("New game, depth={}".format(difficulty + 1))
                         previous_board_click = ""
                         board_click = ""
