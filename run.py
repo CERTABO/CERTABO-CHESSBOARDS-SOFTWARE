@@ -484,6 +484,7 @@ conversion_dialog = False
 mate_we_lost = False
 mate_we_won = False
 human_game = False
+use_board_position = False
 renew = True
 left_click = False
 
@@ -1518,23 +1519,30 @@ while 1:
                 text_color=white,
                 color=darkergreen if rotate180 else grey,
             )
+            use_board_position_button_area = button(
+                "Use board position",
+                210,
+                human_game_button_area[3] + 5,
+                text_color=white,
+                color=darkergreen if use_board_position else grey,
+            )
             if not human_game:
-                txt_large("Depth:", 203, 115, green)
+                txt_large("Depth:", 203, 130, green)
                 show("depth" + str(difficulty + 1), 214, 151)
                 txt_large("<", 189, 156, grey)
                 txt_large(">", 265, 156, grey)
-                txt_large("Engine: {}".format(engine), 150, 70, grey)
+                txt_large("Engine: {}".format(engine), 150, 100, grey)
                 pygame.draw.rect(
                     scr,
                     darkergreen,
                     (
                         440 * x_multiplier,
-                        72 * y_multiplier,
+                        102 * y_multiplier,
                         25 * x_multiplier,
                         25 * y_multiplier,
                     ),
                 )
-                txt_large("...", 445, 70, white)
+                txt_large("...", 445, 100, white)
                 x0 = 213
                 if not human_game:
                     if difficulty == 0:
@@ -1564,7 +1572,9 @@ while 1:
                     human_game = False
                 if coords_in(x, y, flip_board_button_area):
                     rotate180 = not rotate180
-                if 72 < y < 97:
+                if coords_in(x, y, use_board_position_button_area):
+                    use_board_position = not use_board_position
+                if 102 < y < 127:
                     if 440 < x < 465:
                         dialog = "select_engine"
                         current_engine_page = 0
@@ -1596,8 +1606,11 @@ while 1:
                             resuming_new_game = False
                         else:
                             chessboard = chess.Board()
-                            board_state = chess.STARTING_FEN
-                            starting_position = chess.STARTING_FEN
+                            if not use_board_position:
+                                board_state = chess.STARTING_FEN
+                                starting_position = chess.STARTING_FEN
+                            else:
+                                starting_position = board_state
                             move_history = []
                             board_history = [board_state]
                         terminal_print("New game, depth={}".format(difficulty + 1))

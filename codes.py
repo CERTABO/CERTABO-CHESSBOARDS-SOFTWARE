@@ -2,7 +2,6 @@ from __future__ import print_function
 import pickle
 import os
 import chess
-import chess
 from constants import CERTABO_DATA_PATH
 import logging
 
@@ -354,6 +353,10 @@ def calibration(usb_data, new_setup, port):
 
 letter = "a", "b", "c", "d", "e", "f", "g", "h"
 reversed_letter = tuple(reversed(letter))
+
+
+def reverse_bits(n):
+    return int('{:064b}'.format(n)[::-1], 2)
 
 
 def move2led(move, rotate180=False):
