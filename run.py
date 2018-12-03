@@ -1605,12 +1605,13 @@ while 1:
                         if resuming_new_game:
                             resuming_new_game = False
                         else:
-                            chessboard = chess.Board()
                             if not use_board_position:
+                                chessboard = chess.Board()
                                 board_state = chess.STARTING_FEN
                                 starting_position = chess.STARTING_FEN
                             else:
                                 starting_position = board_state
+                                chessboard = chess.Board(board_state)
                             move_history = []
                             board_history = [board_state]
                         terminal_print("New game, depth={}".format(difficulty + 1))
