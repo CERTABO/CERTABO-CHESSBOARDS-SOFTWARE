@@ -1371,7 +1371,7 @@ while 1:
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
                         proc = stockfish.EngineThread(
-                            move_history, difficulty, engine=engine
+                            move_history, difficulty, engine=engine, starting_position=starting_position,
                         )
                         proc.start()
                         # print "continues..."
