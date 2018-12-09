@@ -1625,9 +1625,9 @@ while 1:
                                 board_state = chess.STARTING_FEN
                                 starting_position = chess.STARTING_FEN
                             else:
-                                starting_position = board_state
                                 if side_to_move == "black":
                                     board_state = board_state.replace('w', 'b')
+                                starting_position = board_state
                                 chessboard = chess.Board(board_state)
                             move_history = []
                             board_history = [board_state]
