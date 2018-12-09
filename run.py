@@ -22,12 +22,15 @@ import pygame
 import stockfish
 import subprocess
 import logging
+import logging.handlers
 import Queue
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 
 logging.basicConfig(level="DEBUG")
 logger = logging.getLogger()
-filehandler = logging.FileHandler(os.path.join(CERTABO_DATA_PATH, 'certabo.log'), mode='w')
+filehandler = logging.handlers.TimedRotatingFileHandler(
+    os.path.join(CERTABO_DATA_PATH, "certabo.log"), backupCount=12
+)
 logger.addHandler(filehandler)
 
 
@@ -627,7 +630,9 @@ while 1:
                 logging.info("    adding new calibration sample")
                 calibration_samples_counter += 1
                 if calibration_samples_counter >= 15:
-                    logging.info("------- we have collected enough samples for averaging ----")
+                    logging.info(
+                        "------- we have collected enough samples for averaging ----"
+                    )
                     usb_data = codes.statistic_processing_for_calibration(
                         calibration_samples, False
                     )
@@ -1331,7 +1336,9 @@ while 1:
                             logging.info("--------- before take back: ")
                             logging.info("%s", board_history)
                             logging.info("%s", move_history)
-                            logging.info("%s", [_move.uci() for _move in chessboard.move_stack])
+                            logging.info(
+                                "%s", [_move.uci() for _move in chessboard.move_stack]
+                            )
                             logging.info("Board state: {}".format(board_state))
                             if human_game:
                                 board_history.pop()  # remove last element
@@ -1349,7 +1356,9 @@ while 1:
                             logging.info("--------- after take back: ")
                             logging.info("%s", board_history)
                             logging.info("%s", move_history)
-                            logging.info("%s", [_move.uci() for _move in chessboard.move_stack])
+                            logging.info(
+                                "%s", [_move.uci() for _move in chessboard.move_stack]
+                            )
                             logging.info("Board state: {}".format(board_state))
                             logging.info("----------------------------------")
 
@@ -1374,7 +1383,10 @@ while 1:
                         #                        game_engine.setposition( move_history )
                         #                        am = game_engine.bestmove()
                         proc = stockfish.EngineThread(
-                            move_history, difficulty, engine=engine, starting_position=starting_position,
+                            move_history,
+                            difficulty,
+                            engine=engine,
+                            starting_position=starting_position,
                         )
                         proc.start()
                         # print "continues..."
@@ -1533,7 +1545,7 @@ while 1:
             if use_board_position:
                 _, _, use_board_position_button_x, _ = use_board_position_button_area
                 side_to_move_button_area = button(
-                    "White to move" if side_to_move == 'white' else "Black to move",
+                    "White to move" if side_to_move == "white" else "Black to move",
                     use_board_position_button_x + 5,
                     human_game_button_area[3] + 5,
                     text_color=white if side_to_move == "black" else black,
@@ -1629,7 +1641,7 @@ while 1:
                                 starting_position = chess.STARTING_FEN
                             else:
                                 if side_to_move == "black":
-                                    board_state = board_state.replace('w', 'b')
+                                    board_state = board_state.replace("w", "b")
                                 starting_position = board_state
                                 chessboard = chess.Board(board_state)
                             move_history = []
