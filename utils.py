@@ -62,5 +62,7 @@ def get_engine_list():
 
 
 def coords_in(x, y, area):
+    if not area:
+        return False
     lx, ty, rx, by = area
     return lx < x < rx and ty < y < by

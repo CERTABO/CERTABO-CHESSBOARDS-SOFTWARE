@@ -454,6 +454,7 @@ dialog = ""  # dialog inside the window
 
 timer = 0
 play_white = True
+side_to_move = "white"
 difficulty = 0
 board_state = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 terminal_lines = ["Game started", "Terminal text here"]
@@ -1521,11 +1522,22 @@ while 1:
             )
             use_board_position_button_area = button(
                 "Use board position",
-                210,
+                150,
                 human_game_button_area[3] + 5,
                 text_color=white,
                 color=darkergreen if use_board_position else grey,
             )
+            if use_board_position:
+                _, _, use_board_position_button_x, _ = use_board_position_button_area
+                side_to_move_button_area = button(
+                    "White to move" if side_to_move == 'white' else "Black to move",
+                    use_board_position_button_x + 5,
+                    human_game_button_area[3] + 5,
+                    text_color=white if side_to_move == "black" else black,
+                    color=black if side_to_move == "black" else lightestgrey,
+                )
+            else:
+                side_to_move_button_area = None
             if not human_game:
                 txt_large("Depth:", 203, 130, green)
                 show("depth" + str(difficulty + 1), 214, 151)
@@ -1574,6 +1586,9 @@ while 1:
                     rotate180 = not rotate180
                 if coords_in(x, y, use_board_position_button_area):
                     use_board_position = not use_board_position
+                if use_board_position:
+                    if coords_in(x, y, side_to_move_button_area):
+                        side_to_move = "white" if side_to_move == "black" else "black"
                 if 102 < y < 127:
                     if 440 < x < 465:
                         dialog = "select_engine"
@@ -1611,6 +1626,8 @@ while 1:
                                 starting_position = chess.STARTING_FEN
                             else:
                                 starting_position = board_state
+                                if side_to_move == "black":
+                                    board_state = board_state.replace('w', 'b')
                                 chessboard = chess.Board(board_state)
                             move_history = []
                             board_history = [board_state]
