@@ -33,7 +33,7 @@ def get_calibration_file_name(port):
 
 def load_calibration(port):
     global p, r, n, b, k, q, P, R, N, B, K, Q
-    print("codes.py - loading calibration")
+    logging.info("codes.py - loading calibration")
     try:
         p, r, n, b, k, q, P, R, N, B, K, Q = pickle.load(
             open(os.path.join(CERTABO_DATA_PATH, get_calibration_file_name(port)), "rb")
@@ -50,11 +50,11 @@ def statistic_processing_for_calibration(samples, show_print):
         cells = []
         #        if show_print: print "\n    cell n =",n_cell,letter[n_cell%8]+str(8-n_cell/8), "   samples:"
         if show_print:
-            print("\n    ", letter[n_cell % 8] + str(8 - n_cell / 8), "   samples:")
+            logging.info("\n    %s   samples:", letter[n_cell % 8] + str(8 - n_cell / 8))
         for usb_data in samples:
             cells.append(cell_codes(n_cell, usb_data))
             if show_print:
-                print(cell_codes(n_cell, usb_data))
+                logging.info("%s", cell_codes(n_cell, usb_data))
         histograms = []
         for cell in cells:
             histogram = 0
@@ -67,14 +67,10 @@ def statistic_processing_for_calibration(samples, show_print):
         max_index = histograms.index(max_value)
 
         # append cells[max_index] to result
-        if show_print:
-            print("---final code:", end=" ")
         for i in cells[max_index]:
-            if show_print:
-                print(i, end=" ")
             result.append(i)
         if show_print:
-            print()
+            logging.info("---final code: %s", " ".join(map(str, result)))
 
     return result
 
@@ -131,11 +127,11 @@ def statistic_processing(samples, show_print):
         cells = []
         #        if show_print: print "\n    cell n =",n_cell,letter[n_cell%8]+str(8-n_cell/8), "   samples:"
         if show_print:
-            print("\n    ", letter[n_cell % 8] + str(8 - n_cell / 8), "   samples:")
+            logging.info("\n    %s    samples:", letter[n_cell % 8] + str(8 - n_cell / 8))
         for usb_data in samples:
             cells.append(cell_codes(n_cell, usb_data))
             if show_print:
-                print(cell_codes(n_cell, usb_data))
+                logging.info("%s", cell_codes(n_cell, usb_data))
         histograms = []
 
         known_cells = []
@@ -147,13 +143,12 @@ def statistic_processing(samples, show_print):
                 known_cells.append(cell)
 
         if len(known_cells) == 0:
-            print(
-                "Found only unknown cell codes in cell ",
+            logging.info(
+                "Found only unknown cell codes in cell %s:",
                 letter[n_cell % 8] + str(8 - n_cell / 8),
-                ":",
             )
             for cell in cells:  # stack of history of cell codes for one cell
-                print(cell)
+                logging.info("%s", cell)
 
             found_unknown_cell = True
             break
@@ -169,14 +164,11 @@ def statistic_processing(samples, show_print):
         max_index = histograms.index(max_value)
 
         # append cells[max_index] to result
-        if show_print:
-            print("---final code:", end=" ")
         for i in known_cells[max_index]:
-            if show_print:
-                print(i, end=" ")
             result.append(i)
         if show_print:
-            print()
+            if show_print:
+                logging.info("---final code: %s", " ".join(map(str, result)))
 
     if found_unknown_cell:
         return []
@@ -258,13 +250,13 @@ def calibration(usb_data, new_setup, port):
                     previous_not_in_current = False
                     break
             if previous_not_in_current:
-                print("previous not in current")
+                logging.info("previous not in current")
                 pnew.append(previous)
             else:
-                print("previous in current")
+                logging.info("previous in current")
         return pnew
 
-    print("Q before =", Qn)
+    logging.info("Q before = %s", Qn)
 
     pn = add_new(pn, p, pp)
     rn = add_new(rn, r, rp)
@@ -278,11 +270,11 @@ def calibration(usb_data, new_setup, port):
     Bn = add_new(Bn, B, Bp)
     Kn = add_new(Kn, K, Kp)
     Qn = add_new(Qn, Q, Qp)
-    print("Q after =", Qn)
+    logging.info("Q after = %s", Qn)
 
     # compare_cells( cell, cell_p )
     if not new_setup:
-        print("------- not new setup ----")
+        logging.info("------- not new setup ----")
         results = pn, rn, nn, bn, kn, qn, Pn, Rn, Nn, Bn, Kn, Qn
         p, r, n, b, k, q, P, R, N, B, K, Q = (
             pn,
@@ -300,55 +292,56 @@ def calibration(usb_data, new_setup, port):
         )
     pickle.dump(results, open(os.path.join(CERTABO_DATA_PATH, get_calibration_file_name(port)), "wb"))
 
-    print("----------------")
+    logging.info("----------------")
     # print r
     #    print compare_cells(p[0], p[1])
 
     for j in range(8):
+        row = []
         for i in range(8):
             cell = cell_codes(i + j * 8, usb_data)
             # print cell
             # print empty_cell
             if cell_empty(cell):
-                print("-", end=" ")
+                row.append("-")
             else:  # not empty
                 for cell_p in p:
                     if compare_cells(cell, cell_p):
-                        print("p", end=" ")
+                        row.append("p")
                 for cell_p in P:
                     if compare_cells(cell, cell_p):
-                        print("P", end=" ")
+                        row.append("P")
                 for cell_p in r:
                     if compare_cells(cell, cell_p):
-                        print("r", end=" ")
+                        row.append("r")
                 for cell_p in R:
                     if compare_cells(cell, cell_p):
-                        print("R", end=" ")
+                        row.append("R")
                 for cell_p in n:
                     if compare_cells(cell, cell_p):
-                        print("n", end=" ")
+                        row.append("n")
                 for cell_p in N:
                     if compare_cells(cell, cell_p):
-                        print("N", end=" ")
+                        row.append("N")
                 for cell_p in b:
                     if compare_cells(cell, cell_p):
-                        print("b", end=" ")
+                        row.append("b")
                 for cell_p in B:
                     if compare_cells(cell, cell_p):
-                        print("B", end=" ")
+                        row.append("B")
                 for cell_p in q:
                     if compare_cells(cell, cell_p):
-                        print("q", end=" ")
+                        row.append("q")
                 for cell_p in Q:
                     if compare_cells(cell, cell_p):
-                        print("Q", end=" ")
+                        row.append("Q")
                 for cell_p in k:
                     if compare_cells(cell, cell_p):
-                        print("k", end=" ")
+                        row.append("k")
                 for cell_p in K:
                     if compare_cells(cell, cell_p):
-                        print("K", end=" ")
-        print()
+                        row.append("K")
+        logging.info(" ".join(row))
 
 
 letter = "a", "b", "c", "d", "e", "f", "g", "h"
@@ -436,7 +429,7 @@ def usb_data_to_FEN(usb_data, rotate180=False):
                     s += c
                 if c == "unknown":
                     #                    print "Unknown piece at cell n =",j*8+i, ", ",letter[i]+str(8-j)
-                    print("Unknown piece at ", letter[i] + str(8 - j))
+                    logging.info("Unknown piece at %s", letter[i] + str(8 - j))
                     was_unknown_piece = True
         if empty_cells_counter > 0 and c == "-":
             s += str(empty_cells_counter)
@@ -493,8 +486,8 @@ def FEN2board(FEN_string, play_white):
 
 
 def FENs2move(FEN_prev, FEN, play_white):
-    print("---------------------- FENs2move() --------------------")
-    print("FEN_prev=", FEN_prev, "FEN=", FEN)
+    logging.info("---------------------- FENs2move() --------------------")
+    logging.info("FEN_prev=%s FEN=%s", FEN_prev, FEN)
 
     board_prev = FEN2board(FEN_prev, play_white)
     board = FEN2board(FEN, play_white)
@@ -537,9 +530,9 @@ def FENs2move(FEN_prev, FEN, play_white):
         row = "2"
 
     if pawn in p_from:
-        print("Movement", pawn)
+        logging.info("Movement %s", pawn)
         if row in p_from[pawn]:
-            print("Found conversion !")
+            logging.info("Found conversion !")
             for key in p_to:
                 if key != pawn:
                     move = p_from[pawn] + p_to[key] + key
@@ -556,7 +549,7 @@ def FENs2move(FEN_prev, FEN, play_white):
             if key in p_to:
                 move = p_from[key] + p_to[key]
 
-    print("------------ move found:", move, "---------------")
+    logging.info("------------ move found: %s ------------------", move)
     return move
 
 

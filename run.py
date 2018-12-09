@@ -23,13 +23,16 @@ import stockfish
 import subprocess
 import logging
 import Queue
+from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 
 logging.basicConfig(level="DEBUG")
+logger = logging.getLogger()
+filehandler = logging.FileHandler(os.path.join(CERTABO_DATA_PATH, 'certabo.log'), mode='w')
+logger.addHandler(filehandler)
 
 
 import codes
 from Chessnut import Game
-from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 from utils import port2number, port2udp, find_port, get_engine_list, coords_in
 from publish import Publisher
 
@@ -106,13 +109,13 @@ def do_poweroff(proc):
 f = open("screen.ini", "rb")
 try:
     XRESOLUTION = int(f.readline().split(" #")[0])
-    print(XRESOLUTION)
+    logging.info("%s", XRESOLUTION)
     if XRESOLUTION == 1380:
         XRESOLUTION = 1366
 except:
-    print("Cannot read resolution from screen.ini")
+    logging.info("Cannot read resolution from screen.ini")
 if XRESOLUTION != 480 and XRESOLUTION != 1366 and XRESOLUTION != 1920:
-    print("Wrong value xscreensize.ini =", XRESOLUTION, ", setting 1366")
+    logging.info("Wrong value xscreensize.ini = %s, setting 1366", XRESOLUTION)
     XRESOLUTION = 1366
 try:
     s = f.readline().split(" #")[0]
@@ -122,7 +125,7 @@ try:
         fullscreen = False
 except:
     fullscreen = False
-    print("Cannot read 'fullscreen' or 'window' as second line from screen.ini")
+    logging.info("Cannot read 'fullscreen' or 'window' as second line from screen.ini")
 f.close()
 
 # define set of colors
@@ -153,8 +156,8 @@ pygame.init()
 # auto reduce a screen's resolution
 infoObject = pygame.display.Info()
 xmax, ymax = infoObject.current_w, infoObject.current_h
-print("Xmax=", xmax)
-print("XRESOLUTION =", XRESOLUTION)
+logging.info("Xmax = %s", xmax)
+logging.info("XRESOLUTION = %s", XRESOLUTION)
 if xmax < XRESOLUTION:
     XRESOLUTION = 1366
 if xmax < XRESOLUTION:
@@ -389,7 +392,7 @@ def show_board_and_animated_move(FEN_string, move, x0, y0):
             # pygame.display.flip() # copy to screen
     if piece == "":
         return
-    print(piece)
+    logging.info("%s", piece)
     for i in range(20):
         x, y = 0, 0
         show("chessboard_xy", x0, y0)
@@ -573,7 +576,7 @@ while 1:
             usb_data_exist = True
 
         except:
-            print("No new data from usb.exe, perhaps chess board not connected")
+            logging.info("No new data from usb.exe, perhaps chess board not connected")
 
     scr.fill(white)  # clear screen
 
@@ -607,7 +610,7 @@ while 1:
                 usb_data_history_i = 0
 
             if DEBUG:
-                print("usb_data_history_i = ", usb_data_history_i)
+                logging.info("usb_data_history_i = %s", usb_data_history_i)
             usb_data_history[usb_data_history_i] = usb_data[:]
             usb_data_history_i += 1
             if usb_data_history_filled:
@@ -617,14 +620,14 @@ while 1:
                     if test_state != "":
                         board_state = test_state
                 else:
-                    print("Statistic processing failed, found unknown piece")
+                    logging.info("Statistic processing failed, found unknown piece")
 
             if calibration:
                 calibration_samples.append(usb_data)
-                print("    adding new calibration sample")
+                logging.info("    adding new calibration sample")
                 calibration_samples_counter += 1
                 if calibration_samples_counter >= 15:
-                    print("------- we have collected enough samples for averaging ----")
+                    logging.info("------- we have collected enough samples for averaging ----")
                     usb_data = codes.statistic_processing_for_calibration(
                         calibration_samples, False
                     )
@@ -650,7 +653,7 @@ while 1:
         if left_click:
 
             if 6 < x < 102 and 232 < y < 265:
-                print("calibration")
+                logging.info("calibration")
                 if usb_data_exist:
                     calibration = True
                     new_setup = False
@@ -658,7 +661,7 @@ while 1:
                     calibration_samples = []
                     calibration_samples.append(usb_data)
             if 6 < x < 102 and y >= 265:
-                print("New setup calibration")
+                logging.info("New setup calibration")
                 if usb_data_exist:
                     calibration = True
                     new_setup = True
@@ -743,7 +746,7 @@ while 1:
                 if (77 + 40 - 5) < y < (77 + 40 + 30):
                     dialog = ""
                     if x > (200 + 105):  # confirm button
-                        print("do delete")
+                        logging.info("do delete")
                         os.unlink(
                             os.path.join(
                                 CERTABO_SAVE_PATH,
@@ -928,7 +931,7 @@ while 1:
         if new_usb_data:
             new_usb_data = False
             if DEBUG:
-                print("Virtual board: ", board_state)
+                logging.info("Virtual board: %s", board_state)
 
             banners_counter += 1
 
@@ -965,7 +968,7 @@ while 1:
                                         do_user_move = True
                             else:
                                 if DEBUG:
-                                    print("Place pieces on their places")
+                                    logging.info("Place pieces on their places")
                                 banner_right_places = True
                                 if not human_game:
                                     white_to_move = len(move_history) % 2 == 0
@@ -975,7 +978,7 @@ while 1:
                                     banner_place_pieces = True
                         else:
                             if DEBUG:
-                                print("All pieces on right places")
+                                logging.info("All pieces on right places")
                             sock.sendto(
                                 chr(0)
                                 + chr(0)
@@ -1006,7 +1009,7 @@ while 1:
                                 banner_place_pieces = False
                                 banner_do_move = True
                 else:
-                    print("Statistic processing failed, found unknown piece")
+                    logging.info("Statistic processing failed, found unknown piece")
 
         show("terminal", 179, 3)
 
@@ -1140,7 +1143,7 @@ while 1:
                     if (
                         mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
                     ):  # pressed Force move button
-                        print("------------------------------------")
+                        logging.info("------------------------------------")
                         proc.stop()
                         proc.join()
                         ai_move = proc.best_move
@@ -1152,7 +1155,7 @@ while 1:
                 if not got_fast_result:
                     ai_move = proc.best_move
 
-                print("AI move: ", ai_move)
+                logging.info("AI move: %s", ai_move)
 
                 # highlight right LED
                 i, value, i_source, value_source = codes.move2led(
@@ -1180,19 +1183,19 @@ while 1:
                     chessboard.push_uci(ai_move)
                     move_history.append(ai_move)
                     board_state = str(chessgame)
-                    print("   stockfish move: ", ai_move)
-                    print("after stockfish move: ", board_state)
+                    logging.info("   stockfish move: %s", ai_move)
+                    logging.info("after stockfish move: %s", board_state)
                     board_history.append(board_state)
                     side = ("black", "white")[len(move_history) % 2]
                     terminal_print("{} move: {}".format(side, ai_move))
                     if args.publish:
                         publish()
                 except:
-                    print("   ----invalid chess_engine move! ---- ", ai_move)
+                    logging.info("   ----invalid chess_engine move! ---- %s", ai_move)
                     logging.exception("Exception: ")
                     terminal_print(ai_move + " - invalid move !")
 
-                print("\n\n", board_state)
+                logging.info("\n\n%s", board_state)
 
                 # check for mate
                 mate_we_lost = False
@@ -1208,7 +1211,7 @@ while 1:
 
                 # if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
-                    print("mate!")
+                    logging.info("mate!")
                     mate_we_lost = True
 
                     # user move
@@ -1230,7 +1233,7 @@ while 1:
                         #                   terminal_text_line2 = terminal_text
                         #                   terminal_text = "white m: "+ai_move
 
-                        print("   user move: ", m)
+                        logging.info("   user move: %s", m)
                         side = ("black", "white")[len(move_history) % 2]
                         terminal_print("{} move: {}".format(side, m))
                         if not human_game:
@@ -1239,7 +1242,7 @@ while 1:
                         if args.publish:
                             publish()
                 except:
-                    print("   ----invalid user move! ---- ", move)
+                    logging.info("   ----invalid user move! ---- %s", move)
                     logging.exception("Exception: ")
                     terminal_print(move + " - invalid move !")
                     previous_board_click = ""
@@ -1259,7 +1262,7 @@ while 1:
 
                 #            if len(possible_moves)==0:
                 if chessgame.status >= chessgame.CHECKMATE:
-                    print("mate! we won!")
+                    logging.info("mate! we won!")
                     mate_we_won = True
 
             show_board(board_state, 178, 40)
@@ -1311,7 +1314,7 @@ while 1:
                         icon = icon_codes[i]
                         if len(move[0]) == 4:
                             move[0] += icon
-                            print("move for conversion: ", move[0])
+                            logging.info("move for conversion: %s", move[0])
                             conversion_dialog = False
                             do_user_move = True
                 else:
@@ -1325,11 +1328,11 @@ while 1:
                         if (human_game and len(board_history) > 1) or (
                             not human_game and len(board_history) > 2
                         ):
-                            print("--------- before take back: ")
-                            print(board_history)
-                            print(move_history)
-                            print([_move.uci() for _move in chessboard.move_stack])
-                            print("Board state: {}".format(board_state))
+                            logging.info("--------- before take back: ")
+                            logging.info("%s", board_history)
+                            logging.info("%s", move_history)
+                            logging.info("%s", [_move.uci() for _move in chessboard.move_stack])
+                            logging.info("Board state: {}".format(board_state))
                             if human_game:
                                 board_history.pop()  # remove last element
                                 move_history.pop()  # it's for stockfish engine
@@ -1343,12 +1346,12 @@ while 1:
                                 chessboard.pop()
                             board_state = board_history[-1]
 
-                            print("--------- after take back: ")
-                            print(board_history)
-                            print(move_history)
-                            print([_move.uci() for _move in chessboard.move_stack])
-                            print("Board state: {}".format(board_state))
-                            print("----------------------------------")
+                            logging.info("--------- after take back: ")
+                            logging.info("%s", board_history)
+                            logging.info("%s", move_history)
+                            logging.info("%s", [_move.uci() for _move in chessboard.move_stack])
+                            logging.info("Board state: {}".format(board_state))
+                            logging.info("----------------------------------")
 
                             previous_board_click = ""
                             board_click = ""
@@ -1362,8 +1365,8 @@ while 1:
 
                             hint_text = ""
                         else:
-                            print(
-                                "cannot do takeback, len(board_history) = ",
+                            logging.info(
+                                "cannot do takeback, len(board_history) = %s",
                                 len(board_history),
                             )
 
