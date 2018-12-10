@@ -5,6 +5,7 @@ from utils import find_port, port2udp, port2number
 from socket import AF_INET, SOCK_DGRAM, socket, SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 import chess
 import struct
+import binhex
 
 
 def parse_args():
@@ -58,8 +59,8 @@ def main():
                     square_set |= chess.BB_SQUARES[square_index]
         message = struct.pack('Q', int(square_set))
 
-
     if message:
+        print('Sending %s', ' '.join(str(ord(c)) for c in message))
         sock.sendto(message, SEND_SOCKET)
 
     usb_proc.terminate()
