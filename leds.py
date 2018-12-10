@@ -7,7 +7,7 @@ import struct
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument('--port', type=int)
+    p.add_argument('--port')
     p.add_argument('--all')
     p.add_argument('--on', nargs='+')
     return p.parse_args()
