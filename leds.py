@@ -1,11 +1,8 @@
 import argparse
-import time
-import subprocess
-from utils import find_port, port2udp, port2number
+from utils import port2udp, port2number
 from socket import AF_INET, SOCK_DGRAM, socket, SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 import chess
 import struct
-import binhex
 
 
 def parse_args():
@@ -18,17 +15,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-    if args.port is None:
-        portname = find_port()
-    else:
-        portname = args.port
+    portname = args.port
     port = port2number(portname)
-    usb_command = ["python", "usbtool.py"]
-    if portname is not None:
-        usb_command.extend(["--port", portname])
-    usb_proc = subprocess.Popen(usb_command)
-    time.sleep(3)
-
     board_listen_port, gui_listen_port = port2udp(port)
 
     SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
@@ -62,8 +50,6 @@ def main():
     if message:
         print('Sending %s', ' '.join(str(ord(c)) for c in message))
         sock.sendto(message, SEND_SOCKET)
-
-    usb_proc.terminate()
 
 
 if __name__ == '__main__':
