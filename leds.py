@@ -57,7 +57,7 @@ def main():
                 if arg in chess.SQUARE_NAMES:
                     square_index = chess.SQUARE_NAMES.index(arg)
                     square_set |= chess.BB_SQUARES[square_index]
-        message = struct.pack('Q', int(square_set))
+        message = struct.pack('Q', int(square_set))[::-1]
 
     if message:
         print('Sending %s', ' '.join(str(ord(c)) for c in message))
