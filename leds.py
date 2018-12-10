@@ -11,7 +11,7 @@ import binhex
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--port', type=int)
-    p.add_argument('--all', default='on')
+    p.add_argument('--all')
     p.add_argument('--on', nargs='+')
     return p.parse_args()
 
