@@ -19,6 +19,12 @@ def main():
     else:
         portname = args.port
     port = port2number(portname)
+    usb_command = ["python", "usbtool.py"]
+    if portname is not None:
+        usb_command.extend(["--port", portname])
+    usb_proc = subprocess.Popen(usb_command)
+    time.sleep(3)
+
     board_listen_port, gui_listen_port = port2udp(port)
 
     SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
@@ -26,12 +32,6 @@ def main():
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-
-    usb_command = ["python", "usbtool.py"]
-    if portname is not None:
-        usb_command.extend(["--port", portname])
-    usb_proc = subprocess.Popen(usb_command)
-    time.sleep(3)
 
     message = None
     if args.all:
