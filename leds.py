@@ -31,7 +31,7 @@ def main():
     if portname is not None:
         usb_command.extend(["--port", portname])
     usb_proc = subprocess.Popen(usb_command)
-    time.sleep(1)
+    time.sleep(3)
 
     message = None
     if args.all:
