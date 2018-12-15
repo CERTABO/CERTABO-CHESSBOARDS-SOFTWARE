@@ -1584,7 +1584,7 @@ while 1:
                         terminal_print("New game, depth={}".format(difficulty + 1))
                         previous_board_click = ""
                         board_click = ""
-                        do_user_move = play_white == (side_to_move == 'white')
+                        do_user_move = play_white == chessboard.turn
                         do_ai_move = not do_user_move
 
                         conversion_dialog = False
