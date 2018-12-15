@@ -1249,7 +1249,7 @@ while 1:
                 except:
                     logging.info("   ----invalid user move! ---- %s", move)
                     logging.exception("Exception: ")
-                    terminal_print(move + " - invalid move !")
+                    terminal_print("%s - invalid move !" % move)
                     previous_board_click = ""
                     board_click = ""
                     banner_do_move = True
