@@ -26,7 +26,7 @@ import logging.handlers
 import Queue
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 
-logging.basicConfig(level="DEBUG")
+logging.basicConfig(level="DEBUG", format="%(asctime)s:%(module)s:%(message)s")
 logger = logging.getLogger()
 filehandler = logging.handlers.TimedRotatingFileHandler(
     os.path.join(CERTABO_DATA_PATH, "certabo.log"), backupCount=12
