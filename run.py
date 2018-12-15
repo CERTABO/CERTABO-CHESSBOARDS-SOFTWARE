@@ -1652,13 +1652,9 @@ while 1:
                         terminal_print("New game, depth={}".format(difficulty + 1))
                         previous_board_click = ""
                         board_click = ""
-                        do_user_move = False
-                        do_ai_move = False
+                        do_user_move = play_white == (side_to_move == 'white')
+                        do_ai_move = not do_user_move
 
-                        # if play_white:
-                        #    do_ai_move = False # first do user move
-                        # else:
-                        #    do_ai_move = True
                         conversion_dialog = False
                         mate_we_lost = False
                         mate_we_won = False
