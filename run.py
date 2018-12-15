@@ -1640,10 +1640,13 @@ while 1:
                                 board_state = chess.STARTING_FEN
                                 starting_position = chess.STARTING_FEN
                             else:
-                                if side_to_move == "black":
-                                    board_state = board_state.replace("w", "b")
-                                starting_position = board_state
-                                chessboard = chess.Board(board_state)
+                                chessboard = chess.Board()
+                                chessboard.clear()
+                                chessboard.set_board_fen(board_state.split()[0])
+                                chessboard.turn = side_to_move == 'white'
+                                chessboard.set_castling_fen('KQkq')
+                                starting_position = chessboard.fen()
+                                board_state = chessboard.fen()
                             move_history = []
                             board_history = [board_state]
                         terminal_print("New game, depth={}".format(difficulty + 1))
