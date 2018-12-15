@@ -329,7 +329,7 @@ FEN = {
 
 chessboard = chess.Board()
 board_state = chessboard.fen()
-
+move = []
 
 def show_board(FEN_string, x0, y0):
     show("chessboard_xy", x0, y0)
