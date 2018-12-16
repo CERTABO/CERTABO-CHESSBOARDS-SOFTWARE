@@ -524,7 +524,7 @@ move_detect_max_tries = 3
 banner_right_places = False
 banners_counter = 0
 game_process_just_startted = True
-banner_do_move = False
+waiting_for_user_move = False
 
 new_setup = False
 current_engine_page = 0
@@ -810,7 +810,7 @@ while 1:
                 do_ai_move = False
                 do_user_move = False
                 conversion_dialog = False
-                banner_do_move = False
+                waiting_for_user_move = False
                 banner_place_pieces = True
                 resuming_new_game = True
 
@@ -951,7 +951,7 @@ while 1:
                         s1 = chessboard.board_fen()
                         s2 = board_state_usb.split(" ")[0]
                         if s1 != s2:
-                            if banner_do_move:
+                            if waiting_for_user_move:
                                 try:
                                     move_detect_tries += 1
                                     move = codes.get_moves(chessboard, board_state_usb)
@@ -961,15 +961,14 @@ while 1:
                                 else:
                                     move_detect_tries = 0
                                     if move:
-                                        banner_do_move = False
+                                        waiting_for_user_move = False
                                         do_user_move = True
                             else:
                                 if DEBUG:
                                     logging.info("Place pieces on their places")
                                 banner_right_places = True
                                 if not human_game:
-                                    white_to_move = chessboard.turn
-                                    if play_white != white_to_move:
+                                    if play_white != chessboard.turn:
                                         banner_place_pieces = True
                                 else:
                                     banner_place_pieces = True
@@ -990,10 +989,9 @@ while 1:
                             banner_right_places = False
                             banner_place_pieces = False
                             # start with black, do move just right after right initial board placement
-                            white_to_move = chessboard.turn
 
                             if not human_game:
-                                if white_to_move != play_white:
+                                if chessboard.turn != play_white:
                                     do_ai_move = True
                                 else:
                                     do_ai_move = False
@@ -1004,7 +1002,7 @@ while 1:
                                 and not do_ai_move
                             ):
                                 banner_place_pieces = False
-                                banner_do_move = True
+                                waiting_for_user_move = True
                 else:
                     logging.info("Statistic processing failed, found unknown piece")
 
@@ -1022,7 +1020,7 @@ while 1:
         show("exit", 5, 140 + 140)
 
         if dialog == "exit":
-            show_board(board_state, 178, 40)
+            show_board(chessboard.fen(), 178, 40)
             pygame.draw.rect(
                 scr,
                 lightgrey,
@@ -1208,7 +1206,7 @@ while 1:
                     terminal_print("%s - invalid move !" % move)
                     previous_board_click = ""
                     board_click = ""
-                    banner_do_move = True
+                    waiting_for_user_move = True
 
                 mate_we_won = False
 
@@ -1231,7 +1229,7 @@ while 1:
                     show("move-certabo", x0, y0 + 2)
             #                pygame.draw.rect(scr, black, (x0+2, y0+2, 167, 28) )
             #                txt("Please place pieces",x0+5+22,y0+4,white)
-            if banner_do_move:
+            if waiting_for_user_move:
                 show("do-your-move", x0 + 2, y0 + 2)
                 # pygame.draw.rect(scr, black, (x0+2, y0+2, 167, 28) )
                 # txt("Please move your piece",x0+14,y0+4,white)
@@ -1305,7 +1303,7 @@ while 1:
                             mate_we_won = False
                             mate_we_lost = False
 
-                            banner_do_move = False
+                            waiting_for_user_move = False
                             do_user_move = False
                             banner_right_places = True
                             banner_place_pieces = True
@@ -1573,7 +1571,7 @@ while 1:
                         else:
                             if not use_board_position:
                                 chessboard = chess.Board()
-                                starting_position = chess.STARTING_FEN
+                                starting_position = chessboard.fen()
                             else:
                                 chessboard = chess.Board()
                                 chessboard.clear()
@@ -1584,13 +1582,13 @@ while 1:
                         terminal_print("New game, depth={}".format(difficulty + 1))
                         previous_board_click = ""
                         board_click = ""
-                        do_user_move = play_white == chessboard.turn
-                        do_ai_move = not do_user_move
+                        do_user_move = False
+                        do_ai_move = play_white != chessboard.turn
 
                         conversion_dialog = False
                         mate_we_lost = False
                         mate_we_won = False
-                        banner_do_move = False
+                        waiting_for_user_move = play_white == chessboard.turn
                         game_process_just_started = True
                         banner_place_pieces = True
                         if args.publish:
