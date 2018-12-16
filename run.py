@@ -1161,7 +1161,7 @@ while 1:
                     chessboard.push_uci(ai_move)
                     logging.info("   stockfish move: %s", ai_move)
                     logging.info("after stockfish move: %s", chessboard.fen())
-                    side = ("black", "white")[int(chessboard.turn)]
+                    side = ("white", "black")[int(chessboard.turn)]
                     terminal_print("{} move: {}".format(side, ai_move))
                     if args.publish:
                         publish()
@@ -1193,7 +1193,7 @@ while 1:
                     for m in move:
                         chessboard.push_uci(m)
                         logging.info("   user move: %s", m)
-                        side = ("black", "white")[int(chessboard.turn)]
+                        side = ("white", "black")[int(chessboard.turn)]
                         terminal_print("{} move: {}".format(side, m))
                         if not human_game:
                             do_ai_move = True
