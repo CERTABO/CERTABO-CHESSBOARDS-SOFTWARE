@@ -1583,7 +1583,7 @@ while 1:
                         previous_board_click = ""
                         board_click = ""
                         do_user_move = False
-                        do_ai_move = play_white != chessboard.turn
+                        do_ai_move = False
 
                         conversion_dialog = False
                         mate_we_lost = False
