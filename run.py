@@ -529,26 +529,18 @@ waiting_for_user_move = False
 new_setup = False
 current_engine_page = 0
 
-# sock.sendto( chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0)+chr(0), KUDA_POSYLAT )
-message = (
-    chr(0xFF)
-    + chr(0xFF)
-    + chr(0xFF)
-    + chr(0xFF)
-    + chr(0xFF)
-    + chr(0xFF)
-    + chr(0xFF)
-    + chr(0xFF)
-)
-sock.sendto(message, SEND_SOCKET)
+
+def send_leds(message='\x00' * 8):
+    logging.info("Sending {!r} leds to board".format(message))
+    sock.sendto(message, SEND_SOCKET)
+
+send_leds()
 
 scr.fill(white)  # clear screen
 show("start-up-logo", 7, 0)
 pygame.display.flip()  # copy to screen
 tt.sleep(2)
-sock.sendto(
-    chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0) + chr(0), SEND_SOCKET
-)
+send_leds()
 
 poweroff_time = datetime.now()
 
@@ -674,17 +666,7 @@ while 1:
 
             if 6 < x < 123 and 150 < y < 190:  # new game pressed
                 window = "new game"
-                sock.sendto(
-                    chr(0)
-                    + chr(0)
-                    + chr(0)
-                    + chr(0)
-                    + chr(0)
-                    + chr(0)
-                    + chr(0)
-                    + chr(0),
-                    SEND_SOCKET,
-                )  # switch off LEDs
+                send_leds()
 
             if 6 < x < 163 and 191 < y < 222:  # resume pressed
                 window = "resume"
@@ -975,17 +957,7 @@ while 1:
                         else:
                             if DEBUG:
                                 logging.info("All pieces on right places")
-                            sock.sendto(
-                                chr(0)
-                                + chr(0)
-                                + chr(0)
-                                + chr(0)
-                                + chr(0)
-                                + chr(0)
-                                + chr(0)
-                                + chr(0),
-                                SEND_SOCKET,
-                            )
+                            send_leds()
                             banner_right_places = False
                             banner_place_pieces = False
                             # start with black, do move just right after right initial board placement
@@ -1151,8 +1123,7 @@ while 1:
                         message += chr(value)
                     else:
                         message += chr(value_source)
-
-                sock.sendto(message, SEND_SOCKET)
+                send_leds(message)
                 # banner_do_move = True
                 if not args.robust:
                     show_board_and_animated_move(chessboard.fen(), ai_move, 178, 40)
