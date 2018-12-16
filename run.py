@@ -1124,6 +1124,8 @@ while 1:
                     else:
                         message += chr(value_source)
                 send_leds(message)
+                send_leds(message)
+                send_leds(message)
                 # banner_do_move = True
                 if not args.robust:
                     show_board_and_animated_move(chessboard.fen(), ai_move, 178, 40)
