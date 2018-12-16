@@ -534,7 +534,7 @@ def send_leds(message='\x00' * 8):
     logging.info("Sending {!r} leds to board".format(message))
     sock.sendto(message, SEND_SOCKET)
 
-send_leds()
+send_leds('\xff' * 8)
 
 scr.fill(white)  # clear screen
 show("start-up-logo", 7, 0)
