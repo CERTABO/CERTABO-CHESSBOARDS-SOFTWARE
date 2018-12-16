@@ -1588,7 +1588,7 @@ while 1:
                         conversion_dialog = False
                         mate_we_lost = False
                         mate_we_won = False
-                        waiting_for_user_move = play_white == chessboard.turn
+                        waiting_for_user_move = False
                         game_process_just_started = True
                         banner_place_pieces = True
                         if args.publish:
