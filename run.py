@@ -1277,8 +1277,8 @@ while 1:
                         dialog = "exit"  # start dialog inside Game page
 
                     if 6 < x < 127 and (143 + 22) < y < (174 + 22):  # Take back button
-                        if (human_game and len(chessboard.move_stack) > 1) or (
-                            not human_game and len(chessboard.move_stack) > 2
+                        if (human_game and len(chessboard.move_stack) >= 1) or (
+                            not human_game and len(chessboard.move_stack) >= 2
                         ):
                             logging.info("--------- before take back: ")
                             logging.info("Board state: %s", chessboard.fen())
