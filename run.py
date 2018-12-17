@@ -153,6 +153,7 @@ usb_proc = subprocess.Popen(usb_command)
 tt.sleep(1)  # time to make stable COMx connection
 
 os.environ["SDL_VIDEO_WINDOW_POS"] = "90,20"
+pygame.mixer.init()
 pygame.init()
 
 # auto reduce a screen's resolution
@@ -274,6 +275,27 @@ for name in names:
     elif XRESOLUTION == 1366:
         path = "sprites_1380//"
     sprite[name] = pygame.image.load(path + name + ".png")
+
+
+sound = {}
+sound_names = (
+    "move",
+)
+
+for _sound_name in sound_names:
+    try:
+        sound[_sound_name] = pygame.mixer.Sound('sounds/{}.wav'.format(_sound_name))
+    except:
+        logging.error('Unable to load `{}` sound'.format(_sound_name))
+
+
+def play_sound(sound_name):
+    global sound
+    try:
+        s = sound[sound_name]
+    except KeyError:
+        return
+    s.play()
 
 
 # show sprite by name from names
@@ -1107,6 +1129,7 @@ while 1:
                 if not got_fast_result:
                     ai_move = proc.best_move
 
+                play_sound('move')
                 logging.info("AI move: %s", ai_move)
 
                 # highlight right LED
@@ -1123,8 +1146,6 @@ while 1:
                         message += chr(value)
                     else:
                         message += chr(value_source)
-                send_leds(message)
-                send_leds()
                 send_leds(message)
 
                 # banner_do_move = True
