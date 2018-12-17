@@ -553,7 +553,6 @@ current_engine_page = 0
 
 
 def send_leds(message='\x00' * 8):
-    logging.info("Sending {!r} leds to board".format(message))
     sock.sendto(message, SEND_SOCKET)
 
 send_leds('\xff' * 8)
