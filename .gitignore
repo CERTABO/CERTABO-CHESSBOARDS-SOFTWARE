@@ -17,3 +17,5 @@ record.bin
 /engines
 
 local_constants.py
+
+*.pyc

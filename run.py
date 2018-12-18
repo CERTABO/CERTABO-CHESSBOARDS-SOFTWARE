@@ -536,7 +536,7 @@ calibration = False
 calibration_samples_counter = 0
 calibration_samples = []
 
-usb_data_history_depth = 4
+usb_data_history_depth = 3
 usb_data_history = range(usb_data_history_depth)
 usb_data_history_filled = False
 usb_data_history_i = 0
@@ -634,7 +634,7 @@ while 1:
                     if test_state != "":
                         board_state = test_state
                 else:
-                    logging.info("Statistic processing failed, found unknown piece")
+                    logging.info("found unknown piece, filter processing")
 
             if calibration:
                 calibration_samples.append(usb_data)
@@ -997,7 +997,7 @@ while 1:
                                 banner_place_pieces = False
                                 waiting_for_user_move = True
                 else:
-                    logging.info("Statistic processing failed, found unknown piece")
+                    logging.info("found unknown piece, filter processing")
 
         show("terminal", 179, 3)
 
@@ -1153,8 +1153,8 @@ while 1:
 
                 try:
                     chessboard.push_uci(ai_move)
-                    logging.info("   stockfish move: %s", ai_move)
-                    logging.info("after stockfish move: %s", chessboard.fen())
+                    logging.info("   AI move: %s", ai_move)
+                    logging.info("after AI move: %s", chessboard.fen())
                     side = ("white", "black")[int(chessboard.turn)]
                     terminal_print("{} move: {}".format(side, ai_move))
                     if args.publish:
