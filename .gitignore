@@ -7,13 +7,11 @@ calibration.bin
 ready.txt
 record.bin
 
-*.exe
 *.spec
 
 /.idea
 /build
 /dist
-/engines
 
 local_constants.py
 
