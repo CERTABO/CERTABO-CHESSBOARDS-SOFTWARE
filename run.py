@@ -486,6 +486,7 @@ play_white = True
 side_to_move = "white"
 difficulty = 0
 terminal_lines = ["Game started", "Terminal text here"]
+chess960 = False
 
 
 def terminal_print(s, newline=True):
@@ -1470,6 +1471,13 @@ while 1:
                 text_color=white,
                 color=darkergreen if use_board_position else grey,
             )
+            chess960_button_area = button(
+                "Chess960",
+                370,
+                135,
+                text_color=white,
+                color=darkergreen if chess960 else grey,
+            )
             if use_board_position:
                 _, _, use_board_position_button_x, _ = use_board_position_button_area
                 side_to_move_button_area = button(
@@ -1481,11 +1489,14 @@ while 1:
                 )
             else:
                 side_to_move_button_area = None
-            if not human_game:
+            if human_game:
+                depth_less_button_area = None
+                depth_more_button_area = None
+            else:
                 txt_large("Depth:", 203, 130, green)
                 show("depth" + str(difficulty + 1), 214, 151)
-                txt_large("<", 189, 156, grey)
-                txt_large(">", 265, 156, grey)
+                depth_less_button_area = button("<", 189, 156, text_color=grey, color=white)
+                depth_more_button_area = button(">", 265, 156, text_color=grey, color=white)
                 txt_large("Engine: {}".format(engine), 150, 100, grey)
                 pygame.draw.rect(
                     scr,
@@ -1529,6 +1540,18 @@ while 1:
                     rotate180 = not rotate180
                 if coords_in(x, y, use_board_position_button_area):
                     use_board_position = not use_board_position
+                if coords_in(x, y, chess960_button_area):
+                    chess960 = not chess960
+                if coords_in(x, y, depth_less_button_area):
+                    if difficulty > 0:
+                        difficulty -= 1
+                    else:
+                        difficulty = 19
+                if coords_in(x, y, depth_more_button_area):
+                    if difficulty < 19:
+                        difficulty += 1
+                    else:
+                        difficulty = 0
                 if use_board_position:
                     if coords_in(x, y, side_to_move_button_area):
                         side_to_move = "white" if side_to_move == "black" else "black"
@@ -1536,23 +1559,11 @@ while 1:
                     if 440 < x < 465:
                         dialog = "select_engine"
                         current_engine_page = 0
-                if 149 < y < 188:
-                    if x > 233:
-                        if difficulty < 19:
-                            difficulty += 1
-                        else:
-                            difficulty = 0
-                    else:
-                        if difficulty > 0:
-                            difficulty -= 1
-                        else:
-                            difficulty = 19
-
                 if 268 < y < (275 + 31):
                     if 14 < x < 109:  # <- back
                         window = "home"
 
-                    if 174 < x < 292:  # blacl/white toggle
+                    if 174 < x < 292:  # black/white toggle
                         if play_white:
                             play_white = False
                         else:
