@@ -215,7 +215,6 @@ class Engine(subprocess.Popen):
                 "Move Overhead": 30,
                 "Minimum Thinking Time": 20,
                 "Slow Mover": 80,
-                "UCI_Chess960": "false" if not chess960 else "true",
             }
 
         if rand:
@@ -223,7 +222,8 @@ class Engine(subprocess.Popen):
             base_param["Contempt Factor"] = (randint(rand_min, rand_max),)
 
         self.param = base_param
-        for name, value in list(base_param.items()):
+        self.param["UCI_Chess960"] = "false" if not chess960 else "true"
+        for name, value in list(self.param.items()):
             self.setoption(name, value)
 
     def newgame(self):
