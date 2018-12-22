@@ -177,6 +177,7 @@ class Engine(subprocess.Popen):
         rand_min=-10,
         rand_max=10,
         binary=None,
+        chess960=False,
     ):
         if binary:
             binary_path = binary
@@ -214,7 +215,7 @@ class Engine(subprocess.Popen):
                 "Move Overhead": 30,
                 "Minimum Thinking Time": 20,
                 "Slow Mover": 80,
-                "UCI_Chess960": "false",
+                "UCI_Chess960": "false" if not chess960 else "true",
             }
 
         if rand:

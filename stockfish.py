@@ -60,6 +60,7 @@ class EngineThread(threading.Thread):
         difficulty,
         engine="stockfish",
         starting_position=chess.STARTING_FEN,
+        chess960=False,
         *args,
         **kwargs
     ):

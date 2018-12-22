@@ -1064,6 +1064,7 @@ while 1:
                     difficulty,
                     engine=engine,
                     starting_position=starting_position,
+                    chess960=chess960,
                 )
                 proc.start()
                 # print "continues..."
@@ -1578,7 +1579,7 @@ while 1:
                                 chessboard = chess.Board()
                                 starting_position = chessboard.fen()
                             else:
-                                chessboard = chess.Board()
+                                chessboard = chess.Board(chess960=chess960)
                                 chessboard.clear()
                                 chessboard.set_board_fen(board_state.split()[0])
                                 chessboard.turn = side_to_move == 'white'
