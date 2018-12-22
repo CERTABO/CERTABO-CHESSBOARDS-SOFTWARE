@@ -86,12 +86,13 @@ class EngineThread(threading.Thread):
         self.difficulty = difficulty
         self.stop_sent = False
         self.starting_position = starting_position
+        self.chess960 = chess960
         super(EngineThread, self).__init__(*args, **kwargs)
 
     def run(self):
         logging.info("Starting engine...")
         self.engine = Engine(
-            depth=self.difficulty, binary=self.engine_path, param=self.engine_parameters
+            depth=self.difficulty, binary=self.engine_path, param=self.engine_parameters, chess960=self.chess960
         )
         logging.info("Setting position to %s", self.move_history)
         self.engine.setposition(self.move_history, starting_position=self.starting_position)

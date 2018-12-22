@@ -1317,6 +1317,7 @@ while 1:
                             difficulty,
                             engine=engine,
                             starting_position=starting_position,
+                            chess960=chess960,
                         )
                         proc.start()
                         # print "continues..."
