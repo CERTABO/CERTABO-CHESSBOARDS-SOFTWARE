@@ -265,6 +265,9 @@ names = (
     "please-wait",
     "check-mate-banner",
     "stale-mate-banner",
+    "five-fold-repetition-banner",
+    "seventy-five-moves-banner",
+    "insufficient-material-banner",
 )
 
 sprite = {}
@@ -1224,6 +1227,12 @@ while 1:
                     gameover_banner = "check-mate-banner"
                 elif chessboard.is_stalemate():
                     gameover_banner = "stale-mate-banner"
+                elif chessboard.is_fivefold_repetition():
+                    gameover_banner = "five-fold-repetition-banner"
+                elif chessboard.is_seventyfive_moves():
+                    gameover_banner = "seventy-five-moves-banner"
+                elif chessboard.is_insufficient_material():
+                    gameover_banner = "insufficient-material-banner"
                 show(gameover_banner, 227, 97)
 
             if conversion_dialog:
