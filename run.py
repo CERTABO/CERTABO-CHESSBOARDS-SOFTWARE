@@ -444,7 +444,7 @@ def show_board_and_animated_move(FEN_string, move, x0, y0):
 
 
 def generate_pgn():
-    global play_white, human_game, mate_we_lost, mate_we_won
+    global play_white, human_game
     move_history = [_move.uci() for _move in chessboard.move_stack]
     game = chess.pgn.Game()
     game.headers["Date"] = datetime.now().strftime("%Y.%m.%d")
@@ -454,13 +454,8 @@ def generate_pgn():
     else:
         game.headers["White"] = "Computer" if not human_game else "Human"
         game.headers["Black"] = "Human"
-    if mate_we_lost:
-        game.headers["Result"] = "0-1" if play_white else "1-0"
-    if mate_we_won:
-        game.headers["Result"] = "1-0" if play_white else "0-1"
-    if not mate_we_won and not mate_we_lost:
-        game.headers["Result"] = "*"
-    game.setup(chess.Board(starting_position))
+    game.headers["Result"] = chessboard.result()
+    game.setup(chess.Board(starting_position, chess960=chess960))
     node = game.add_variation(chess.Move.from_uci(move_history[0]))
     for move in move_history[1:]:
         node = node.add_variation(chess.Move.from_uci(move))
@@ -509,8 +504,6 @@ board_click = ""  # example: "e2"
 do_ai_move = True
 do_user_move = False
 conversion_dialog = False
-mate_we_lost = False
-mate_we_won = False
 human_game = False
 use_board_position = False
 renew = True
@@ -697,8 +690,6 @@ while 1:
                 saved_files = [v for v in files if ".pgn" in v]
                 saved_files_time = []
                 terminal_lines = ["", ""]
-                mate_we_won = False
-                mate_we_lost = False
 
                 for name in saved_files:
                     saved_files_time.append(
@@ -1057,7 +1048,7 @@ while 1:
                         board_click = ""
 
         else:  # usual game process
-            if not human_game and do_ai_move and (not mate_we_won and not mate_we_lost):
+            if not human_game and do_ai_move and not chessboard.is_game_over():
                 do_ai_move = False
                 proc = stockfish.EngineThread(
                     [_move.uci() for _move in chessboard.move_stack],
@@ -1168,22 +1159,19 @@ while 1:
 
                 logging.info("\n\n%s", chessboard.fen())
 
-                # check for mate
-                mate_we_lost = False
-                # print "state = ",chessgame.status
-                # print "possible moves after AI move: ",possible_moves
-
                 if chessboard.is_check():
                     # print " *************** check ! ******************"
                     terminal_print(" check!", False)
 
-                # if len(possible_moves)==0:
                 if chessboard.is_checkmate():
                     logging.info("mate!")
-                    mate_we_lost = True
+
+                if chessboard.is_stalemate():
+                    logging.info("stalemate!")
+
 
                     # user move
-            if do_user_move and (not mate_we_won and not mate_we_lost):
+            if do_user_move and not chessboard.is_game_over():
                 do_user_move = False
                 try:
                     for m in move:
@@ -1204,14 +1192,14 @@ while 1:
                     board_click = ""
                     waiting_for_user_move = True
 
-                mate_we_won = False
-
                 if chessboard.is_check():
                     terminal_print(" check!", False)
 
                 if chessboard.is_checkmate():
                     logging.info("mate! we won!")
-                    mate_we_won = True
+
+                if chessboard.is_stalemate():
+                    logging.info("stalemate!")
 
             show_board(chessboard.fen(), 178, 40)
 
@@ -1230,11 +1218,12 @@ while 1:
                 # pygame.draw.rect(scr, black, (x0+2, y0+2, 167, 28) )
                 # txt("Please move your piece",x0+14,y0+4,white)
 
-            if mate_we_lost or mate_we_won:
-                show("check-mate-banner", 227, 97)
-                # pygame.draw.rect(scr, lightgrey, (227+2, 77+2,200,78) )
-                # pygame.draw.rect(scr, white, (227, 77,200,78) )
-                # txt_large("Mate! Game Over",227+21,77+21,grey)
+            if chessboard.is_game_over():
+                if chessboard.is_checkmate():
+                    gameover_banner = "check-mate-banner"
+                elif chessboard.is_stalemate():
+                    gameover_banner = "stale-mate-banner"
+                show(gameover_banner, 227, 97)
 
             if conversion_dialog:
                 pygame.draw.rect(scr, lightgrey, (227 + 2, 77 + 2, 200, 78))
@@ -1296,8 +1285,6 @@ while 1:
 
                             previous_board_click = ""
                             board_click = ""
-                            mate_we_won = False
-                            mate_we_lost = False
 
                             waiting_for_user_move = False
                             do_user_move = False
@@ -1593,8 +1580,6 @@ while 1:
                         do_ai_move = False
 
                         conversion_dialog = False
-                        mate_we_lost = False
-                        mate_we_won = False
                         waiting_for_user_move = False
                         game_process_just_started = True
                         banner_place_pieces = True
