@@ -264,6 +264,7 @@ names = (
     "new-setup",
     "please-wait",
     "check-mate-banner",
+    "stale-mate-banner",
 )
 
 sprite = {}
