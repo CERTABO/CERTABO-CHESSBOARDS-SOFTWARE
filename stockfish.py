@@ -3,6 +3,7 @@ import cPickle as pickle
 import os  # , Queue
 import time
 import threading
+import platform
 import json
 import chess
 from constants import ENGINE_PATH
@@ -65,7 +66,10 @@ class EngineThread(threading.Thread):
         **kwargs
     ):
         self.engine = engine
-        self.engine_path = os.path.join(ENGINE_PATH, "{}.exe".format(self.engine))
+        if platform.system() == "Windows":
+            self.engine_path = os.path.join(ENGINE_PATH, "{}.exe".format(self.engine))
+        else:
+            self.engine_path = os.path.join(ENGINE_PATH, self.engine)
         self.engine_parameters = None
         try:
             with open(

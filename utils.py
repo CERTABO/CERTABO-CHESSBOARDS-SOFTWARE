@@ -2,6 +2,8 @@ import logging
 import os
 import serial
 import string
+import platform
+import stat
 from constants import BASE_PORT, ENGINE_PATH
 
 
@@ -64,13 +66,23 @@ def find_port():
         return
 
 
-def get_engine_list():
-    result = []
-    for filename in os.listdir(ENGINE_PATH):
-        if filename.endswith('.exe'):
-            result.append(filename[:-4])
-    result.sort()
-    return result
+if platform.system() == 'Windows':
+    def get_engine_list():
+        result = []
+        for filename in os.listdir(ENGINE_PATH):
+            if filename.endswith('.exe'):
+                result.append(filename[:-4])
+        result.sort()
+        return result
+else:
+    def get_engine_list():
+        result = []
+        for filename in os.listdir(ENGINE_PATH):
+            st = os.stat(os.path.join(ENGINE_PATH, filename))
+            if st.st_mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH):
+                result.append(filename)
+        result.sort()
+        return result
 
 
 def coords_in(x, y, area):
