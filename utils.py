@@ -1,6 +1,7 @@
 import logging
 import os
 import serial
+import string
 from constants import BASE_PORT, ENGINE_PATH
 
 
@@ -18,6 +19,15 @@ def port2number(port):
             if isinstance(port, str):
                 if port.upper().startswith('COM'):
                     return int(port[3:]) - 1  # Convert to zero based enumeration
+                if port.lower().startswith('/dev/'):
+                    digits = []
+                    for c in reversed(port):
+                        if c not in string.digits:
+                            break
+                        digits.append(c)
+                    if not digits:
+                        return None
+                    return int(''.join(digits))
 
         else:
             return n
