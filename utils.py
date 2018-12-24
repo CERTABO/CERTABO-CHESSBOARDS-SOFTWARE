@@ -35,6 +35,8 @@ def find_port():
     logging.debug('Searching for port...')
     for port in comports():
         device = port[0]
+        if 'bluetooth' in device.lower():
+            continue
         try:
             logging.debug('Trying %s', device)
             s = serial.Serial(device)
