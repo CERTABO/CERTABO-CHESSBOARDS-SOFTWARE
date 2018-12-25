@@ -1,7 +1,6 @@
 from __future__ import print_function
 import sys
 import argparse
-import random
 
 DEBUG = False
 
@@ -17,7 +16,7 @@ from socket import *
 import chess.pgn
 import chess
 import os
-import pickle
+import platform
 import pygame
 import stockfish
 import subprocess
@@ -143,7 +142,10 @@ lightgrey = 190, 190, 190
 lightestgrey = 230, 230, 230
 
 if TO_EXE:
-    usb_command = ["usbtool.exe"]
+    if platform.name() == "Windows":
+        usb_command = ["usbtool.exe"]
+    else:
+        usb_command = ["./usbtool"]
 else:
     usb_command = ["python", "usbtool.py"]
 if portname is not None:
