@@ -7,8 +7,8 @@ pyinstaller -y usbtool.py
 
 mkdir dist/result
 
-cp dist/run/* dist\result
-cp dist/usbtool/* dist\result\
+cp dist/run/* dist/result/
+cp dist/usbtool/* dist/result/
 
 cp -r pics dist/result/
 cp -r sprites_1380 dist/result/
