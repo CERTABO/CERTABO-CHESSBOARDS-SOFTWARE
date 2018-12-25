@@ -142,7 +142,7 @@ lightgrey = 190, 190, 190
 lightestgrey = 230, 230, 230
 
 if TO_EXE:
-    if platform.name() == "Windows":
+    if platform.system() == "Windows":
         usb_command = ["usbtool.exe"]
     else:
         usb_command = ["./usbtool"]
