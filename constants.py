@@ -28,3 +28,6 @@ CERTABO_DATA_PATH = appdirs.user_data_dir("GUI", "Certabo")
 if __name__ == "__main__":
     print("ENGINE_PATH", ENGINE_PATH)
     print("MY_DOCUMENTS", MY_DOCUMENTS)
+    print("CERTABO_DATA_PATH", CERTABO_DATA_PATH)
+    print("CERTABO_SAVE_PATH", CERTABO_SAVE_PATH)
+
