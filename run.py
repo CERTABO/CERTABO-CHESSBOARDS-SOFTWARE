@@ -25,6 +25,14 @@ import logging.handlers
 import Queue
 from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
 
+
+for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
+    try:
+        os.makedirs(d)
+    except OSError:
+        pass
+
+
 logging.basicConfig(level="DEBUG", format="%(asctime)s:%(module)s:%(message)s")
 logger = logging.getLogger()
 filehandler = logging.handlers.TimedRotatingFileHandler(
@@ -77,13 +85,6 @@ def make_publisher():
 def publish():
     global pgn_queue
     pgn_queue.put(generate_pgn())
-
-
-for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
-    try:
-        os.makedirs(d)
-    except OSError:
-        pass
 
 
 def txt(s, x, y, color):
