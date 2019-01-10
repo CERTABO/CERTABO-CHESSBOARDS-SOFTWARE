@@ -194,7 +194,6 @@ class Engine(subprocess.Popen):
         self.output_queue = Queue.Queue()
         self.output_reader = AsyncLineReader(self.stdout, self.output_queue)
         self.output_reader.start()
-        time.sleep(0.5)
         self.depth = depth
         self.ponder = ponder
         self.put("uci")

@@ -1059,7 +1059,7 @@ while 1:
                 do_ai_move = False
                 proc = stockfish.EngineThread(
                     [_move.uci() for _move in chessboard.move_stack],
-                    difficulty,
+                    difficulty + 1,
                     engine=engine,
                     starting_position=starting_position,
                     chess960=chess960,
@@ -1314,7 +1314,7 @@ while 1:
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
                         proc = stockfish.EngineThread(
                             [_move.uci() for _move in chessboard.move_stack],
-                            difficulty,
+                            difficulty + 1,
                             engine=engine,
                             starting_position=starting_position,
                             chess960=chess960,
