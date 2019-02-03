@@ -488,6 +488,7 @@ dialog = ""  # dialog inside the window
 timer = 0
 play_white = True
 side_to_move = "white"
+enable_syzygy=True
 difficulty = 0
 terminal_lines = ["Game started", "Terminal text here"]
 chess960 = False
@@ -1067,7 +1068,7 @@ while 1:
                     engine=engine,
                     starting_position=starting_position,
                     chess960=chess960,
-                    syzygy_path=args.syzygy,
+                    syzygy_path=args.syzygy if enable_syzygy else None,
                 )
                 proc.start()
                 # print "continues..."
@@ -1323,7 +1324,7 @@ while 1:
                             engine=engine,
                             starting_position=starting_position,
                             chess960=chess960,
-                            syzygy_path=args.syzygy,
+                            syzygy_path=args.syzygy if enable_syzygy else None,
                         )
                         proc.start()
                         # print "continues..."
@@ -1486,6 +1487,13 @@ while 1:
                 text_color=white,
                 color=darkergreen if chess960 else grey,
             )
+            syzygy_button_area = button(
+                "Syzygy",
+                370,
+                chess960_button_area[3] + 5,
+                text_color=white,
+                color=darkergreen if enable_syzygy else grey,
+            )
             if use_board_position:
                 _, _, use_board_position_button_x, _ = use_board_position_button_area
                 side_to_move_button_area = button(
@@ -1550,6 +1558,8 @@ while 1:
                     use_board_position = not use_board_position
                 if coords_in(x, y, chess960_button_area):
                     chess960 = not chess960
+                if coords_in(x, y, syzygy_button_area):
+                    enable_syzygy = not enable_syzygy
                 if coords_in(x, y, depth_less_button_area):
                     if difficulty > 0:
                         difficulty -= 1
