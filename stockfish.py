@@ -62,6 +62,7 @@ class EngineThread(threading.Thread):
         engine="stockfish",
         starting_position=chess.STARTING_FEN,
         chess960=False,
+        syzygy_path=None,
         *args,
         **kwargs
     ):
@@ -70,7 +71,7 @@ class EngineThread(threading.Thread):
             self.engine_path = os.path.join(ENGINE_PATH, "{}.exe".format(self.engine))
         else:
             self.engine_path = os.path.join(ENGINE_PATH, self.engine)
-        self.engine_parameters = None
+        self.engine_parameters = {}
         try:
             with open(
                 os.path.join(ENGINE_PATH, "{}.parameters.json".format(self.engine))
@@ -81,6 +82,8 @@ class EngineThread(threading.Thread):
                 "Could not load params for engine %s. Defaults will be used"
             )
             pass
+        if syzygy_path:
+            self.engine_parameters["SyzygyPath"] = syzygy_path
         self.move_history = move_history
         self.please_stop = False
         self.stop_engine = False

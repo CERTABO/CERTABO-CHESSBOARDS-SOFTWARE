@@ -53,6 +53,7 @@ parser.add_argument("--publish", help="URL to publish data")
 parser.add_argument("--game-id", help="Game ID")
 parser.add_argument("--game-key", help="Game key")
 parser.add_argument("--robust", help="Robust", action="store_true")
+parser.add_argument("--syzygy", help="Syzygy path")
 args = parser.parse_args()
 
 if args.port is None:
@@ -1065,6 +1066,7 @@ while 1:
                     engine=engine,
                     starting_position=starting_position,
                     chess960=chess960,
+                    syzygy_path=args.syzygy,
                 )
                 proc.start()
                 # print "continues..."
@@ -1320,6 +1322,7 @@ while 1:
                             engine=engine,
                             starting_position=starting_position,
                             chess960=chess960,
+                            syzygy_path=args.syzygy,
                         )
                         proc.start()
                         # print "continues..."
