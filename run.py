@@ -54,6 +54,7 @@ parser.add_argument("--game-id", help="Game ID")
 parser.add_argument("--game-key", help="Game key")
 parser.add_argument("--robust", help="Robust", action="store_true")
 parser.add_argument("--syzygy", help="Syzygy path")
+parser.add_argument("--hide-cursor", help="Hide cursor", action="store_true")
 args = parser.parse_args()
 
 if args.port is None:
@@ -197,11 +198,11 @@ scr.fill(black)  # clear screen
 pygame.display.flip()  # copy to screen
 
 # change mouse cursor to be unvisible - not needed for Windows!
-# if not DEBUG:
-#    mc_strings = '        ','        ','        ','        ','        ','        ','        ','        '
-#    cursor,mask = pygame.cursors.compile( mc_strings )
-#    cursor_sizer = ((8, 8), (0, 0), cursor, mask)
-#    pygame.mouse.set_cursor(*cursor_sizer)
+if args.hide_cursor:
+   mc_strings = '        ','        ','        ','        ','        ','        ','        ','        '
+   cursor,mask = pygame.cursors.compile( mc_strings )
+   cursor_sizer = ((8, 8), (0, 0), cursor, mask)
+   pygame.mouse.set_cursor(*cursor_sizer)
 
 # ----------- load sprites
 names = (
