@@ -256,7 +256,10 @@ class Engine(subprocess.Popen):
             position = "fen {}".format(starting_position)
         else:
             position = "startpos"
-        self.put("position {} moves {}".format(position, Engine._movelisttostr(moves)))
+        if moves:
+            self.put("position {} moves {}".format(position, Engine._movelisttostr(moves)))
+        else:
+            self.put("position {}".format(position))
         self.isready()
 
     def setfenposition(self, fen):
