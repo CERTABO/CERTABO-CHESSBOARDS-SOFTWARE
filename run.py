@@ -1132,7 +1132,7 @@ while 1:
                     tt.sleep(0.05)
 
                 if not got_fast_result:
-                    ai_move = proc.best_move
+                    ai_move = proc.best_move.lower()
 
                 play_sound('move')
                 logging.info("AI move: %s", ai_move)
