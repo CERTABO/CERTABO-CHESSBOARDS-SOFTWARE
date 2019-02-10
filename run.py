@@ -53,7 +53,7 @@ parser.add_argument("--publish", help="URL to publish data")
 parser.add_argument("--game-id", help="Game ID")
 parser.add_argument("--game-key", help="Game key")
 parser.add_argument("--robust", help="Robust", action="store_true")
-parser.add_argument("--syzygy", help="Syzygy path")
+parser.add_argument("--syzygy", help="Syzygy path", default=os.path.join(CERTABO_DATA_PATH, 'syzygy'))
 parser.add_argument("--hide-cursor", help="Hide cursor", action="store_true")
 args = parser.parse_args()
 
@@ -488,7 +488,8 @@ dialog = ""  # dialog inside the window
 timer = 0
 play_white = True
 side_to_move = "white"
-enable_syzygy=True
+syzygy_available = os.path.exists(args.syzygy)
+enable_syzygy=syzygy_available
 difficulty = 0
 terminal_lines = ["Game started", "Terminal text here"]
 chess960 = False
@@ -1487,13 +1488,14 @@ while 1:
                 text_color=white,
                 color=darkergreen if chess960 else grey,
             )
-            syzygy_button_area = button(
-                "Syzygy",
-                370,
-                chess960_button_area[3] + 5,
-                text_color=white,
-                color=darkergreen if enable_syzygy else grey,
-            )
+            if syzygy_available:
+                syzygy_button_area = button(
+                    "Syzygy",
+                    370,
+                    chess960_button_area[3] + 5,
+                    text_color=white,
+                    color=darkergreen if enable_syzygy else grey,
+                )
             if use_board_position:
                 _, _, use_board_position_button_x, _ = use_board_position_button_area
                 side_to_move_button_area = button(
@@ -1558,7 +1560,7 @@ while 1:
                     use_board_position = not use_board_position
                 if coords_in(x, y, chess960_button_area):
                     chess960 = not chess960
-                if coords_in(x, y, syzygy_button_area):
+                if syzygy_available and coords_in(x, y, syzygy_button_area):
                     enable_syzygy = not enable_syzygy
                 if coords_in(x, y, depth_less_button_area):
                     if difficulty > 0:
