@@ -72,6 +72,8 @@ if platform.system() == 'Windows':
         for filename in os.listdir(ENGINE_PATH):
             if filename.endswith('.exe'):
                 result.append(filename[:-4])
+            elif filename.endswith('.bin'):
+                result.append(filename)
         result.sort()
         return result
 else:
