@@ -19,6 +19,7 @@ import os
 import platform
 import pygame
 import stockfish
+import polyglot
 import subprocess
 import logging
 import logging.handlers
@@ -71,7 +72,7 @@ LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
 pgn_queue = None
 publisher = None
 
-DEFAULT_ENGINES = ("stockfish", "houdini", "komodo", "fire", "lczero")
+DEFAULT_ENGINES = ("stockfish", "polyglot", "houdini", "komodo", "fire", "lczero")
 
 
 def make_publisher():
@@ -1063,14 +1064,22 @@ while 1:
         else:  # usual game process
             if not human_game and do_ai_move and not chessboard.is_game_over():
                 do_ai_move = False
-                proc = stockfish.EngineThread(
-                    [_move.uci() for _move in chessboard.move_stack],
-                    difficulty + 1,
-                    engine=engine,
-                    starting_position=starting_position,
-                    chess960=chess960,
-                    syzygy_path=args.syzygy if enable_syzygy else None,
-                )
+                if 'stockfish' in engine:
+                    proc = stockfish.EngineThread(
+                        [_move.uci() for _move in chessboard.move_stack],
+                        difficulty + 1,
+                        engine=engine,
+                        starting_position=starting_position,
+                        chess960=chess960,
+                        syzygy_path=args.syzygy if enable_syzygy else None,
+                    )
+                else:
+                    proc = polyglot.EngineThread(
+                        chessboard,
+                        difficulty + 1,
+                        engine=engine,
+                        chess960=chess960
+                    )
                 proc.start()
                 # print "continues..."
 
@@ -1319,14 +1328,22 @@ while 1:
                             )
 
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
-                        proc = stockfish.EngineThread(
-                            [_move.uci() for _move in chessboard.move_stack],
-                            difficulty + 1,
-                            engine=engine,
-                            starting_position=starting_position,
-                            chess960=chess960,
-                            syzygy_path=args.syzygy if enable_syzygy else None,
-                        )
+                        if 'stockfish' in engine:
+                            proc = stockfish.EngineThread(
+                                [_move.uci() for _move in chessboard.move_stack],
+                                difficulty + 1,
+                                engine=engine,
+                                starting_position=starting_position,
+                                chess960=chess960,
+                                syzygy_path=args.syzygy if enable_syzygy else None,
+                            )
+                        else:
+                            proc = polyglot.EngineThread(
+                                chessboard,
+                                difficulty + 1,
+                                engine=engine,
+                                chess960=chess960
+                            )
                         proc.start()
                         # print "continues..."
 
