@@ -7,6 +7,8 @@ import chess
 import chess.polyglot
 from constants import ENGINE_PATH
 
+TO_EXE = True
+
 class EngineThread(threading.Thread):
     def __init__(
         self,
@@ -28,13 +30,16 @@ class EngineThread(threading.Thread):
     def run(self):
         logging.info("Starting engine...")
         reader = chess.polyglot.open_reader(self.engine_path)
-        entry = reader.find(self.board)
-        self.best_move = entry.move().uci()
+        entry = reader.get(self.board)
+        if entry is not None:
+            self.best_move = entry.move().uci()
+        else:
+            self.best_move = None
         return
 
 def main():
     logging.basicConfig(level="DEBUG")
-    board = chess.Board()
+    board = chess.Board('rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2')
     et = EngineThread(board, difficulty=5, engine="performance.bin")
     et.start()
     et.join()

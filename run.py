@@ -72,7 +72,7 @@ LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
 pgn_queue = None
 publisher = None
 
-DEFAULT_ENGINES = ("stockfish", "polyglot", "houdini", "komodo", "fire", "lczero")
+DEFAULT_ENGINES = ("stockfish", "houdini", "komodo", "fire", "lczero")
 
 
 def make_publisher():
