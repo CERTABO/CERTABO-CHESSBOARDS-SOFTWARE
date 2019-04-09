@@ -4,6 +4,7 @@ import appdirs
 
 
 ENGINE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "engines")
+DATA_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "data")
 BASE_PORT = 3002
 
 if platform.system() == "Windows":

@@ -4,7 +4,7 @@ import serial
 import string
 import platform
 import stat
-from constants import BASE_PORT, ENGINE_PATH
+from constants import BASE_PORT, ENGINE_PATH, DATA_PATH
 
 
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -72,8 +72,6 @@ if platform.system() == 'Windows':
         for filename in os.listdir(ENGINE_PATH):
             if filename.endswith('.exe'):
                 result.append(filename[:-4])
-            elif filename.endswith('.bin'):
-                result.append(filename)
         result.sort()
         return result
 else:
@@ -86,6 +84,12 @@ else:
         result.sort()
         return result
 
+def get_book_list():
+    result = []
+    for filename in os.listdir(DATA_PATH):
+        result.append(filename)
+    result.sort()
+    return result
 
 def coords_in(x, y, area):
     if not area:

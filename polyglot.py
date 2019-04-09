@@ -5,7 +5,7 @@ import logging
 import threading
 import chess
 import chess.polyglot
-from constants import ENGINE_PATH
+from constants import DATA_PATH
 
 TO_EXE = True
 
@@ -20,7 +20,7 @@ class EngineThread(threading.Thread):
         **kwargs
     ):
         self.engine = engine
-        self.engine_path = os.path.join(ENGINE_PATH, self.engine)
+        self.engine_path = os.path.join(DATA_PATH, self.engine)
         self.board = board
         self.best_move = None
         self.difficulty = difficulty

@@ -43,7 +43,7 @@ logger.addHandler(filehandler)
 
 
 import codes
-from utils import port2number, port2udp, find_port, get_engine_list, coords_in
+from utils import port2number, port2udp, find_port, get_engine_list, get_book_list, coords_in
 from publish import Publisher
 
 stockfish.TO_EXE = TO_EXE
@@ -522,6 +522,7 @@ renew = True
 left_click = False
 
 engine = "stockfish"
+book = ""
 
 saved_files = []
 resume_file_selected = 0
@@ -1077,7 +1078,7 @@ while 1:
                     proc = polyglot.EngineThread(
                         chessboard,
                         difficulty + 1,
-                        engine=engine,
+                        engine=book,
                         chess960=chess960
                     )
                 proc.start()
@@ -1341,7 +1342,7 @@ while 1:
                             proc = polyglot.EngineThread(
                                 chessboard,
                                 difficulty + 1,
-                                engine=engine,
+                                engine=book,
                                 chess960=chess960
                             )
                         proc.start()
@@ -1466,6 +1467,38 @@ while 1:
                         elif action == "prev_page":
                             current_engine_page -= 1
                         break
+        elif dialog == "select_book":
+            show("hide_back", 0, 0)
+            txt_large("Select book:", 250, 20, black)
+            button_coords = []
+            book_button_x = 250
+            book_button_y = 50
+            book_button_vertical_margin = 5
+            book_list = get_book_list()
+            for book_name in book_list:
+                book_button_area = button(
+                    book_name,
+                    book_button_x,
+                    book_button_y,
+                    text_color=white,
+                    color=darkergreen if book == book_name else grey,
+                )
+                button_coords.append(("select_book", book_name, book_button_area))
+                _, _, _, book_button_y = book_button_area
+                book_button_y += book_button_vertical_margin
+            done_button_area = button(
+                "Done", 415, 275, color=darkergreen, text_color=white
+            )
+            button_coords.append(("select_book_done", None, done_button_area))
+            if left_click:
+                for action, value, (lx, ty, rx, by) in button_coords:
+                    if lx < x < rx and ty < y < by:
+                        if action == "select_book":
+                            engine = "polyglot"
+                            book = value
+                        elif action == "select_book_done":
+                            dialog = ""
+                        break
         else:
             txt_large("Mode:", 150, 20, grey)
             human_game_button_area = button(
@@ -1533,6 +1566,7 @@ while 1:
                 depth_less_button_area = button("<", 189, 156, text_color=grey, color=white)
                 depth_more_button_area = button(">", 265, 156, text_color=grey, color=white)
                 txt_large("Engine: {}".format(engine), 150, 100, grey)
+                txt("Book: {}".format(book), 10, 165, grey)
                 pygame.draw.rect(
                     scr,
                     darkergreen,
@@ -1544,6 +1578,17 @@ while 1:
                     ),
                 )
                 txt_large("...", 445, 100, white)
+                pygame.draw.rect(
+                    scr,
+                    darkergreen,
+                    (
+                        10 * x_multiplier,
+                        142 * y_multiplier,
+                        25 * x_multiplier,
+                        25 * y_multiplier,
+                    ),
+                )
+                txt_large("...", 15, 140, white)
                 x0 = 213
                 if not human_game:
                     if difficulty == 0:
@@ -1596,6 +1641,9 @@ while 1:
                     if 440 < x < 465:
                         dialog = "select_engine"
                         current_engine_page = 0
+                if 142 < y < 167:
+                    if 10 < x < 35:
+                        dialog = "select_book"
                 if 268 < y < (275 + 31):
                     if 14 < x < 109:  # <- back
                         window = "home"
