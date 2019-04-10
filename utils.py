@@ -4,7 +4,7 @@ import serial
 import string
 import platform
 import stat
-from constants import BASE_PORT, ENGINE_PATH, DATA_PATH
+from constants import BASE_PORT, ENGINE_PATH, BOOK_PATH
 
 
 if os.name == 'nt':  # sys.platform == 'win32':
@@ -86,7 +86,7 @@ else:
 
 def get_book_list():
     result = []
-    for filename in os.listdir(DATA_PATH):
+    for filename in os.listdir(BOOK_PATH):
         result.append(filename)
     result.sort()
     return result

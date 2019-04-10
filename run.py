@@ -19,6 +19,7 @@ import os
 import platform
 import pygame
 import stockfish
+import pypolyglot
 import subprocess
 import logging
 import logging.handlers
@@ -42,7 +43,7 @@ logger.addHandler(filehandler)
 
 
 import codes
-from utils import port2number, port2udp, find_port, get_engine_list, coords_in
+from utils import port2number, port2udp, find_port, get_engine_list, get_book_list, coords_in
 from publish import Publisher
 
 stockfish.TO_EXE = TO_EXE
@@ -521,6 +522,7 @@ renew = True
 left_click = False
 
 engine = "stockfish"
+book = ""
 
 saved_files = []
 resume_file_selected = 0
@@ -1063,77 +1065,88 @@ while 1:
         else:  # usual game process
             if not human_game and do_ai_move and not chessboard.is_game_over():
                 do_ai_move = False
-                proc = stockfish.EngineThread(
-                    [_move.uci() for _move in chessboard.move_stack],
-                    difficulty + 1,
-                    engine=engine,
-                    starting_position=starting_position,
-                    chess960=chess960,
-                    syzygy_path=args.syzygy if enable_syzygy else None,
-                )
-                proc.start()
-                # print "continues..."
+                got_polyglot_result = False
+                if not book:
+                    got_polyglot_result = False
+                else:
+                    finder = pypolyglot.Finder(book, chessboard, difficulty + 1)
+                    best_move = finder.bestmove()
+                    got_polyglot_result = (best_move is not None)
 
-                show_board(chessboard.fen(), 178, 40)
-                pygame.draw.rect(
-                    scr,
-                    lightgrey,
-                    (
-                        229 * x_multiplier,
-                        79 * y_multiplier,
-                        200 * x_multiplier,
-                        78 * y_multiplier,
-                    ),
-                )
-                pygame.draw.rect(
-                    scr,
-                    white,
-                    (
-                        227 * x_multiplier,
-                        77 * y_multiplier,
-                        200 * x_multiplier,
-                        78 * y_multiplier,
-                    ),
-                )
-                txt_large("Analysing...", 227 + 55, 77 + 8, grey)
-                show("force-move", 247, 77 + 39)
-                pygame.display.flip()  # copy to screen
+                if got_polyglot_result:
+                    ai_move = best_move.lower()
+                else:    
+                    proc = stockfish.EngineThread(
+                        [_move.uci() for _move in chessboard.move_stack],
+                        difficulty + 1,
+                        engine=engine,
+                        starting_position=starting_position,
+                        chess960=chess960,
+                        syzygy_path=args.syzygy if enable_syzygy else None,
+                    )
+                    proc.start()
+                    # print "continues..."
 
-                got_fast_result = False
-                # while stockfish.th.is_alive(): # thinking
-                while proc.is_alive():
+                    show_board(chessboard.fen(), 178, 40)
+                    pygame.draw.rect(
+                        scr,
+                        lightgrey,
+                        (
+                            229 * x_multiplier,
+                            79 * y_multiplier,
+                            200 * x_multiplier,
+                            78 * y_multiplier,
+                        ),
+                    )
+                    pygame.draw.rect(
+                        scr,
+                        white,
+                        (
+                            227 * x_multiplier,
+                            77 * y_multiplier,
+                            200 * x_multiplier,
+                            78 * y_multiplier,
+                        ),
+                    )
+                    txt_large("Analysing...", 227 + 55, 77 + 8, grey)
+                    show("force-move", 247, 77 + 39)
+                    pygame.display.flip()  # copy to screen
 
-                    # event from system & keyboard
-                    for event in pygame.event.get():  # all values in event list
-                        if event.type == pygame.QUIT:
-                            if args.publish:
-                                publisher.stop()
-                            pygame.display.quit()
-                            pygame.quit()
-                            sys.exit()
+                    got_fast_result = False
+                    # while stockfish.th.is_alive(): # thinking
+                    while proc.is_alive():
 
-                    x, y = pygame.mouse.get_pos()  # mouse position
-                    x = x / x_multiplier
-                    y = y / y_multiplier
+                        # event from system & keyboard
+                        for event in pygame.event.get():  # all values in event list
+                            if event.type == pygame.QUIT:
+                                if args.publish:
+                                    publisher.stop()
+                                pygame.display.quit()
+                                pygame.quit()
+                                sys.exit()
 
-                    mbutton = pygame.mouse.get_pressed()
+                        x, y = pygame.mouse.get_pos()  # mouse position
+                        x = x / x_multiplier
+                        y = y / y_multiplier
 
-                    # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
-                    # pygame.display.flip() # copy to screen
-                    if (
-                        mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
-                    ):  # pressed Force move button
-                        logging.info("------------------------------------")
-                        proc.stop()
-                        proc.join()
-                        ai_move = proc.best_move
-                        got_fast_result = True
-                        break
+                        mbutton = pygame.mouse.get_pressed()
 
-                    tt.sleep(0.05)
+                        # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
+                        # pygame.display.flip() # copy to screen
+                        if (
+                            mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
+                        ):  # pressed Force move button
+                            logging.info("------------------------------------")
+                            proc.stop()
+                            proc.join()
+                            ai_move = proc.best_move
+                            got_fast_result = True
+                            break
 
-                if not got_fast_result:
-                    ai_move = proc.best_move.lower()
+                        tt.sleep(0.05)
+
+                    if not got_fast_result:
+                        ai_move = proc.best_move.lower()
 
                 play_sound('move')
                 logging.info("AI move: %s", ai_move)
@@ -1319,71 +1332,82 @@ while 1:
                             )
 
                     if 6 < x < 89 and (183 + 22) < y < (216 + 22):  # Hint button
-                        proc = stockfish.EngineThread(
-                            [_move.uci() for _move in chessboard.move_stack],
-                            difficulty + 1,
-                            engine=engine,
-                            starting_position=starting_position,
-                            chess960=chess960,
-                            syzygy_path=args.syzygy if enable_syzygy else None,
-                        )
-                        proc.start()
-                        # print "continues..."
+                        got_polyglot_result = False
+                        if not book:
+                            got_polyglot_result = False
+                        else:
+                            finder = pypolyglot.Finder(book, chessboard, difficulty + 1)
+                            best_move = finder.bestmove()
+                            got_polyglot_result = (best_move is not None)
+                        
+                        if got_polyglot_result:
+                            hint_text = best_move
+                        else:
+                            proc = stockfish.EngineThread(
+                                [_move.uci() for _move in chessboard.move_stack],
+                                difficulty + 1,
+                                engine=engine,
+                                starting_position=starting_position,
+                                chess960=chess960,
+                                syzygy_path=args.syzygy if enable_syzygy else None,
+                            )
+                            proc.start()
+                            # print "continues..."
 
-                        show_board(chessboard.fen(), 178, 40)
-                        pygame.draw.rect(
-                            scr,
-                            lightgrey,
-                            (
-                                229 * x_multiplier,
-                                79 * y_multiplier,
-                                200 * x_multiplier,
-                                78 * y_multiplier,
-                            ),
-                        )
-                        pygame.draw.rect(
-                            scr,
-                            white,
-                            (
-                                227 * x_multiplier,
-                                77 * y_multiplier,
-                                200 * x_multiplier,
-                                78 * y_multiplier,
-                            ),
-                        )
-                        txt_large("Analysing...", 227 + 55, 77 + 8, grey)
-                        show("force-move", 247, 77 + 39)
-                        pygame.display.flip()  # copy to screen
+                            show_board(chessboard.fen(), 178, 40)
+                            pygame.draw.rect(
+                                scr,
+                                lightgrey,
+                                (
+                                    229 * x_multiplier,
+                                    79 * y_multiplier,
+                                    200 * x_multiplier,
+                                    78 * y_multiplier,
+                                ),
+                            )
+                            pygame.draw.rect(
+                                scr,
+                                white,
+                                (
+                                    227 * x_multiplier,
+                                    77 * y_multiplier,
+                                    200 * x_multiplier,
+                                    78 * y_multiplier,
+                                ),
+                            )
+                            txt_large("Analysing...", 227 + 55, 77 + 8, grey)
+                            show("force-move", 247, 77 + 39)
+                            pygame.display.flip()  # copy to screen
 
-                        got_fast_result = False
-                        while proc.is_alive():  # thinking
-                            # event from system & keyboard
-                            for event in pygame.event.get():  # all values in event list
-                                if event.type == pygame.QUIT:
-                                    publisher.stop()
-                                    pygame.display.quit()
-                                    pygame.quit()
-                                    sys.exit()
+                            got_fast_result = False
+                            while proc.is_alive():  # thinking
+                                # event from system & keyboard
+                                for event in pygame.event.get():  # all values in event list
+                                    if event.type == pygame.QUIT:
+                                        publisher.stop()
+                                        pygame.display.quit()
+                                        pygame.quit()
+                                        sys.exit()
 
-                            x, y = pygame.mouse.get_pos()  # mouse position
-                            x = x / x_multiplier
-                            y = y / y_multiplier
+                                x, y = pygame.mouse.get_pos()  # mouse position
+                                x = x / x_multiplier
+                                y = y / y_multiplier
 
-                            mbutton = pygame.mouse.get_pressed()
-                            # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
-                            # pygame.display.flip() # copy to screen
-                            if (
-                                mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
-                            ):  # pressed Force move button
-                                proc.stop()
-                                proc.join()
+                                mbutton = pygame.mouse.get_pressed()
+                                # txt_large("%d %d %s"%(x,y,str(mbutton)),0,0,black)
+                                # pygame.display.flip() # copy to screen
+                                if (
+                                    mbutton[0] == 1 and 249 < x < 404 and 120 < y < 149
+                                ):  # pressed Force move button
+                                    proc.stop()
+                                    proc.join()
+                                    hint_text = proc.best_move
+                                    got_fast_result = True
+                                    mbutton = (0, 0, 0)
+                                    break
+
+                            if not got_fast_result:
                                 hint_text = proc.best_move
-                                got_fast_result = True
-                                mbutton = (0, 0, 0)
-                                break
-
-                        if not got_fast_result:
-                            hint_text = proc.best_move
 
                     if 6 < x < 78 and 244 < y < 272:  # Save button
                         window = "save"
@@ -1448,6 +1472,37 @@ while 1:
                             current_engine_page += 1
                         elif action == "prev_page":
                             current_engine_page -= 1
+                        break
+        elif dialog == "select_book":
+            show("hide_back", 0, 0)
+            txt_large("Select book:", 250, 20, black)
+            button_coords = []
+            book_button_x = 250
+            book_button_y = 50
+            book_button_vertical_margin = 5
+            book_list = get_book_list()
+            for book_name in book_list:
+                book_button_area = button(
+                    book_name,
+                    book_button_x,
+                    book_button_y,
+                    text_color=white,
+                    color=darkergreen if book == book_name else grey,
+                )
+                button_coords.append(("select_book", book_name, book_button_area))
+                _, _, _, book_button_y = book_button_area
+                book_button_y += book_button_vertical_margin
+            done_button_area = button(
+                "Done", 415, 275, color=darkergreen, text_color=white
+            )
+            button_coords.append(("select_book_done", None, done_button_area))
+            if left_click:
+                for action, value, (lx, ty, rx, by) in button_coords:
+                    if lx < x < rx and ty < y < by:
+                        if action == "select_book":
+                            book = value
+                        elif action == "select_book_done":
+                            dialog = ""
                         break
         else:
             txt_large("Mode:", 150, 20, grey)
@@ -1516,6 +1571,7 @@ while 1:
                 depth_less_button_area = button("<", 189, 156, text_color=grey, color=white)
                 depth_more_button_area = button(">", 265, 156, text_color=grey, color=white)
                 txt_large("Engine: {}".format(engine), 150, 100, grey)
+                txt("Book: {}".format(book), 10, 165, grey)
                 pygame.draw.rect(
                     scr,
                     darkergreen,
@@ -1527,6 +1583,17 @@ while 1:
                     ),
                 )
                 txt_large("...", 445, 100, white)
+                pygame.draw.rect(
+                    scr,
+                    darkergreen,
+                    (
+                        10 * x_multiplier,
+                        142 * y_multiplier,
+                        25 * x_multiplier,
+                        25 * y_multiplier,
+                    ),
+                )
+                txt_large("...", 15, 140, white)
                 x0 = 213
                 if not human_game:
                     if difficulty == 0:
@@ -1579,6 +1646,9 @@ while 1:
                     if 440 < x < 465:
                         dialog = "select_engine"
                         current_engine_page = 0
+                if 142 < y < 167:
+                    if 10 < x < 35:
+                        dialog = "select_book"
                 if 268 < y < (275 + 31):
                     if 14 < x < 109:  # <- back
                         window = "home"
