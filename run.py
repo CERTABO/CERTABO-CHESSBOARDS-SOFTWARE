@@ -1143,7 +1143,7 @@ while 1:
                     tt.sleep(0.05)
 
                 if not got_fast_result:
-                    if ai_move is None:
+                    if proc.best_move is None:
                         ai_move = None
                     else:
                         ai_move = proc.best_move.lower()
