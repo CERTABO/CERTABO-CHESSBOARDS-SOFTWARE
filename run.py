@@ -1143,7 +1143,25 @@ while 1:
                     tt.sleep(0.05)
 
                 if not got_fast_result:
-                    ai_move = proc.best_move.lower()
+                    if ai_move is None:
+                        ai_move = None
+                    else:
+                        ai_move = proc.best_move.lower()
+
+                if ai_move is None:
+                    proc1 = stockfish.EngineThread(
+                        [_move.uci() for _move in chessboard.move_stack],
+                        difficulty + 1,
+                        engine="stockfish",
+                        starting_position=starting_position,
+                        chess960=chess960,
+                        syzygy_path=args.syzygy if enable_syzygy else None,
+                    )
+                    proc1.start()
+                    proc1.join()
+                    while proc1.is_alive():
+                        tt.sleep(0.05)
+                    ai_move = proc1.best_move.lower()
 
                 play_sound('move')
                 logging.info("AI move: %s", ai_move)
@@ -1402,6 +1420,21 @@ while 1:
 
                         if not got_fast_result:
                             hint_text = proc.best_move
+                        
+                        if hint_text is None:
+                            proc1 = stockfish.EngineThread(
+                                [_move.uci() for _move in chessboard.move_stack],
+                                difficulty + 1,
+                                engine="stockfish",
+                                starting_position=starting_position,
+                                chess960=chess960,
+                                syzygy_path=args.syzygy if enable_syzygy else None,
+                            )
+                            proc1.start()
+                            proc1.join()
+                            while proc1.is_alive():
+                                tt.sleep(0.05)
+                            hint_text = proc1.best_move
 
                     if 6 < x < 78 and 244 < y < 272:  # Save button
                         window = "save"
