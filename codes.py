@@ -137,10 +137,15 @@ def statistic_processing(samples, show_print):
         known_cells = []
         for cell in cells:  # stack of history of cell codes for one cell
             name = get_name(cell)
-            if name == "-":
-                cell = 0, 0, 0, 0, 0
             if name != "":
                 known_cells.append(cell)
+            elif name == "-":           
+                cell = 0, 0, 0, 0, 0
+            # [edit] ignore unknown codes and replace it with 0
+            else:            	
+               	cell = 0, 0, 0, 0, 0            	    
+               	known_cells.append(cell)
+            # [endedit]   	
 
         if len(known_cells) == 0:
             logging.info(

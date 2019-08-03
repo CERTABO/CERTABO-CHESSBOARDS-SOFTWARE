@@ -5,7 +5,7 @@ import appdirs
 
 ENGINE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "engines")
 BOOK_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "books")
-BASE_PORT = 3002
+BASE_PORT = 3102
 
 if platform.system() == "Windows":
     import ctypes.wintypes

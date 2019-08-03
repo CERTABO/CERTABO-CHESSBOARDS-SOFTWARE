@@ -21,7 +21,7 @@ else:
     print('No port argument speicified')
 
 board_listen_port, gui_listen_port = port2udp(port2number(args.port))
-
+print('USBTOOL: Board listen port: %s, gui listen port: %s' % (board_listen_port, gui_listen_port))
 uart_ok = False
 try:
     uart = serial.Serial(args.port, 38400, timeout=2.5)  # 0-COM1, 1-COM2 / speed /

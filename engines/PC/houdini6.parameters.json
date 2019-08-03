@@ -1,0 +1,15 @@
+{
+"Strength": 70, 
+"Slow Mover": 80, 
+"Hash": 16, 
+"UCI_Chess960": "false", 
+"Move Overhead": 30, 
+"MultiPV": 1, 
+"Contempt Factor": 0, 
+"Write Debug Log": "false", 
+"Threads": 1, 
+"Minimum Thinking Time": 20, 
+"Min Split Depth": 0, 
+"Contempt": 0
+  
+}

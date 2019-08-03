@@ -65,6 +65,7 @@ else:
 port = port2number(portname)
 
 board_listen_port, gui_listen_port = port2udp(port)
+logging.info('GUI: Board listen port: %s, gui listen port: %s', board_listen_port, gui_listen_port)
 
 SEND_SOCKET = ("127.0.0.1", board_listen_port)  # send to
 LISTEN_SOCKET = ("127.0.0.1", gui_listen_port)  # listen to
@@ -105,7 +106,10 @@ def txt_large(s, x, y, color):
 def do_poweroff(proc):
     if args.publish:
         publisher.stop()
-    subprocess.call(["taskkill", "/F", "/T", "/PID", str(proc.pid)])
+    if platform.system() == "Windows":
+        subprocess.call(["taskkill", "/F", "/T", "/PID", str(proc.pid)])
+    else:
+        subprocess.call(["kill", str(proc.pid)])
     pygame.display.quit()
     pygame.quit()
     sys.exit()
@@ -559,7 +563,8 @@ new_setup = False
 current_engine_page = 0
 
 
-def send_leds(message='\x00' * 8):
+def send_leds(message='\x00' * 8): 
+    
     logging.info("Sending leds: {}".format([ord(c) for c in message]))
     sock.sendto(message, SEND_SOCKET)
 
@@ -1143,7 +1148,7 @@ while 1:
                             got_fast_result = True
                             break
 
-                        tt.sleep(0.05)
+                        tt.sleep(0.5)
 
                     if not got_fast_result:
                         ai_move = proc.best_move.lower()
@@ -1164,8 +1169,10 @@ while 1:
                     elif j == i:
                         message += chr(value)
                     else:
-                        message += chr(value_source)
+                        message += chr(value_source)        
+                        
                 send_leds(message)
+
 
                 # banner_do_move = True
                 if not args.robust:

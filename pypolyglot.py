@@ -2,7 +2,9 @@ import os
 import chess
 import chess.polyglot
 import logging
+import time as tt
 from constants import BOOK_PATH
+
 
 TO_EXE = True
 
@@ -19,6 +21,7 @@ class Finder:
         self.reader = chess.polyglot.open_reader(self.book_path)
         
     def bestmove(self):
+        tt.sleep(0.5)
         logging.info("Polyglot finding...")
         entry = self.reader.get(self.board)
         if entry is not None:
