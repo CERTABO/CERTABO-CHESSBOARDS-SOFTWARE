@@ -56,7 +56,7 @@ parser.add_argument("--game-key", help="Game key")
 parser.add_argument("--robust", help="Robust", action="store_true")
 parser.add_argument("--syzygy", help="Syzygy path", default=os.path.join(CERTABO_DATA_PATH, 'syzygy'))
 parser.add_argument("--hide-cursor", help="Hide cursor", action="store_true")
-parser.add_argument("--max-depth", help="Maximum depth", default=MAX_DEPTH_DEFAULT)
+parser.add_argument("--max-depth", help="Maximum depth", type=int, default=MAX_DEPTH_DEFAULT)
 args = parser.parse_args()
 
 if args.port is None:
