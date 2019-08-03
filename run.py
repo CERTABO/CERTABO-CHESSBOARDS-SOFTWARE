@@ -24,7 +24,7 @@ import subprocess
 import logging
 import logging.handlers
 import Queue
-from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH
+from constants import CERTABO_SAVE_PATH, CERTABO_DATA_PATH, MAX_DEPTH_DEFAULT
 
 
 for d in (CERTABO_SAVE_PATH, CERTABO_DATA_PATH):
@@ -56,6 +56,7 @@ parser.add_argument("--game-key", help="Game key")
 parser.add_argument("--robust", help="Robust", action="store_true")
 parser.add_argument("--syzygy", help="Syzygy path", default=os.path.join(CERTABO_DATA_PATH, 'syzygy'))
 parser.add_argument("--hide-cursor", help="Hide cursor", action="store_true")
+parser.add_argument("--max-depth", help="Maximum depth", default=MAX_DEPTH_DEFAULT)
 args = parser.parse_args()
 
 if args.port is None:
@@ -1640,9 +1641,9 @@ while 1:
                     if difficulty > 0:
                         difficulty -= 1
                     else:
-                        difficulty = 19
+                        difficulty = args.max_depth
                 if coords_in(x, y, depth_more_button_area):
-                    if difficulty < 19:
+                    if difficulty < args.max_depth:
                         difficulty += 1
                     else:
                         difficulty = 0

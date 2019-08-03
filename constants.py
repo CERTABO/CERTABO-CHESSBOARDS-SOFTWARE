@@ -26,9 +26,10 @@ else:
 CERTABO_SAVE_PATH = os.path.join(MY_DOCUMENTS, "Certabo Saved Games")
 CERTABO_DATA_PATH = appdirs.user_data_dir("GUI", "Certabo")
 
+MAX_DEPTH_DEFAULT = 20
+
 if __name__ == "__main__":
     print("ENGINE_PATH", ENGINE_PATH)
     print("MY_DOCUMENTS", MY_DOCUMENTS)
     print("CERTABO_DATA_PATH", CERTABO_DATA_PATH)
     print("CERTABO_SAVE_PATH", CERTABO_SAVE_PATH)
-
