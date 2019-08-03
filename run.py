@@ -240,26 +240,6 @@ names = (
     "black",
     "confirm",
     "delete-game",
-    "depth1",
-    "depth2",
-    "depth3",
-    "depth4",
-    "depth5",
-    "depth6",
-    "depth7",
-    "depth8",
-    "depth9",
-    "depth10",
-    "depth11",
-    "depth12",
-    "depth13",
-    "depth14",
-    "depth15",
-    "depth16",
-    "depth17",
-    "depth18",
-    "depth19",
-    "depth20",
     "done",
     "force-move",
     "select-depth",
@@ -1575,7 +1555,7 @@ while 1:
                 depth_more_button_area = None
             else:
                 txt_large("Depth:", 203, 130, green)
-                show("depth" + str(difficulty + 1), 214, 151)
+                button('{:02d}'.format(difficulty + 1), 220, 157, color=grey, text_color=white)
                 depth_less_button_area = button("<", 189, 156, text_color=grey, color=white)
                 depth_more_button_area = button(">", 265, 156, text_color=grey, color=white)
                 txt_large("Engine: {}".format(engine), 150, 100, grey)
@@ -1641,9 +1621,9 @@ while 1:
                     if difficulty > 0:
                         difficulty -= 1
                     else:
-                        difficulty = args.max_depth
+                        difficulty = args.max_depth - 1
                 if coords_in(x, y, depth_more_button_area):
-                    if difficulty < args.max_depth:
+                    if difficulty < args.max_depth - 1:
                         difficulty += 1
                     else:
                         difficulty = 0
