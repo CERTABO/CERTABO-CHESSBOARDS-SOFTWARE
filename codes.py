@@ -40,6 +40,9 @@ def load_calibration(port):
         )
     except (IOError, OSError):
         return False
+    except ValueError:
+        logging.info("Can't load calibration data")
+        return False
     return True
 
 
