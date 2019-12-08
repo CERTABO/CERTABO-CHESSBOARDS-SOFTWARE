@@ -1,5 +1,11 @@
 from __future__ import print_function
-import cPickle as pickle
+
+import sys
+if (sys.version_info.major == 3):
+    import _pickle as pickle
+else:
+    import cPickle as pickle
+
 import os  # , Queue
 import time
 import threading
