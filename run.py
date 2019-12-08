@@ -245,7 +245,7 @@ def do_poweroff(proc):
     sys.exit()
 
 
-f = open("screen.ini", "rb")
+f = open("screen.ini", "r")
 try:
     XRESOLUTION = int(f.readline().split(" #")[0])
     logging.info("%s", XRESOLUTION)
@@ -689,7 +689,7 @@ calibration_samples_counter = 0
 calibration_samples = []
 
 usb_data_history_depth = 3
-usb_data_history = range(usb_data_history_depth)
+usb_data_history = list(range(usb_data_history_depth))
 usb_data_history_filled = False
 usb_data_history_i = 0
 move_detect_tries = 0
@@ -704,12 +704,12 @@ new_setup = False
 current_engine_page = 0
 
 
-def send_leds(message='\x00' * 8): 
+def send_leds(message=b'\x00' * 8): 
     
     # logging.info("Sending leds: {}".format([ord(c) for c in message]))
     sock.sendto(message, SEND_SOCKET)
 
-send_leds('\xff' * 8)
+send_leds(b'\xff' * 8)
 
 scr.fill(white)  # clear screen
 show("start-up-logo", 7, 0)
@@ -741,7 +741,7 @@ while True:
     if recv_ready:
         try:
             data, addr = sock.recvfrom(2048)
-            usb_data = map(int, data.split(" "))
+            usb_data = list(map(int, data.decode().split(" ")))
             new_usb_data = True
             usb_data_exist = True
 
@@ -781,7 +781,7 @@ while True:
 
             if DEBUG:
                 logging.info("usb_data_history_i = %s", usb_data_history_i)
-            usb_data_history[usb_data_history_i] = usb_data[:]
+            usb_data_history[usb_data_history_i] = list(usb_data)[:]
             usb_data_history_i += 1
             if usb_data_history_filled:
                 usb_data_processed = codes.statistic_processing(usb_data_history, False)
@@ -940,7 +940,7 @@ while True:
                 dialog = "delete"  # start delete confirm dialog on the page
 
             if 107 < x < 442 and 40 < y < 274:  # pressed on file list
-                i = (int(y) - 41) / 29
+                i = int((int(y) - 41) / 29)
                 if i < len(saved_files):
                     resume_file_selected = i
 
@@ -951,7 +951,7 @@ while True:
                         CERTABO_SAVE_PATH,
                         saved_files[resume_file_selected + resume_file_start],
                     ),
-                    "rb",
+                    "r",
                 ) as f:
                     _game = chess.pgn.read_game(f)
                 if _game:
@@ -1095,7 +1095,7 @@ while True:
                 usb_data_history_i = 0
 
                 # print "usb_data_history_i = ",usb_data_history_i
-            usb_data_history[usb_data_history_i] = usb_data[:]
+            usb_data_history[usb_data_history_i] = list(usb_data)[:]
             usb_data_history_i += 1
             if usb_data_history_filled:
                 usb_data_processed = codes.statistic_processing(usb_data_history, False)
@@ -1327,16 +1327,16 @@ while True:
                     i, value, i_source, value_source = codes.move2led(
                         ai_move, rotate180
                     )  # error here if checkmate before
-                    message = ""
+                    message = bytearray()
                     for j in range(8):
                         if j != i and j != i_source:
-                            message += chr(0)
+                            message.append(0)
                         elif j == i and j == i_source:
-                            message += chr(value + value_source)
+                            message.append(value + value_source)
                         elif j == i:
-                            message += chr(value)
+                            message.append(value)
                         else:
-                            message += chr(value_source)
+                            message.append(value_source)
 
                     send_leds(message)
 
