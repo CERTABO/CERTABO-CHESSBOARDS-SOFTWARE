@@ -1,6 +1,10 @@
 import threading
 import requests
-import Queue
+import sys
+if (sys.version_info.major == 3):
+    import queue as Queue
+else:
+    import Queue
 import time
 import logging
 

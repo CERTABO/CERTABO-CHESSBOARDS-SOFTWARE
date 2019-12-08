@@ -1,6 +1,9 @@
 import os
-
-import Queue
+import sys
+if (sys.version_info.major == 3):
+    import queue as Queue
+else:
+    import Queue
 import logging
 import re
 import subprocess

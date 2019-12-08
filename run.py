@@ -24,7 +24,10 @@ import pypolyglot
 import subprocess
 import logging
 import logging.handlers
-import Queue
+if (sys.version_info.major == 3):
+    import queue as Queue
+else:
+    import Queue
 from collections import deque
 import random
 
