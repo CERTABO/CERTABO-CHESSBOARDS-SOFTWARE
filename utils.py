@@ -68,12 +68,19 @@ def find_port():
 
 if platform.system() == 'Windows':
     def get_engine_list():
-        result = []
+        result_exe = []
+        result_rom = []
         for filename in os.listdir(ENGINE_PATH):
+            if filename == 'MessChess':
+                roms = os.path.join(ENGINE_PATH, filename, 'roms')
+                for rom in os.listdir(roms):
+                    result_rom.append('rom-' + os.path.splitext(rom)[0])
+
             if filename.endswith('.exe'):
-                result.append(filename[:-4])
-        result.sort()
-        return result
+                result_exe.append(os.path.splitext(filename)[0])
+        result_exe.sort()
+        result_rom.sort()
+        return result_exe + result_rom
 else:
     def get_engine_list():
         result = []
