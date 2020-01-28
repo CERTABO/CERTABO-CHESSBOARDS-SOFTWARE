@@ -26,7 +26,7 @@ class Finder:
         entry = self.reader.get(self.board)
         if entry is not None:
             logging.info("Polyglot found")
-            best_move = entry.move().uci()
+            best_move = entry.move.uci()
         else:
             logging.info("Polyglot not found")
             best_move = None

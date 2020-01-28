@@ -962,7 +962,7 @@ while True:
                     play_white = _game.headers["White"] == "Human"
                     starting_position = _game.board().fen()
 
-                    logging.info("Move history - %s", [_move.uci() for _move in _game.main_line()])
+                    logging.info("Move history - %s", [_move.uci() for _move in _game.mainline_moves()])
                     previous_board_click = ""
                     board_click = ""
                     do_ai_move = False
