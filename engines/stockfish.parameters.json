@@ -8,7 +8,7 @@
 "Write Debug Log": "false", 
 "Threads": 1, 
 "Skill Level": 20, 
-"Minimum Thinking Time": 20, 
+"Minimum Thinking Time": 200, 
 "Min Split Depth": 0, 
 "Contempt": 0
   

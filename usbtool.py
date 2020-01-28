@@ -3,6 +3,7 @@ import serial.tools.list_ports
 DEBUG = False
 
 # for exe compile run python 1.py py2exe
+import sys
 import argparse
 import datetime
 import time
@@ -140,4 +141,4 @@ while 1:
                     counter = 0
                     message = ""
                 else:
-                    message += c
+                    message = c
