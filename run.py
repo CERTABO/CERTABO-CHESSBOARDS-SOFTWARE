@@ -6,6 +6,7 @@ DEBUG = False
 DEBUG_FAST = False
 
 TO_EXE = getattr(sys, "frozen", False)
+APP_NAME = "CERTABO"
 
 XRESOLUTION = 1920
 
@@ -245,7 +246,13 @@ def do_poweroff(proc):
     sys.exit()
 
 
-f = open("screen.ini", "r")
+if getattr( sys, 'frozen', False ):
+    bundle_dir = sys._MEIPASS + "/"
+else :
+    bundle_dir = os.path.dirname(os.path.abspath(__file__))+ "/"
+
+f = open(bundle_dir+"screen.ini", "r")
+
 try:
     XRESOLUTION = int(f.readline().split(" #")[0])
     logging.info("%s", XRESOLUTION)
@@ -279,22 +286,35 @@ grey = 100, 100, 100
 lightgrey = 190, 190, 190
 lightestgrey = 230, 230, 230
 
+
 if TO_EXE:
     if platform.system() == "Windows":
         usb_command = ["usbtool.exe"]
     else:
-        usb_command = ["./usbtool"]
+        
+        if getattr(sys, 'frozen', False):
+            # we are running in a bundle
+                usb_command = ["python3", sys._MEIPASS + "/usbtool.py"]
+        else:
+                # we are running in a normal Python environment
+                bundle_dir = os.path.dirname(os.path.abspath(__file__))
+                usb_command = ["python3 ", bundle_dir + "/usbtool.py"]
+        #if APP_NAME+'.app/Contents/Resources' in str(os.getcwd()):
+        
+        #else:
+        #    usb_command = ["./usbtool"]
 else:
     usb_command = ["python", "usbtool.py"]
 if portname is not None:
     usb_command.extend(["--port", portname])
+
 logging.debug("Calling %s", usb_command)
 usb_proc = subprocess.Popen(usb_command)
 
 if not DEBUG_FAST:
     tt.sleep(1)  # time to make stable COMx connection
-
-icon = pygame.image.load('certabo.png')
+print(pygame.image.get_extended())
+icon = pygame.image.load(bundle_dir+'certabo.png')
 pygame.display.set_icon(icon)
 
 os.environ["SDL_VIDEO_WINDOW_POS"] = "90,50"
@@ -331,8 +351,10 @@ else:
     )
 
 pygame.display.set_caption("Chess software")
-font = pygame.font.Font("Fonts//OpenSans-Regular.ttf", int(13 * y_multiplier))
-font_large = pygame.font.Font("Fonts//OpenSans-Regular.ttf", int(19 * y_multiplier))
+font = pygame.font.Font(bundle_dir+"Fonts/OpenSans-Regular.ttf", int(13 * y_multiplier))
+font_large = pygame.font.Font(bundle_dir+"Fonts/OpenSans-Regular.ttf", int(19 * y_multiplier))
+
+    
 
 scr.fill(black)  # clear screen
 pygame.display.flip()  # copy to screen
@@ -398,11 +420,11 @@ names = (
 sprite = {}
 for name in names:
     if XRESOLUTION == 480:
-        path = "sprites//"
+        path = bundle_dir+"sprites//"
     elif XRESOLUTION == 1920:
-        path = "sprites_1920//"
+        path = bundle_dir+"sprites_1920//"
     elif XRESOLUTION == 1366:
-        path = "sprites_1380//"
+        path = bundle_dir+"sprites_1380//"
     sprite[name] = pygame.image.load(path + name + ".png")
 
 

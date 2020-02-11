@@ -16,3 +16,7 @@ record.bin
 local_constants.py
 
 *.pyc
+
+.vscode/
+.DS_Store
+myenv/

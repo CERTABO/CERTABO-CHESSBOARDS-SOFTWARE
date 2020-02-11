@@ -47,12 +47,15 @@ def port2udp(port_number):
 def find_port():
     logging.debug('Searching for port...')
     for port in comports():
+        
         device = port[0]
         if 'bluetooth' in device.lower():
             continue
-        if port.pid != 0xea60 and port.vid != 0x10c4:
-            logging.debug(f'skipping: {port.hwid}')
-            continue
+        
+        # if port.pid != 0xea60 and port.vid != 0x10c4:
+        #     logging.debug('skipping: {0}'.format(port.hwid))
+        #     continue
+        
         try:
             logging.debug('Trying %s', device)
             s = serial.Serial(device)
