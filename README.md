@@ -1,12 +1,13 @@
 CERTABO CHESS BOARD SOFTWARE
 https://python-chess.readthedocs.io/en/latest/polyglot.html
+Those revision are for running the software on very latest Catalina release
 
-pip2 install --user pygame
-pip2 install --user pystockfish
-pip2 install --user pyserial
-pip2 install --user python-chess==0.23.11
-pip2 install --user appdirs
-pip2 install --user requests
-pip2 install --user win32com
+pip3 install --user pygame==2.0.0.dev6 
+pip3 install --user pystockfish
+pip3 install --user pyserial
+pip3 install --user python-chess
+pip3 install --user appdirs
+pip3 install --user requests
+pip3 install --user win32com
 
-python2 run.py
+python3 run.py
