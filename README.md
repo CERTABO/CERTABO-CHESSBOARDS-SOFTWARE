@@ -1,5 +1,5 @@
 CERTABO CHESS BOARD SOFTWARE
-https://python-chess.readthedocs.io/en/latest/polyglot.html
+This release include support for polyglot book, time + increment, endgame table base and several other improvment
 Those revision are for running the software on very latest Catalina release
 
 pip3 install --user pygame==2.0.0.dev6 
