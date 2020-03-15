@@ -1,6 +1,6 @@
 CERTABO CHESS BOARD SOFTWARE
 https://python-chess.readthedocs.io/en/latest/polyglot.html
-This version has been ported to Python3 and it is working cross platform on Windows, Unix any distro and Mac up to latest High Sierra.
+This version has been ported to Python3 and it is working cross platform on Windows, Unix any distro and Mac up to Mojave.
 note: For Catalina users please refer to Mac-Catalina branch where the software has been adapted for it. Basically latest pygame release is not compatible with Catalina (for user want to run and compile on Catalina please  replace pip3 install --user pygame with the following  pip3 install --user pygame==2.0.0.dev6)
 
 pip3 install --user pygame
