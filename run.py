@@ -285,7 +285,7 @@ if TO_EXE:
     else:
         usb_command = ["./usbtool"]
 else:
-    usb_command = ["python", "usbtool.py"]
+    usb_command = ["python3", "usbtool.py"]
 if portname is not None:
     usb_command.extend(["--port", portname])
 logging.debug("Calling %s", usb_command)
